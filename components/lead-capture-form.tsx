@@ -11,14 +11,8 @@ type LeadFormValues = {
   message: string;
 };
 
-const inputBase =
-  "w-full rounded-xl border border-graphite/15 bg-stone-white px-4 py-2.5 text-sm text-graphite placeholder:text-warm-mist/60 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/25";
-
-const labelBase = "flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-graphite/70";
-
 export function LeadCaptureForm() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [isSuccess, setIsSuccess] = useState(false);
   const {
     register,
     handleSubmit,
@@ -28,11 +22,12 @@ export function LeadCaptureForm() {
 
   const onSubmit = async (values: LeadFormValues) => {
     setStatusMessage(null);
-    setIsSuccess(false);
 
     const response = await fetch("/api/lead", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(values),
     });
 
@@ -40,50 +35,33 @@ export function LeadCaptureForm() {
 
     if (!response.ok) {
       setStatusMessage(payload.message ?? "Unable to submit your request.");
-      setIsSuccess(false);
       return;
     }
 
-    setStatusMessage("Thanks. We will review your project and come back with next steps shortly.");
-    setIsSuccess(true);
+    setStatusMessage("Thanks! Our team will contact you shortly.");
     reset();
   };
 
   return (
-    <section className="rounded-3xl border border-graphite/8 bg-parchment p-8 shadow-sm sm:p-12" aria-labelledby="lead-form-heading">
-      <div className="mb-10 space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-          Fixed-Price Quotes
-        </p>
-        <h2
-          id="lead-form-heading"
-          className="text-3xl font-bold tracking-tight text-graphite sm:text-4xl"
-        >
-          Check Our Availability
-        </h2>
-        <p className="max-w-md text-sm leading-relaxed text-warm-mist sm:text-base">
-          Tell us what you are planning and we will come back with a clear next step, an honest timeframe, and a fixed-price quote where appropriate.
-        </p>
-      </div>
+    <section className="space-y-4 rounded-2xl border border-dark-slate/10 bg-off-white p-6 sm:p-8">
+      <h2 className="text-2xl font-semibold text-dark-slate sm:text-3xl">Lead Capture</h2>
+      <p className="text-sm text-steel-gray sm:text-base">
+        Tell us about your project and we will schedule a consultation.
+      </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-5 sm:grid-cols-2">
-        <label className={labelBase}>
-          Full Name
+      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 sm:grid-cols-2">
+        <label className="space-y-1 text-sm font-medium text-dark-slate">
+          Name
           <input
             {...register("name", { required: "Name is required." })}
-            className={inputBase}
-            placeholder="Jane Smith"
-            autoComplete="name"
+            className="w-full rounded-md border border-dark-slate/20 bg-white px-3 py-2 text-sm outline-none ring-industrial-orange focus:ring-2"
+            placeholder="John Smith"
           />
-          {errors.name ? (
-            <p className="text-xs font-normal normal-case tracking-normal text-rose-600" role="alert">
-              {errors.name.message}
-            </p>
-          ) : null}
+          {errors.name ? <p className="text-xs text-industrial-orange">{errors.name.message}</p> : null}
         </label>
 
-        <label className={labelBase}>
-          Email Address
+        <label className="space-y-1 text-sm font-medium text-dark-slate">
+          Email
           <input
             {...register("email", {
               required: "Email is required.",
@@ -92,50 +70,41 @@ export function LeadCaptureForm() {
                 message: "Enter a valid email address.",
               },
             })}
-            className={inputBase}
+            className="w-full rounded-md border border-dark-slate/20 bg-white px-3 py-2 text-sm outline-none ring-industrial-orange focus:ring-2"
             placeholder="you@example.com"
             type="email"
-            autoComplete="email"
           />
-          {errors.email ? (
-            <p className="text-xs font-normal normal-case tracking-normal text-rose-600" role="alert">
-              {errors.email.message}
-            </p>
-          ) : null}
+          {errors.email ? <p className="text-xs text-industrial-orange">{errors.email.message}</p> : null}
         </label>
 
-        <label className={labelBase}>
-          Phone <span className="font-normal normal-case tracking-normal text-warm-mist/60">(optional)</span>
+        <label className="space-y-1 text-sm font-medium text-dark-slate">
+          Phone
           <input
             {...register("phone")}
-            className={inputBase}
-            placeholder="+44 7700 000 000"
+            className="w-full rounded-md border border-dark-slate/20 bg-white px-3 py-2 text-sm outline-none ring-industrial-orange focus:ring-2"
+            placeholder="+1 555 010 0200"
             type="tel"
-            autoComplete="tel"
           />
         </label>
 
-        <label className={labelBase}>
+        <label className="space-y-1 text-sm font-medium text-dark-slate">
           Project Type
           <select
             {...register("projectType", { required: "Select a project type." })}
-            className={inputBase}
+            className="w-full rounded-md border border-dark-slate/20 bg-white px-3 py-2 text-sm outline-none ring-industrial-orange focus:ring-2"
           >
             <option value="">Select an option</option>
-            <option value="kitchen-fitting">Kitchen fitting</option>
-            <option value="home-renovation">Home renovation</option>
-            <option value="extension">Extension</option>
-            <option value="bathroom-renovation">Bathroom renovation</option>
-            <option value="general-building-works">General building works</option>
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+            <option value="industrial">Industrial</option>
+            <option value="renovation">Renovation</option>
           </select>
           {errors.projectType ? (
-            <p className="text-xs font-normal normal-case tracking-normal text-rose-600" role="alert">
-              {errors.projectType.message}
-            </p>
+            <p className="text-xs text-industrial-orange">{errors.projectType.message}</p>
           ) : null}
         </label>
 
-        <label className={`${labelBase} sm:col-span-2`}>
+        <label className="space-y-1 text-sm font-medium text-dark-slate sm:col-span-2">
           Message
           <textarea
             {...register("message", {
@@ -145,31 +114,24 @@ export function LeadCaptureForm() {
                 message: "Please enter at least 10 characters.",
               },
             })}
-            className={`${inputBase} h-32 resize-none`}
-            placeholder="Tell us about the property, the work you need, and when you would like to start."
+            className="h-28 w-full rounded-md border border-dark-slate/20 bg-white px-3 py-2 text-sm outline-none ring-industrial-orange focus:ring-2"
+            placeholder="Tell us about your site, timeline, and requirements."
           />
           {errors.message ? (
-            <p className="text-xs font-normal normal-case tracking-normal text-rose-600" role="alert">
-              {errors.message.message}
-            </p>
+            <p className="text-xs text-industrial-orange">{errors.message.message}</p>
           ) : null}
         </label>
 
-        <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center">
+        <div className="sm:col-span-2">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center rounded-xl bg-graphite px-7 py-3 text-sm font-semibold text-stone-white shadow-sm transition hover:bg-graphite/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-parchment disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center rounded-md bg-industrial-orange px-5 py-3 text-sm font-semibold text-off-white transition hover:bg-industrial-orange/90 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSubmitting ? "Sending..." : "Get Your Fixed-Price Quote"}
+            {isSubmitting ? "Sending..." : "Submit Inquiry"}
           </button>
-
           {statusMessage ? (
-            <p
-              className={`text-sm ${isSuccess ? "text-sage" : "text-rose-600"}`}
-              role="status"
-              aria-live="polite"
-            >
+            <p className="mt-3 text-sm text-steel-gray" role="status" aria-live="polite">
               {statusMessage}
             </p>
           ) : null}

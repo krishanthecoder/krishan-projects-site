@@ -1,4 +1,3 @@
-import { HeroSection } from "@/components/hero-section";
 import { LeadCaptureForm } from "@/components/lead-capture-form";
 import { ProjectGallery } from "@/components/project-gallery";
 import { ProjectHero } from "@/components/project-hero";
@@ -11,6 +10,7 @@ function formatPostedDate(dateString?: string) {
   if (!dateString) return null;
   const parsed = new Date(dateString);
   if (Number.isNaN(parsed.getTime())) return null;
+
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "long",
@@ -21,7 +21,7 @@ function formatPostedDate(dateString?: string) {
 export default async function Home() {
   const latestProjects = await getLatestProjectsForGallery();
   const testimonials = await getAllTestimonials();
-
+  const featuredProject = latestProjects[0] ?? null;
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Krishan Construction Group";
   const serviceArea = (process.env.NEXT_PUBLIC_BUSINESS_SERVICE_AREAS ?? "Vancouver, Surrey, Burnaby")
     .split(",")
@@ -30,113 +30,100 @@ export default async function Home() {
   const phoneNumber = process.env.NEXT_PUBLIC_BUSINESS_PHONE ?? "+1-604-000-0000";
   const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL ?? "https://www.krishanconstruction.com";
 
-  // Compute aggregate rating for the hero trust badge
-  const reviewCount = testimonials.length;
-  const averageRating =
-    reviewCount > 0
-      ? testimonials.reduce((sum, t) => sum + t.rating, 0) / reviewCount
-      : null;
-
-  // Pass the first two project images as hero side panels
-  const heroImages = [latestProjects[0]?.image, latestProjects[1]?.image];
-
   return (
-    <main id="main-content" className="min-h-screen bg-stone-white">
+    <main id="main-content" className="min-h-screen bg-off-white px-6 py-16 sm:px-10">
       <LocalBusinessJsonLd
         businessName={businessName}
         serviceArea={serviceArea}
         phoneNumber={phoneNumber}
         websiteUrl={websiteUrl}
       />
+      <section className="mx-auto max-w-6xl space-y-10 rounded-2xl border border-dark-slate/10 bg-white p-8 shadow-sm sm:p-12">
+        <ScrollReveal>
+          <SectionTitle
+            eyebrow="Built for Endurance"
+            title="High-End Construction Digital Presence"
+            description="A production-ready Next.js starter with App Router, TypeScript, and a premium construction color system."
+          />
+        </ScrollReveal>
 
-      {/* ── Parallax hero with side imagery ── */}
-      <HeroSection
-        images={heroImages}
-        headline="Premium Construction for Every Project"
-        subheadline="Trusted builders delivering quality craftsmanship, on time and on budget."
-        averageRating={averageRating}
-        reviewCount={reviewCount}
-        trustLine="Fully Insured & Certified"
-        primaryCta={{ label: "Get a Free Quote", href: "#contact" }}
-        secondaryCta={{ label: "View Our Projects", href: "#projects" }}
-      />
+        <ScrollReveal delay={0.05}>
+          <div className="grid gap-4 text-sm sm:grid-cols-3">
+            <div className="rounded-xl bg-dark-slate p-5 text-off-white">
+              <p className="font-semibold">Dark Slate</p>
+              <p className="mt-2 text-off-white/75">Primary brand foundation</p>
+            </div>
+            <div className="rounded-xl bg-industrial-orange p-5 text-off-white">
+              <p className="font-semibold">Industrial Orange</p>
+              <p className="mt-2 text-off-white/85">Action and emphasis</p>
+            </div>
+            <div className="rounded-xl border border-dark-slate/20 bg-off-white p-5 text-dark-slate">
+              <p className="font-semibold">Off-White</p>
+              <p className="mt-2 text-steel-gray">Clean premium backdrop</p>
+            </div>
+          </div>
+        </ScrollReveal>
 
-      {/* ── Featured project ── */}
-      <section id="services" className="bg-parchment">
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
-          <ScrollReveal delay={0.04}>
-            <ProjectHero project={latestProjects[0] ?? null} />
-          </ScrollReveal>
-        </div>
-      </section>
+        <ScrollReveal delay={0.08}>
+          <ProjectHero project={featuredProject} />
+        </ScrollReveal>
 
-      {/* ── Project gallery ── */}
-      <section id="projects" className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
-        <ScrollReveal delay={0.04}>
+        <ScrollReveal delay={0.1}>
           <ProjectGallery />
         </ScrollReveal>
-      </section>
 
-      {/* ── Testimonials ── */}
-      {testimonials.length > 0 ? (
-        <section className="bg-parchment" aria-labelledby="testimonials-heading">
-          <div className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
-            <ScrollReveal delay={0.04}>
-              <SectionTitle eyebrow="What Clients Say" title="Client Testimonials" />
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.08}>
-              <div className="mt-12 grid gap-6 sm:grid-cols-2">
+        {testimonials.length > 0 ? (
+          <ScrollReveal delay={0.12}>
+            <section className="space-y-4" aria-labelledby="testimonials-heading">
+              <h2 id="testimonials-heading" className="text-2xl font-semibold text-dark-slate sm:text-3xl">
+                Client Testimonials
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-2">
                 {testimonials.slice(0, 4).map((testimonial) => (
                   <article
                     key={testimonial._id}
-                    className="flex flex-col rounded-2xl border border-graphite/8 bg-stone-white p-6 shadow-sm"
+                    className="rounded-xl border border-dark-slate/10 bg-off-white p-5"
                   >
-                    <div
-                      className="flex items-center gap-1"
-                      aria-label={`Rating: ${testimonial.rating} out of 5`}
-                    >
-                      {Array.from({ length: 5 }).map((_, index) => (
-                        <span
-                          key={`${testimonial._id}-star-${index}`}
-                          aria-hidden="true"
-                          className={`text-sm leading-none ${
-                            index < testimonial.rating ? "text-gold" : "text-gold/25"
-                          }`}
-                        >
-                          ★
-                        </span>
-                      ))}
-                    </div>
-
-                    <p className="mt-4 flex-1 text-sm leading-relaxed text-warm-mist">
-                      {testimonial.content}
-                    </p>
-
-                    <div className="mt-5 flex items-end justify-between gap-4 border-t border-graphite/8 pt-4">
-                      <div>
-                        <p className="text-sm font-semibold text-graphite">{testimonial.clientName}</p>
-                        {testimonial.jobTitle ? (
-                          <p className="mt-0.5 text-xs text-warm-mist">{testimonial.jobTitle}</p>
-                        ) : null}
-                      </div>
-                      {formatPostedDate(testimonial.createdAt) ? (
-                        <p className="shrink-0 text-xs text-warm-mist/70">
-                          {formatPostedDate(testimonial.createdAt)}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="grid gap-y-1">
+                        <h3 className="text-base font-semibold leading-6 text-dark-slate">
+                          {testimonial.jobTitle || "Client Review"}
+                        </h3>
+                        <p className="text-sm font-semibold leading-5 text-industrial-orange">
+                          {testimonial.clientName}
                         </p>
-                      ) : null}
+                      </div>
+                      <div className="grid justify-items-end gap-y-1">
+                        <p className="text-xs leading-6 text-steel-gray">
+                          {formatPostedDate(testimonial.createdAt)
+                            ? `Posted ${formatPostedDate(testimonial.createdAt)}`
+                            : "\u00A0"}
+                        </p>
+                        <div
+                          className="flex items-center justify-end gap-1 leading-5"
+                          aria-label={`Rating: ${testimonial.rating} out of 5`}
+                        >
+                          {Array.from({ length: 5 }).map((_, index) => (
+                            <span
+                              key={`${testimonial._id}-star-${index}`}
+                              aria-hidden="true"
+                              className={index < testimonial.rating ? "text-[#ffde21]" : "text-[#ffde21]/30"}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
+                    <p className="mt-3 text-sm leading-6 text-steel-gray">{testimonial.content}</p>
                   </article>
                 ))}
               </div>
-            </ScrollReveal>
-          </div>
-        </section>
-      ) : null}
+            </section>
+          </ScrollReveal>
+        ) : null}
 
-      {/* ── Lead capture form ── */}
-      <section id="contact" className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
-        <ScrollReveal delay={0.04}>
+        <ScrollReveal delay={0.14}>
           <LeadCaptureForm />
         </ScrollReveal>
       </section>

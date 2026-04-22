@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Studio",
-  description: "Content management studio for Krishan Projects.",
   robots: "noindex, nofollow",
 };
 

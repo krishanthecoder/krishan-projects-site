@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sanity": "sanity",
-    "cleanup:daily": "pkill -f \"next dev\" || true && rm -rf .next && npm cache clean --force"
+    "sanity": "sanity"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",

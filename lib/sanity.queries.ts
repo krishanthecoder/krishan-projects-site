@@ -35,7 +35,6 @@ export type GalleryProject = {
   title: string;
   projectLocation?: string;
   projectValue?: number;
-  services: string[];
   image: SanityImage | null;
 };
 
@@ -44,7 +43,6 @@ export type GalleryImageItem = {
   projectTitle: string;
   projectLocation?: string;
   projectValue?: number;
-  services: string[];
   image: SanityImage;
 };
 
@@ -81,7 +79,6 @@ const latestProjectsForGalleryQuery = groq`*[_type == "project"] | order(_create
   title,
   projectLocation,
   projectValue,
-  services,
   "image": images[0]{
     ...,
     asset->{
@@ -98,7 +95,6 @@ const latestProjectsWithImagesQuery = groq`*[_type == "project"] | order(_create
   title,
   projectLocation,
   projectValue,
-  services,
   "images": images[]{
     ...,
     asset->{
@@ -142,7 +138,6 @@ export async function getLatestGalleryImages() {
       title: string;
       projectLocation?: string;
       projectValue?: number;
-      services?: string[];
       images: SanityImage[] | null;
     }>
   >(latestProjectsWithImagesQuery);
@@ -155,7 +150,6 @@ export async function getLatestGalleryImages() {
         projectTitle: project.title,
         projectLocation: project.projectLocation,
         projectValue: project.projectValue,
-        services: project.services ?? [],
         image,
       })),
   ) as GalleryImageItem[];

@@ -1,38 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F9F9F8;
-  --foreground: #333333;
+  --background: #f5f3ee;
+  --foreground: #1f2a30;
 }
 
 @theme inline {
-  /* ── Semantic aliases ── */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
-  /* ── Light & Airy core palette ── */
-  --color-stone-white: #F9F9F8;
-  --color-parchment: #EDEBE5;
-  --color-graphite: #333333;
-  --color-warm-mist: #8C8780;
-  --color-gold: #C4973D;
-  --color-sage: #7A9E7E;
-
-  /* ── Legacy aliases — kept so existing class names resolve ── */
-  --color-off-white: #F9F9F8;
-  --color-dark-slate: #333333;
-  --color-industrial-orange: #C4973D;
-  --color-steel-gray: #8C8780;
-
-  /* ── Typography ── */
+  --color-dark-slate: #1f2a30;
+  --color-industrial-orange: #d96a1f;
+  --color-off-white: #f5f3ee;
+  --color-steel-gray: #5b6770;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #1C1A17;
-    --foreground: #F9F9F8;
+    --background: #131b20;
+    --foreground: #f5f3ee;
   }
 }
 
@@ -40,40 +27,4 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-.brand-mark__hammer {
-  transform-box: fill-box;
-  transform-origin: 58% 32%;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .brand-mark--animated .brand-mark__hammer {
-    animation: brand-hammer-swing 2.6s ease-in-out infinite;
-  }
-}
-
-@keyframes brand-hammer-swing {
-  0%,
-  72%,
-  100% {
-    transform: rotate(0deg);
-  }
-
-  12% {
-    transform: rotate(-16deg);
-  }
-
-  32% {
-    transform: rotate(8deg);
-  }
-
-  48% {
-    transform: rotate(-6deg);
-  }
-
-  60% {
-    transform: rotate(2deg);
-  }
 }
