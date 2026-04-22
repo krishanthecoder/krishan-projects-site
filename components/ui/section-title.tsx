@@ -1,22 +1,26 @@
 type SectionTitleProps = {
+  /** Render as h1 for the primary page title, h2 for section headings (default). */
+  as?: "h1" | "h2";
   eyebrow?: string;
   title: string;
   description?: string;
 };
 
-export function SectionTitle({ eyebrow, title, description }: SectionTitleProps) {
+export function SectionTitle({ as: Tag = "h2", eyebrow, title, description }: SectionTitleProps) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {eyebrow ? (
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-industrial-orange">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
           {eyebrow}
         </p>
       ) : null}
-      <h1 className="text-4xl font-bold tracking-tight text-dark-slate sm:text-5xl">
+      <Tag className="text-4xl font-bold tracking-tight text-graphite sm:text-5xl lg:text-6xl">
         {title}
-      </h1>
+      </Tag>
       {description ? (
-        <p className="max-w-2xl text-base text-steel-gray sm:text-lg">{description}</p>
+        <p className="max-w-2xl text-base leading-relaxed text-warm-mist sm:text-lg">
+          {description}
+        </p>
       ) : null}
     </div>
   );
