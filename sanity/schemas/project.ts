@@ -41,6 +41,20 @@ export const projectSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: "projectLocation",
+      title: "Project Location",
+      type: "string",
+      description: "Example: Kitchen Renovation - Chelsea",
+      validation: (rule) => rule.required().min(3),
+    }),
+    defineField({
+      name: "projectValue",
+      title: "Project Value",
+      type: "number",
+      description: "Enter numeric amount only (e.g. 25000). GBP symbol is added automatically.",
+      validation: (rule) => rule.min(0),
+    }),
+    defineField({
       name: "services",
       title: "Services",
       type: "array",

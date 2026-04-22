@@ -15,6 +15,7 @@ if (!projectId) {
 export default defineConfig({
   name: "default",
   title: "Krishan Construction CMS",
+  basePath: "/studio",
   projectId,
   dataset,
   plugins: [structureTool()],

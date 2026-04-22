@@ -25,19 +25,33 @@ export type Project = {
   title: string;
   images: SanityImage[];
   description: PortableTextBlock[];
+  projectLocation?: string;
+  projectValue?: number;
   services: string[];
 };
 
 export type GalleryProject = {
   _id: string;
   title: string;
+  projectLocation?: string;
+  projectValue?: number;
   image: SanityImage | null;
+};
+
+export type GalleryImageItem = {
+  _id: string;
+  projectTitle: string;
+  projectLocation?: string;
+  projectValue?: number;
+  image: SanityImage;
 };
 
 export type Testimonial = {
   _id: string;
   clientName: string;
+  jobTitle: string;
   rating: number;
+  createdAt?: string;
   content: string;
 };
 
@@ -46,20 +60,42 @@ const allProjectsQuery = groq`*[_type == "project"] | order(_createdAt desc){
   title,
   images,
   description,
+  projectLocation,
+  projectValue,
   services
 }`;
 
 const allTestimonialsQuery = groq`*[_type == "testimonial"] | order(_createdAt desc){
   _id,
   clientName,
+  jobTitle,
   rating,
+  "createdAt": _createdAt,
   content
 }`;
 
 const latestProjectsForGalleryQuery = groq`*[_type == "project"] | order(_createdAt desc)[0...6]{
   _id,
   title,
+  projectLocation,
+  projectValue,
   "image": images[0]{
+    ...,
+    asset->{
+      _id,
+      metadata{
+        lqip
+      }
+    }
+  }
+}`;
+
+const latestProjectsWithImagesQuery = groq`*[_type == "project"] | order(_createdAt desc)[0...6]{
+  _id,
+  title,
+  projectLocation,
+  projectValue,
+  "images": images[]{
     ...,
     asset->{
       _id,
@@ -89,4 +125,32 @@ export async function getLatestProjectsForGallery() {
     return [];
   }
   return sanityClient.fetch<GalleryProject[]>(latestProjectsForGalleryQuery);
+}
+
+export async function getLatestGalleryImages() {
+  if (!sanityConfigured) {
+    return [];
+  }
+
+  const projects = await sanityClient.fetch<
+    Array<{
+      _id: string;
+      title: string;
+      projectLocation?: string;
+      projectValue?: number;
+      images: SanityImage[] | null;
+    }>
+  >(latestProjectsWithImagesQuery);
+
+  return projects.flatMap((project) =>
+    (project.images ?? [])
+      .filter((image) => Boolean(image?.asset))
+      .map((image, index) => ({
+        _id: `${project._id}-${index}`,
+        projectTitle: project.title,
+        projectLocation: project.projectLocation,
+        projectValue: project.projectValue,
+        image,
+      })),
+  ) as GalleryImageItem[];
 }

@@ -6,6 +6,15 @@ type ProjectHeroProps = {
   project: GalleryProject | null;
 };
 
+function formatGbpValue(value?: number) {
+  if (typeof value !== "number") return null;
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: "GBP",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 export function ProjectHero({ project }: ProjectHeroProps) {
   if (!project?.image) {
     return (
@@ -37,6 +46,14 @@ export function ProjectHero({ project }: ProjectHeroProps) {
         />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-dark-slate/90 to-transparent px-6 py-5">
           <h2 className="text-2xl font-semibold text-off-white">{project.title}</h2>
+          {project.projectLocation ? (
+            <p className="mt-1 text-sm text-off-white/85">{project.projectLocation}</p>
+          ) : null}
+          {project.projectValue ? (
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.08em] text-off-white/75">
+              Project Value: {formatGbpValue(project.projectValue)}
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

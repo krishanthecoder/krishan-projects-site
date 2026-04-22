@@ -12,35 +12,44 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Krishan Projects";
+const serviceAreas = (process.env.NEXT_PUBLIC_BUSINESS_SERVICE_AREAS ?? "South Ockendon, Grays, London")
+  .split(",")
+  .map((area) => area.trim())
+  .filter(Boolean);
+const primaryArea = serviceAreas[0] ?? "London";
+const serviceAreasLabel = serviceAreas.join(", ");
+const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL ?? "https://krishanprojects.co.uk";
+const phoneNumber = process.env.NEXT_PUBLIC_BUSINESS_PHONE ?? "07572138829";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.krishanconstruction.com"),
+  metadataBase: new URL(websiteUrl),
   title: {
-    default: "Krishan Construction Group",
-    template: "%s | Krishan Construction Group",
+    default: `${businessName} | Builders in ${primaryArea}`,
+    template: `%s | ${businessName}`,
   },
   description:
-    "Premium commercial and residential construction services with engineering precision and modern project delivery.",
+    `${businessName} provides trusted construction and renovation services across ${serviceAreasLabel}.`,
   keywords: [
     "construction",
-    "commercial construction",
-    "residential construction",
-    "general contractor",
-    "project management",
+    "home renovation",
+    "local builder",
+    "tradesman",
+    primaryArea,
+    ...serviceAreas,
   ],
   openGraph: {
-    title: "Krishan Construction Group",
-    description:
-      "Premium commercial and residential construction services with engineering precision and modern project delivery.",
-    url: "https://www.krishanconstruction.com",
-    siteName: "Krishan Construction Group",
+    title: `${businessName} | Builders in ${primaryArea}`,
+    description: `${businessName} serves ${serviceAreasLabel} for kitchen, bathroom, loft, and full-home renovation projects.`,
+    url: websiteUrl,
+    siteName: businessName,
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Krishan Construction Group",
-    description:
-      "Premium commercial and residential construction services with engineering precision and modern project delivery.",
+    title: `${businessName} | ${primaryArea}`,
+    description: `${businessName} serves ${serviceAreasLabel}.`,
   },
   robots: {
     index: true,
@@ -66,6 +75,13 @@ export default function RootLayout({
           Skip to main content
         </a>
         {children}
+        <footer className="border-t border-dark-slate/10 bg-dark-slate px-6 py-8 text-sm text-off-white sm:px-10">
+          <div className="mx-auto max-w-6xl space-y-2">
+            <p className="font-semibold">{businessName}</p>
+            <p className="text-off-white/80">Serving {serviceAreasLabel}</p>
+            <p className="text-off-white/80">Call us: {phoneNumber}</p>
+          </div>
+        </footer>
       </body>
     </html>
   );
