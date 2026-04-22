@@ -84,28 +84,37 @@ export default async function Home() {
                     key={testimonial._id}
                     className="rounded-xl border border-dark-slate/10 bg-off-white p-5"
                   >
-                    <h3 className="text-base font-semibold text-dark-slate">
-                      {testimonial.jobTitle || "Client Review"}
-                    </h3>
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-industrial-orange">{testimonial.clientName}</p>
-                      <div className="flex items-center gap-1" aria-label={`Rating: ${testimonial.rating} out of 5`}>
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <span
-                            key={`${testimonial._id}-star-${index}`}
-                            aria-hidden="true"
-                            className={index < testimonial.rating ? "text-[#ffde21]" : "text-[#ffde21]/30"}
-                          >
-                            ★
-                          </span>
-                        ))}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="grid gap-y-1">
+                        <h3 className="text-base font-semibold leading-6 text-dark-slate">
+                          {testimonial.jobTitle || "Client Review"}
+                        </h3>
+                        <p className="text-sm font-semibold leading-5 text-industrial-orange">
+                          {testimonial.clientName}
+                        </p>
+                      </div>
+                      <div className="grid justify-items-end gap-y-1">
+                        <p className="text-xs leading-6 text-steel-gray">
+                          {formatPostedDate(testimonial.createdAt)
+                            ? `Posted ${formatPostedDate(testimonial.createdAt)}`
+                            : "\u00A0"}
+                        </p>
+                        <div
+                          className="flex items-center justify-end gap-1 leading-5"
+                          aria-label={`Rating: ${testimonial.rating} out of 5`}
+                        >
+                          {Array.from({ length: 5 }).map((_, index) => (
+                            <span
+                              key={`${testimonial._id}-star-${index}`}
+                              aria-hidden="true"
+                              className={index < testimonial.rating ? "text-[#ffde21]" : "text-[#ffde21]/30"}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    {formatPostedDate(testimonial.createdAt) ? (
-                      <p className="mt-1 text-xs text-steel-gray">
-                        Posted {formatPostedDate(testimonial.createdAt)}
-                      </p>
-                    ) : null}
                     <p className="mt-3 text-sm leading-6 text-steel-gray">{testimonial.content}</p>
                   </article>
                 ))}
