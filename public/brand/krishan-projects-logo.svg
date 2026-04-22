@@ -1,0 +1,14 @@
+<svg width="720" height="220" viewBox="0 0 720 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M46 42V170H174" stroke="#C4973D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M62 58H46" stroke="#C4973D" stroke-width="8" stroke-linecap="round"/>
+  <path d="M62 76H46" stroke="#C4973D" stroke-width="8" stroke-linecap="round"/>
+  <path d="M62 144H46" stroke="#C4973D" stroke-width="8" stroke-linecap="round"/>
+  <path d="M142 170V154" stroke="#C4973D" stroke-width="8" stroke-linecap="round"/>
+  <path d="M124 170V154" stroke="#C4973D" stroke-width="8" stroke-linecap="round"/>
+  <path d="M86 148L118 116" stroke="#333333" stroke-width="12" stroke-linecap="round"/>
+  <path d="M86 148L74 160" stroke="#333333" stroke-width="12" stroke-linecap="round"/>
+  <path d="M90 72C84.477 72 80 76.477 80 82V88C80 93.523 84.477 98 90 98H107L95 110C92.9 112.1 92.9 115.35 95 117.45C97.1 119.55 100.35 119.55 102.45 117.45L121.5 98H129L147.5 116.5C149.6 118.6 152.85 118.6 154.95 116.5C157.05 114.4 157.05 111.15 154.95 109.05L143.5 98H147.5C153.851 98 159 92.851 159 86.5C159 80.149 153.851 75 147.5 75H132L125.5 68.5C123.4 66.4 120.15 66.4 118.05 68.5L111.55 75H90V72Z" fill="#333333"/>
+  <text x="224" y="128" fill="#333333" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="600" letter-spacing="1.6">
+    Krishan Projects
+  </text>
+</svg>

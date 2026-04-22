@@ -15,43 +15,63 @@ function formatGbpValue(value?: number) {
   }).format(value);
 }
 
+function formatProjectScope(services: string[] = []) {
+  const cleanedServices = services
+    .map((service) => service.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (cleanedServices.length === 0) return "home renovation";
+  if (cleanedServices.length === 1) return cleanedServices[0];
+  return `${cleanedServices[0]} and ${cleanedServices[1]}`;
+}
+
 export function ProjectHero({ project }: ProjectHeroProps) {
   if (!project?.image) {
     return (
-      <section className="rounded-2xl border border-dark-slate/10 bg-dark-slate p-8 text-off-white sm:p-12">
-        <p className="text-sm uppercase tracking-[0.2em] text-industrial-orange">Featured Project</p>
-        <h2 className="mt-4 text-3xl font-semibold">Showcase your best construction work here.</h2>
-        <p className="mt-3 text-off-white/75">
+      <section className="rounded-3xl border border-graphite/10 bg-graphite p-10 text-stone-white sm:p-14">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+          Featured Project
+        </p>
+        <h2 className="mt-4 max-w-lg text-3xl font-bold leading-snug tracking-tight sm:text-4xl">
+          Showcase your best construction work here.
+        </h2>
+        <p className="mt-3 max-w-sm text-base leading-relaxed text-stone-white/60">
           Add a project image in Sanity Studio and this hero will automatically update.
         </p>
       </section>
     );
   }
 
-  const heroAlt = project.image.alt?.trim() || project.title;
+  const heroAlt =
+    project.image.alt?.trim() ||
+    `${formatProjectScope(project.services)} project by ${project.title}${project.projectLocation ? ` in ${project.projectLocation}` : " in London"}`;
 
   return (
     <section className="space-y-4">
-      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-industrial-orange">
-        Featured Project
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+        Recently Completed in London
       </p>
-      <div className="relative h-80 overflow-hidden rounded-2xl border border-dark-slate/10">
+      <div className="relative h-96 overflow-hidden rounded-3xl border border-graphite/10 shadow-md sm:h-[28rem]">
         <SanityImage
           image={project.image}
           alt={heroAlt}
           fill
           priority
           sizes="(max-width: 768px) 100vw, 85vw"
-          className="object-cover"
+          className="object-cover transition-transform duration-700 hover:scale-[1.02]"
         />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-dark-slate/90 to-transparent px-6 py-5">
-          <h2 className="text-2xl font-semibold text-off-white">{project.title}</h2>
+        {/* Bottom gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-graphite/85 via-graphite/30 to-transparent px-8 py-7">
+          <h2 className="text-2xl font-bold tracking-tight text-stone-white sm:text-3xl">
+            {project.title}
+          </h2>
           {project.projectLocation ? (
-            <p className="mt-1 text-sm text-off-white/85">{project.projectLocation}</p>
+            <p className="mt-1 text-sm text-stone-white/75">{project.projectLocation}</p>
           ) : null}
           {project.projectValue ? (
-            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.08em] text-off-white/75">
-              Project Value: {formatGbpValue(project.projectValue)}
+            <p className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/15 px-3 py-1 text-xs font-semibold text-gold backdrop-blur-sm">
+              {formatGbpValue(project.projectValue)}
             </p>
           ) : null}
         </div>
