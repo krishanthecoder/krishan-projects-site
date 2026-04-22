@@ -11,7 +11,6 @@ function formatPostedDate(dateString?: string) {
   if (!dateString) return null;
   const parsed = new Date(dateString);
   if (Number.isNaN(parsed.getTime())) return null;
-
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "long",
@@ -22,7 +21,7 @@ function formatPostedDate(dateString?: string) {
 export default async function Home() {
   const latestProjects = await getLatestProjectsForGallery();
   const testimonials = await getAllTestimonials();
-  const featuredProject = latestProjects[0] ?? null;
+
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Krishan Construction Group";
   const serviceArea = (process.env.NEXT_PUBLIC_BUSINESS_SERVICE_AREAS ?? "Vancouver, Surrey, Burnaby")
     .split(",")
@@ -30,6 +29,16 @@ export default async function Home() {
     .filter(Boolean);
   const phoneNumber = process.env.NEXT_PUBLIC_BUSINESS_PHONE ?? "+1-604-000-0000";
   const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL ?? "https://www.krishanconstruction.com";
+
+  // Compute aggregate rating for the hero trust badge
+  const reviewCount = testimonials.length;
+  const averageRating =
+    reviewCount > 0
+      ? testimonials.reduce((sum, t) => sum + t.rating, 0) / reviewCount
+      : null;
+
+  // Pass the first two project images as hero side panels
+  const heroImages = [latestProjects[0]?.image, latestProjects[1]?.image];
 
   return (
     <main id="main-content" className="min-h-screen bg-stone-white">
@@ -40,58 +49,29 @@ export default async function Home() {
         websiteUrl={websiteUrl}
       />
 
-      {/* ── Parallax hero ──
-          Uses the featured project image as the background if available,
-          falls back to a warm stone gradient. */}
-      <HeroSection image={featuredProject?.image ?? null}>
-        <ScrollReveal>
-          <SectionTitle
-            as="h1"
-            eyebrow="Built for Endurance"
-            title="High-End Construction Digital Presence"
-            description="A production-ready Next.js starter with App Router, TypeScript, and a premium construction design system."
-          />
-        </ScrollReveal>
-
-        {/* Palette swatches */}
-        <ScrollReveal delay={0.06}>
-          <div className="mt-12 grid gap-4 text-sm sm:grid-cols-3">
-            <div className="rounded-2xl bg-graphite p-6 text-stone-white shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-stone-white/50">
-                Primary
-              </p>
-              <p className="mt-2 font-semibold">Graphite</p>
-              <p className="mt-1 text-stone-white/60">Brand foundation</p>
-            </div>
-            <div className="rounded-2xl bg-gold p-6 text-stone-white shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-stone-white/60">
-                Accent
-              </p>
-              <p className="mt-2 font-semibold">Antique Gold</p>
-              <p className="mt-1 text-stone-white/75">Premium emphasis</p>
-            </div>
-            <div className="rounded-2xl border border-graphite/10 bg-parchment p-6 text-graphite shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-warm-mist">
-                Surface
-              </p>
-              <p className="mt-2 font-semibold">Parchment</p>
-              <p className="mt-1 text-warm-mist">Warm neutral backdrop</p>
-            </div>
-          </div>
-        </ScrollReveal>
-      </HeroSection>
+      {/* ── Parallax hero with side imagery ── */}
+      <HeroSection
+        images={heroImages}
+        headline="Premium Construction for Every Project"
+        subheadline="Trusted builders delivering quality craftsmanship, on time and on budget."
+        averageRating={averageRating}
+        reviewCount={reviewCount}
+        trustLine="Fully Insured & Certified"
+        primaryCta={{ label: "Get a Free Quote", href: "#contact" }}
+        secondaryCta={{ label: "View Our Projects", href: "#projects" }}
+      />
 
       {/* ── Featured project ── */}
-      <section className="bg-parchment">
+      <section id="services" className="bg-parchment">
         <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
           <ScrollReveal delay={0.04}>
-            <ProjectHero project={featuredProject} />
+            <ProjectHero project={latestProjects[0] ?? null} />
           </ScrollReveal>
         </div>
       </section>
 
       {/* ── Project gallery ── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
+      <section id="projects" className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
         <ScrollReveal delay={0.04}>
           <ProjectGallery />
         </ScrollReveal>
@@ -102,10 +82,7 @@ export default async function Home() {
         <section className="bg-parchment" aria-labelledby="testimonials-heading">
           <div className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
             <ScrollReveal delay={0.04}>
-              <SectionTitle
-                eyebrow="What Clients Say"
-                title="Client Testimonials"
-              />
+              <SectionTitle eyebrow="What Clients Say" title="Client Testimonials" />
             </ScrollReveal>
 
             <ScrollReveal delay={0.08}>
@@ -115,7 +92,6 @@ export default async function Home() {
                     key={testimonial._id}
                     className="flex flex-col rounded-2xl border border-graphite/8 bg-stone-white p-6 shadow-sm"
                   >
-                    {/* Stars */}
                     <div
                       className="flex items-center gap-1"
                       aria-label={`Rating: ${testimonial.rating} out of 5`}
@@ -133,17 +109,13 @@ export default async function Home() {
                       ))}
                     </div>
 
-                    {/* Review body */}
                     <p className="mt-4 flex-1 text-sm leading-relaxed text-warm-mist">
                       {testimonial.content}
                     </p>
 
-                    {/* Attribution */}
                     <div className="mt-5 flex items-end justify-between gap-4 border-t border-graphite/8 pt-4">
                       <div>
-                        <p className="text-sm font-semibold text-graphite">
-                          {testimonial.clientName}
-                        </p>
+                        <p className="text-sm font-semibold text-graphite">{testimonial.clientName}</p>
                         {testimonial.jobTitle ? (
                           <p className="mt-0.5 text-xs text-warm-mist">{testimonial.jobTitle}</p>
                         ) : null}
@@ -163,7 +135,7 @@ export default async function Home() {
       ) : null}
 
       {/* ── Lead capture form ── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
+      <section id="contact" className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
         <ScrollReveal delay={0.04}>
           <LeadCaptureForm />
         </ScrollReveal>
