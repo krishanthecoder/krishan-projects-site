@@ -31,13 +31,13 @@ export function ProjectHero({ project }: ProjectHeroProps) {
     return (
       <section className="rounded-3xl border border-graphite/10 bg-graphite p-10 text-stone-white sm:p-14">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-          Featured Project
+          From a recent job
         </p>
         <h2 className="mt-4 max-w-lg text-3xl font-bold leading-snug tracking-tight sm:text-4xl">
-          Showcase your best construction work here.
+          A look inside the work we do.
         </h2>
         <p className="mt-3 max-w-sm text-base leading-relaxed text-stone-white/60">
-          Add a project image in Sanity Studio and this hero will automatically update.
+          Add a project image in Sanity Studio and this panel will pull in automatically.
         </p>
       </section>
     );
@@ -50,7 +50,7 @@ export function ProjectHero({ project }: ProjectHeroProps) {
   return (
     <section className="space-y-4">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-        Recently Completed in London
+        From a recent job
       </p>
       <div className="relative h-96 overflow-hidden rounded-3xl border border-graphite/10 shadow-md sm:h-[28rem]">
         <SanityImage

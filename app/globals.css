@@ -24,6 +24,9 @@
   --color-industrial-orange: #C4973D;
   --color-steel-gray: #8C8780;
 
+  /* ── Custom animations ── */
+  --animate-status-blink: status-blink 2.4s ease-in-out infinite;
+
   /* ── Typography ── */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -52,6 +55,13 @@ body {
   .brand-mark--animated .brand-mark__hammer {
     animation: brand-hammer-swing 2.6s ease-in-out infinite;
   }
+}
+
+/* Subtle opacity breathe for the "taking on new work" status badge text.
+   Stays well above 0 so it never feels broken or flashing. */
+@keyframes status-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
 }
 
 @keyframes brand-hammer-swing {

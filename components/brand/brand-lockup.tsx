@@ -9,18 +9,18 @@ export function BrandLockup({
   compact = false,
   className = "",
 }: BrandLockupProps) {
-  const markSize = compact ? 44 : 52;
+  const markSize = compact ? 38 : 46;
   const textClassName = compact
-    ? "text-sm sm:text-base"
-    : "text-base sm:text-[1.1rem]";
+    ? "text-sm sm:text-base tracking-[0.12em]"
+    : "text-base sm:text-[1.12rem] tracking-[0.14em]";
 
   return (
-    <div className={`flex items-center gap-3 ${className}`.trim()}>
+    <div className={`flex items-center gap-2.5 ${className}`.trim()}>
       <div className="shrink-0">
-        <BrandMark size={markSize} animated />
+        <BrandMark size={markSize} />
       </div>
       <p
-        className={`min-w-0 font-semibold tracking-[0.06em] text-graphite ${textClassName}`.trim()}
+        className={`min-w-0 whitespace-nowrap font-semibold leading-none text-graphite ${textClassName}`.trim()}
       >
         Krishan Projects
       </p>

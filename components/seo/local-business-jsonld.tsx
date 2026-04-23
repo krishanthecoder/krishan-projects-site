@@ -29,7 +29,7 @@ export function LocalBusinessJsonLd({
     "@id": `${normalizedWebsiteUrl}/#localbusiness`,
     name: businessName,
     description:
-      "Premium home renovations, kitchen fitting, extensions, and building works in London with a focus on quality, cleanliness, and fixed timelines.",
+      "A small London building team offering home renovations, kitchen fitting, extensions and general building works with tidy sites, honest quotes and realistic timelines.",
     telephone: phoneNumber,
     areaServed: areaServed.map((area) => ({
       "@type": "City",
@@ -43,10 +43,11 @@ export function LocalBusinessJsonLd({
       addressCountry: "GB",
     },
     knowsAbout: [
-      "Premium kitchen fitting in London",
+      "Kitchen fitting in London",
       "Home renovation",
       "House extensions",
-      "Fixed-price building works",
+      "General building works",
+      "Bathroom renovation",
     ],
   };
 

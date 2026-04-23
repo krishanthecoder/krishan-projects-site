@@ -93,14 +93,17 @@ export function ProjectGallery() {
       <section className="space-y-6" aria-labelledby="project-gallery-heading" aria-busy={isLoading}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+              Recent jobs
+            </p>
             <h2
               id="project-gallery-heading"
               className="text-3xl font-bold tracking-tight text-graphite sm:text-4xl"
             >
-              Renovation and Kitchen Fitting Projects in London
+              Real homes we&apos;ve worked on across London
             </h2>
             <p className="max-w-2xl text-sm leading-relaxed text-warm-mist sm:text-base">
-              See the standard of finish, tidy handover, and detailed workmanship homeowners can expect across our renovation, extension, and premium kitchen fitting projects.
+              Have a look at the standard of finish, the detail on kitchens and bathrooms, and how we leave a site. These are recent renovation, extension and kitchen fitting jobs — not stock photos.
             </p>
           </div>
           {!isLoading && images.length > 0 ? (
@@ -174,7 +177,7 @@ export function ProjectGallery() {
             </div>
           ) : (
             <p className="rounded-2xl border border-graphite/10 bg-parchment p-6 text-sm text-warm-mist">
-              Add projects with images in Sanity Studio to populate this gallery.
+              Photos from our recent jobs will show up here once projects are added in Sanity Studio.
             </p>
           )
         ) : null}

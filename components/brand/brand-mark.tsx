@@ -26,65 +26,101 @@ export function BrandMark({
     >
       <title>{title}</title>
       <path
-        d="M16 14V50H46"
-        stroke={accentColor}
-        strokeWidth="4.5"
-        strokeLinecap="round"
+        d="M15 15V51H47V45H21V15H15Z"
+        fill="#55616C"
+        stroke={primaryColor}
+        strokeWidth="1.75"
         strokeLinejoin="round"
       />
       <path
-        d="M16 50H46"
-        stroke={accentColor}
-        strokeWidth="4.5"
+        d="M19 21V47H43"
+        stroke="#97A3AD"
+        strokeWidth="1.75"
         strokeLinecap="round"
         strokeLinejoin="round"
+        opacity="0.95"
       />
       <path
-        d="M22 20H16"
+        d="M21 18H15"
         stroke={accentColor}
-        strokeWidth="3"
+        strokeWidth="2.5"
         strokeLinecap="round"
       />
       <path
-        d="M22 26H16"
+        d="M21 24H15"
         stroke={accentColor}
-        strokeWidth="3"
+        strokeWidth="2.5"
         strokeLinecap="round"
       />
       <path
-        d="M22 44H16"
+        d="M21 45H15"
         stroke={accentColor}
-        strokeWidth="3"
+        strokeWidth="2.5"
         strokeLinecap="round"
       />
       <path
-        d="M40 50V44"
+        d="M36 51V45"
         stroke={accentColor}
-        strokeWidth="3"
+        strokeWidth="2.5"
         strokeLinecap="round"
       />
       <path
-        d="M34 50V44"
+        d="M42 51V45"
         stroke={accentColor}
-        strokeWidth="3"
+        strokeWidth="2.5"
         strokeLinecap="round"
       />
       <g className={animated ? "brand-mark__hammer" : undefined}>
         <path
-          d="M24 44L34 30"
+          d="M17 18L46 47"
           stroke={primaryColor}
-          strokeWidth="4.5"
+          strokeWidth="9.5"
           strokeLinecap="round"
         />
         <path
-          d="M24 44L20 48"
-          stroke={primaryColor}
-          strokeWidth="4.5"
+          d="M17 18L46 47"
+          stroke={accentColor}
+          strokeWidth="6.5"
           strokeLinecap="round"
         />
         <path
-          d="M27 18C25.343 18 24 19.343 24 21V23C24 24.657 25.343 26 27 26H32.3L28.7 29.6C28.1 30.2 28.1 31.15 28.7 31.75C29.3 32.35 30.25 32.35 30.85 31.75L36.6 26H39L44.6 31.6C45.2 32.2 46.15 32.2 46.75 31.6C47.35 31 47.35 30.05 46.75 29.45L43.3 26H44.5C46.433 26 48 24.433 48 22.5C48 20.567 46.433 19 44.5 19H39.7L37.8 17.1C37.2 16.5 36.25 16.5 35.65 17.1L33.75 19H27Z"
-          fill={primaryColor}
+          d="M19.5 20.5L43.5 44.5"
+          stroke="#E2B274"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          opacity="0.9"
+        />
+        <path
+          d="M33 18H44"
+          stroke={primaryColor}
+          strokeWidth="6.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M43.5 15V21"
+          stroke={primaryColor}
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M33.5 18C35.5 14.2 39.7 13.2 43.5 15"
+          stroke={primaryColor}
+          strokeWidth="5.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M33.5 18C35 21.4 33.9 24.4 29.7 26.8"
+          stroke={primaryColor}
+          strokeWidth="5.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M33 18L28.5 23.2"
+          stroke={primaryColor}
+          strokeWidth="5.5"
+          strokeLinecap="round"
         />
       </g>
     </svg>

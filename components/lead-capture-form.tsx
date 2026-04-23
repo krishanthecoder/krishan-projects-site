@@ -44,7 +44,7 @@ export function LeadCaptureForm() {
       return;
     }
 
-    setStatusMessage("Thanks. We will review your project and come back with next steps shortly.");
+    setStatusMessage("Thanks. We've got your message and will come back to you today.");
     setIsSuccess(true);
     reset();
   };
@@ -53,16 +53,16 @@ export function LeadCaptureForm() {
     <section className="rounded-3xl border border-graphite/8 bg-parchment p-8 shadow-sm sm:p-12" aria-labelledby="lead-form-heading">
       <div className="mb-10 space-y-3">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-          Fixed-Price Quotes
+          Free, no-pressure quotes
         </p>
         <h2
           id="lead-form-heading"
           className="text-3xl font-bold tracking-tight text-graphite sm:text-4xl"
         >
-          Check Our Availability
+          Message us about your project
         </h2>
         <p className="max-w-md text-sm leading-relaxed text-warm-mist sm:text-base">
-          Tell us what you are planning and we will come back with a clear next step, an honest timeframe, and a fixed-price quote where appropriate.
+          Drop us a message and we&apos;ll get back to you today — a friendly chat about what you&apos;re planning, a free site visit, and a clear written quote. No commitment, no hard sell.
         </p>
       </div>
 
@@ -161,7 +161,7 @@ export function LeadCaptureForm() {
             disabled={isSubmitting}
             className="inline-flex items-center justify-center rounded-xl bg-graphite px-7 py-3 text-sm font-semibold text-stone-white shadow-sm transition hover:bg-graphite/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-parchment disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSubmitting ? "Sending..." : "Get Your Fixed-Price Quote"}
+            {isSubmitting ? "Sending..." : "Send us a message"}
           </button>
 
           {statusMessage ? (
