@@ -1,13 +1,21 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
+
+// A craftsman at work — warm, detailed, conveys precision and care.
+// Swap this URL (or pass backgroundSrc as a prop) to change the hero image.
+const DEFAULT_BG =
+  "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1920&q=85";
 
 type HeroSectionProps = {
   children: React.ReactNode;
+  /** Override the default background image URL. */
+  backgroundSrc?: string;
 };
 
-export function HeroSection({ children }: HeroSectionProps) {
+export function HeroSection({ children, backgroundSrc = DEFAULT_BG }: HeroSectionProps) {
   const ref = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -15,19 +23,38 @@ export function HeroSection({ children }: HeroSectionProps) {
     offset: ["start start", "end start"],
   });
 
-  // Content drifts up gently and fades as section scrolls out
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
+  // Fade content out as section scrolls away — no transforms that affect layout
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
     <section
       ref={ref}
-      className="relative overflow-hidden"
+      className="relative flex min-h-[calc(100vh-4rem)] items-center overflow-hidden"
       aria-label="Site hero"
     >
+      {/* ── Static background image ── */}
+      <Image
+        src={backgroundSrc}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-center"
+        aria-hidden="true"
+      />
+
+      {/* ── Overlay ──────────────────────────────────────────────────────────
+          Heavier at top/bottom (badge and pillar cards) so graphite text stays
+          legible; thinner in the middle to let the image breathe. */}
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-stone-white/90 via-stone-white/72 to-stone-white/88"
+        aria-hidden="true"
+      />
+
+      {/* ── Content ── */}
       <motion.div
-        className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32"
-        style={{ y: contentY, opacity: contentOpacity }}
+        className="relative z-10 mx-auto w-full max-w-6xl px-6 py-8 sm:px-10"
+        style={{ opacity: contentOpacity }}
       >
         {children}
       </motion.div>

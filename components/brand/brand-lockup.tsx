@@ -1,4 +1,4 @@
-import { BrandMark } from "@/components/brand/brand-mark";
+import Image from "next/image";
 
 type BrandLockupProps = {
   compact?: boolean;
@@ -9,21 +9,22 @@ export function BrandLockup({
   compact = false,
   className = "",
 }: BrandLockupProps) {
-  const markSize = compact ? 38 : 46;
-  const textClassName = compact
-    ? "text-sm sm:text-base tracking-[0.12em]"
-    : "text-base sm:text-[1.12rem] tracking-[0.14em]";
+  // We use a tightly cropped transparent PNG to preserve the
+  // high-fidelity skeuomorphic detail without a visible background box.
+  const height = compact ? 36 : 56;
 
   return (
-    <div className={`flex items-center gap-2.5 ${className}`.trim()}>
-      <div className="shrink-0">
-        <BrandMark size={markSize} />
-      </div>
-      <p
-        className={`min-w-0 whitespace-nowrap font-semibold leading-none text-graphite ${textClassName}`.trim()}
-      >
-        Krishan Projects
-      </p>
+    <div className={`flex items-center ${className}`.trim()}>
+      <Image
+        src="/brand/navbar-logo-transparent.png"
+        alt="Krishan Projects"
+        width={1188}
+        height={394}
+        sizes={compact ? "108px" : "168px"}
+        style={{ height: `${height}px`, width: "auto" }}
+        className="block object-contain"
+        priority
+      />
     </div>
   );
 }

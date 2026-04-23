@@ -166,7 +166,7 @@ export default async function Home() {
 
         {/* Three pillars */}
         <ScrollReveal delay={0.22}>
-          <div className="mt-14 grid gap-4 text-sm sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 text-sm sm:grid-cols-3">
             {pillars.map((card) => {
               const wrapperClass =
                 card.variant === "graphite"
@@ -228,7 +228,7 @@ export default async function Home() {
 
       {/* ── Featured project ── */}
       <section className="bg-parchment">
-        <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
+        <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
           <ScrollReveal delay={0.04}>
             <ProjectHero project={featuredProject} />
           </ScrollReveal>
@@ -237,7 +237,7 @@ export default async function Home() {
 
       {/* ── About + How we work ── */}
       <section
-        className="mx-auto max-w-6xl px-6 py-24 sm:px-10"
+        className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20"
         aria-labelledby="about-heading"
       >
         <ScrollReveal delay={0.04}>
@@ -327,7 +327,7 @@ export default async function Home() {
       </section>
 
       {/* ── Project gallery ── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
+      <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
         <ScrollReveal delay={0.04}>
           <ProjectGallery />
         </ScrollReveal>
@@ -336,7 +336,7 @@ export default async function Home() {
       {/* ── Testimonials ── */}
       {testimonials.length > 0 ? (
         <section className="bg-parchment" aria-labelledby="testimonials-heading">
-          <div className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
+          <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
             <ScrollReveal delay={0.04}>
               <SectionTitle
                 id="testimonials-heading"
@@ -401,7 +401,7 @@ export default async function Home() {
       ) : null}
 
       {/* ── Lead capture form ── */}
-      <section className="mx-auto max-w-6xl px-6 py-24 sm:px-10">
+      <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
         <ScrollReveal delay={0.04}>
           <LeadCaptureForm />
         </ScrollReveal>
