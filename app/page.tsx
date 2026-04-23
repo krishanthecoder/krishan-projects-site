@@ -1,6 +1,4 @@
 import { HeroSection } from "@/components/hero-section";
-import { LeadCaptureForm } from "@/components/lead-capture-form";
-import { ProjectGallery } from "@/components/project-gallery";
 import { ProjectHero } from "@/components/project-hero";
 import { LocalBusinessJsonLd } from "@/components/seo/local-business-jsonld";
 import { TrustCards } from "@/components/trust-cards";
@@ -94,7 +92,7 @@ export default async function Home() {
           Uses the featured project image as the background if available,
           falls back to a warm stone gradient. */}
       <HeroSection>
-        <div className="relative grid gap-12 lg:grid-cols-[1fr_340px] lg:items-center">
+        <div className="relative grid gap-8 lg:grid-cols-[1fr_300px] lg:items-center">
           <div>
             <ScrollReveal>
               <div className="inline-flex items-center gap-2 rounded-full bg-gold/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
@@ -107,7 +105,7 @@ export default async function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.04}>
-              <div className="mt-6">
+              <div className="mt-4">
                 <SectionTitle
                   as="h1"
                   eyebrow={`Small ${primaryArea} Building Team`}
@@ -119,7 +117,7 @@ export default async function Home() {
 
             {/* Personal note from the team */}
             <ScrollReveal delay={0.08}>
-              <figure className="mt-8 flex max-w-xl items-start gap-3 rounded-2xl border border-gold/25 bg-gold/8 p-5 text-graphite">
+              <figure className="mt-4 flex max-w-xl items-start gap-3 rounded-2xl border border-gold/25 bg-gold/8 p-4 text-graphite">
                 <span
                   aria-hidden="true"
                   className="font-serif text-3xl leading-none text-gold"
@@ -138,15 +136,15 @@ export default async function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.12}>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <a
-                  href="#lead-form-heading"
+                  href="/contact"
                   className="inline-flex items-center justify-center rounded-xl bg-graphite px-6 py-3 text-sm font-semibold text-stone-white shadow-sm transition hover:bg-graphite/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
                 >
                   Get a free quote
                 </a>
                 <a
-                  href="#project-gallery-heading"
+                  href="/gallery"
                   className="inline-flex items-center justify-center rounded-xl border border-graphite/15 bg-stone-white px-6 py-3 text-sm font-semibold text-graphite transition hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
                 >
                   See our recent work
@@ -155,7 +153,7 @@ export default async function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.16}>
-              <p className="mt-5 text-sm text-warm-mist">
+              <p className="mt-4 text-sm text-warm-mist">
                 Or call us on{" "}
                 <a
                   href={`tel:${phoneNumber.replace(/\s/g, "")}`}
@@ -170,53 +168,68 @@ export default async function Home() {
 
           {/* Sticky-note style Trust Card for Desktop */}
           <div className="hidden lg:block">
-            <div className="-translate-y-12">
+            <div className="-translate-y-4">
               <TrustCards />
             </div>
           </div>
         </div>
 
         {/* Trust cards for mobile - shown below the CTA */}
-        <div className="mt-12 lg:hidden">
+        <div className="mt-10 lg:hidden">
           <TrustCards />
         </div>
 
-        {/* Three pillars */}
-        <ScrollReveal delay={0.22}>
-          <div className="mt-8 grid gap-4 text-sm sm:grid-cols-3">
-            {pillars.map((card) => {
-              const wrapperClass =
-                card.variant === "graphite"
-                  ? "rounded-2xl bg-graphite p-6 text-stone-white shadow-sm"
-                  : card.variant === "gold"
-                    ? "rounded-2xl bg-gold p-6 text-stone-white shadow-sm"
-                    : "rounded-2xl border border-graphite/10 bg-parchment p-6 text-graphite shadow-sm";
-
-              const labelClass =
-                card.variant === "graphite"
-                  ? "text-xs font-semibold uppercase tracking-[0.15em] text-stone-white/60"
-                  : card.variant === "gold"
-                    ? "text-xs font-semibold uppercase tracking-[0.15em] text-stone-white/75"
-                    : "text-xs font-semibold uppercase tracking-[0.15em] text-warm-mist";
-
-              const bodyClass =
-                card.variant === "graphite"
-                  ? "mt-1 text-stone-white/75"
-                  : card.variant === "gold"
-                    ? "mt-1 text-stone-white/85"
-                    : "mt-1 text-warm-mist";
-
-              return (
-                <div key={card.pillar} className={wrapperClass}>
-                  <p className={labelClass}>{card.pillar}</p>
-                  <p className="mt-2 font-semibold">{card.title}</p>
-                  <p className={bodyClass}>{card.body}</p>
-                </div>
-              );
-            })}
-          </div>
-        </ScrollReveal>
       </HeroSection>
+
+      {/* ── Brand Pillars ── */}
+      <section id="brand-pillars" className="border-b border-graphite/8 bg-stone-white py-14 sm:py-16">
+        <div className="mx-auto max-w-6xl px-6 sm:px-10">
+          <ScrollReveal delay={0.04}>
+            <div className="mb-8">
+              <SectionTitle
+                eyebrow="Why Homeowners Choose Us"
+                title="Built around quality, cleanliness, and clear timelines"
+                description="Everything we do on site follows these three principles so you always know the standard to expect."
+              />
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.1}>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {pillars.map((card) => {
+                const wrapperClass =
+                  card.variant === "graphite"
+                    ? "rounded-2xl bg-graphite p-6 text-stone-white shadow-sm"
+                    : card.variant === "gold"
+                      ? "rounded-2xl bg-gold p-6 text-stone-white shadow-sm"
+                      : "rounded-2xl border border-graphite/10 bg-parchment p-6 text-graphite shadow-sm";
+
+                const labelClass =
+                  card.variant === "graphite"
+                    ? "text-xs font-semibold uppercase tracking-[0.15em] text-stone-white/60"
+                    : card.variant === "gold"
+                      ? "text-xs font-semibold uppercase tracking-[0.15em] text-stone-white/75"
+                      : "text-xs font-semibold uppercase tracking-[0.15em] text-warm-mist";
+
+                const bodyClass =
+                  card.variant === "graphite"
+                    ? "mt-1 text-stone-white/75"
+                    : card.variant === "gold"
+                      ? "mt-1 text-stone-white/85"
+                      : "mt-1 text-warm-mist";
+
+                return (
+                  <div key={card.pillar} className={wrapperClass}>
+                    <p className={labelClass}>{card.pillar}</p>
+                    <p className="mt-2 font-semibold">{card.title}</p>
+                    <p className={bodyClass}>{card.body}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
 
       {/* ── Areas we cover ── */}
       <section
