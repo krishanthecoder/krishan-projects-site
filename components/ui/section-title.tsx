@@ -20,7 +20,7 @@ export function SectionTitle({ as: Tag = "h2", id, eyebrow, title, description }
         {title}
       </Tag>
       {description ? (
-        <p className="max-w-2xl text-base leading-relaxed text-warm-mist sm:text-lg">
+        <p className="max-w-2xl text-base leading-relaxed text-graphite/85 sm:text-lg">
           {description}
         </p>
       ) : null}

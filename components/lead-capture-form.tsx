@@ -61,7 +61,7 @@ export function LeadCaptureForm() {
         >
           Message us about your project
         </h2>
-        <p className="max-w-md text-sm leading-relaxed text-warm-mist sm:text-base">
+        <p className="max-w-md text-sm leading-relaxed text-graphite/85 sm:text-base">
           Drop us a message and we&apos;ll get back to you today — a friendly chat about what you&apos;re planning, a free site visit, and a clear written quote. No commitment, no hard sell.
         </p>
       </div>

@@ -3,16 +3,19 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 
 import { BrandLockup } from "@/components/brand/brand-lockup";
+import { MainNav } from "@/components/main-nav";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Krishan Projects";
@@ -77,7 +80,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
       <body className="flex min-h-full flex-col bg-stone-white text-graphite">
         {/* Skip link */}
@@ -98,13 +101,18 @@ export default function RootLayout({
             >
               <BrandLockup />
             </Link>
-            <a
-              href={`tel:${phoneNumber.replace(/\s/g, "")}`}
-              className="shrink-0 rounded-xl px-4 py-2 text-sm font-semibold text-gold ring-1 ring-gold/40 transition-colors hover:bg-gold/8 hover:ring-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-              aria-label={`Call us at ${phoneNumber}`}
-            >
-              {phoneNumber}
-            </a>
+
+            <div className="flex items-center gap-8">
+              <MainNav />
+
+              <a
+                href={`tel:${phoneNumber.replace(/\s/g, "")}`}
+                className="shrink-0 rounded-xl bg-gold px-4 py-2 text-sm font-bold text-stone-white shadow-sm transition-all hover:bg-gold/90 active:scale-95 active:bg-gold/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                aria-label={`Call us at ${phoneNumber}`}
+              >
+                {phoneNumber}
+              </a>
+            </div>
           </div>
         </header>
 
@@ -115,7 +123,13 @@ export default function RootLayout({
           <div className="mx-auto max-w-6xl">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex flex-col gap-3">
-                <BrandLockup compact />
+                <Link
+                  href="/"
+                  className="transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                  aria-label={`${businessName} home`}
+                >
+                  <BrandLockup compact />
+                </Link>
                 <p className="text-sm text-warm-mist">Serving {serviceAreasLabel}</p>
               </div>
               <a

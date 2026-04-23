@@ -3,6 +3,7 @@ import { LeadCaptureForm } from "@/components/lead-capture-form";
 import { ProjectGallery } from "@/components/project-gallery";
 import { ProjectHero } from "@/components/project-hero";
 import { LocalBusinessJsonLd } from "@/components/seo/local-business-jsonld";
+import { TrustCards } from "@/components/trust-cards";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SectionTitle } from "@/components/ui/section-title";
 import { getAllTestimonials, getLatestProjectsForGallery } from "@/lib/sanity.queries";
@@ -93,76 +94,92 @@ export default async function Home() {
           Uses the featured project image as the background if available,
           falls back to a warm stone gradient. */}
       <HeroSection>
-        <ScrollReveal>
-          <div className="inline-flex items-center gap-2 rounded-full bg-gold/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
-            <span aria-hidden="true" className="relative flex h-2 w-2 shrink-0">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-gold motion-safe:animate-ping motion-safe:[animation-duration:2.4s]" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-gold motion-safe:animate-status-blink" />
-            </span>
-            Currently taking on new work
-          </div>
-        </ScrollReveal>
+        <div className="relative grid gap-12 lg:grid-cols-[1fr_340px] lg:items-center">
+          <div>
+            <ScrollReveal>
+              <div className="inline-flex items-center gap-2 rounded-full bg-gold/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
+                <span aria-hidden="true" className="relative flex h-2 w-2 shrink-0">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-gold motion-safe:animate-ping motion-safe:[animation-duration:2.4s]" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-gold motion-safe:animate-status-blink" />
+                </span>
+                Currently taking on new work
+              </div>
+            </ScrollReveal>
 
-        <ScrollReveal delay={0.04}>
-          <div className="mt-6">
-            <SectionTitle
-              as="h1"
-              eyebrow={`Small ${primaryArea} Building Team`}
-              title={`Builders and kitchen fitters you can actually trust in ${primaryArea}.`}
-              description={`We're a small team covering ${serviceAreasLabel}. Home renovations, kitchen fitting, extensions and general building works — done properly, kept tidy, and finished when we said we would.`}
-            />
-          </div>
-        </ScrollReveal>
+            <ScrollReveal delay={0.04}>
+              <div className="mt-6">
+                <SectionTitle
+                  as="h1"
+                  eyebrow={`Small ${primaryArea} Building Team`}
+                  title={`Builders and kitchen fitters you can actually trust in ${primaryArea}.`}
+                  description={`We're a small team covering ${serviceAreasLabel}. Home renovations, kitchen fitting, extensions and general building works — done properly, kept tidy, and finished when we said we would.`}
+                />
+              </div>
+            </ScrollReveal>
 
-        {/* Personal note from the team */}
-        <ScrollReveal delay={0.08}>
-          <figure className="mt-8 flex max-w-xl items-start gap-3 rounded-2xl border border-gold/25 bg-gold/8 p-5 text-graphite">
-            <span
-              aria-hidden="true"
-              className="font-serif text-3xl leading-none text-gold"
-            >
-              &ldquo;
-            </span>
-            <div>
-              <blockquote className="text-sm italic leading-relaxed text-graphite/80 sm:text-base">
-                We started {businessName} because we wanted to do things properly — give homeowners our full attention, be honest about timings, and take real pride in every job.
-              </blockquote>
-              <figcaption className="mt-2 text-xs font-semibold not-italic text-gold">
-                &mdash; The {businessName} team
-              </figcaption>
+            {/* Personal note from the team */}
+            <ScrollReveal delay={0.08}>
+              <figure className="mt-8 flex max-w-xl items-start gap-3 rounded-2xl border border-gold/25 bg-gold/8 p-5 text-graphite">
+                <span
+                  aria-hidden="true"
+                  className="font-serif text-3xl leading-none text-gold"
+                >
+                  &ldquo;
+                </span>
+                <div>
+                  <blockquote className="text-sm italic leading-relaxed text-graphite/90 sm:text-base">
+                    We started {businessName} because we wanted to do things properly — give homeowners our full attention, be honest about timings, and take real pride in every job.
+                  </blockquote>
+                  <figcaption className="mt-2 text-xs font-semibold not-italic text-gold">
+                    &mdash; The {businessName} team
+                  </figcaption>
+                </div>
+              </figure>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.12}>
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <a
+                  href="#lead-form-heading"
+                  className="inline-flex items-center justify-center rounded-xl bg-graphite px-6 py-3 text-sm font-semibold text-stone-white shadow-sm transition hover:bg-graphite/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                >
+                  Get a free quote
+                </a>
+                <a
+                  href="#project-gallery-heading"
+                  className="inline-flex items-center justify-center rounded-xl border border-graphite/15 bg-stone-white px-6 py-3 text-sm font-semibold text-graphite transition hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                >
+                  See our recent work
+                </a>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.16}>
+              <p className="mt-5 text-sm text-warm-mist">
+                Or call us on{" "}
+                <a
+                  href={`tel:${phoneNumber.replace(/\s/g, "")}`}
+                  className="font-semibold text-gold hover:text-gold/80"
+                >
+                  {phoneNumber}
+                </a>
+                {" "}— we&apos;ll get back to you the same day.
+              </p>
+            </ScrollReveal>
+          </div>
+
+          {/* Sticky-note style Trust Card for Desktop */}
+          <div className="hidden lg:block">
+            <div className="-translate-y-12">
+              <TrustCards />
             </div>
-          </figure>
-        </ScrollReveal>
-
-        <ScrollReveal delay={0.12}>
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
-            <a
-              href="#lead-form-heading"
-              className="inline-flex items-center justify-center rounded-xl bg-graphite px-6 py-3 text-sm font-semibold text-stone-white shadow-sm transition hover:bg-graphite/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-            >
-              Get a free quote
-            </a>
-            <a
-              href="#project-gallery-heading"
-              className="inline-flex items-center justify-center rounded-xl border border-graphite/15 bg-stone-white px-6 py-3 text-sm font-semibold text-graphite transition hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-            >
-              See our recent work
-            </a>
           </div>
-        </ScrollReveal>
+        </div>
 
-        <ScrollReveal delay={0.16}>
-          <p className="mt-5 text-sm text-warm-mist">
-            Or call us on{" "}
-            <a
-              href={`tel:${phoneNumber.replace(/\s/g, "")}`}
-              className="font-semibold text-gold hover:text-gold/80"
-            >
-              {phoneNumber}
-            </a>
-            {" "}— we&apos;ll get back to you the same day.
-          </p>
-        </ScrollReveal>
+        {/* Trust cards for mobile - shown below the CTA */}
+        <div className="mt-12 lg:hidden">
+          <TrustCards />
+        </div>
 
         {/* Three pillars */}
         <ScrollReveal delay={0.22}>
@@ -253,10 +270,10 @@ export default async function Home() {
               >
                 A small {primaryArea} building team — not a faceless company
               </h2>
-              <p className="max-w-xl text-sm leading-relaxed text-warm-mist sm:text-base">
+              <p className="max-w-xl text-sm leading-relaxed text-graphite/85 sm:text-base">
                 We&apos;re a small team of builders and fitters based in {primaryArea}, working directly with homeowners across {serviceAreasLabel}. No call centres. No rotating account managers. You get the same faces from the first quote to the day we hand the keys back.
               </p>
-              <p className="max-w-xl text-sm leading-relaxed text-warm-mist sm:text-base">
+              <p className="max-w-xl text-sm leading-relaxed text-graphite/85 sm:text-base">
                 Between us we&apos;ve got years of hands-on experience across kitchen fitting, full home renovations, extensions and general building works. We set this team up because we wanted to do things properly — honest pricing, tidy sites, and the level of care you&apos;d want in your own home.
               </p>
 
@@ -264,7 +281,7 @@ export default async function Home() {
                 <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-graphite/70">
                   Why homeowners shortlist us
                 </h3>
-                <ul className="mt-4 space-y-3 text-sm leading-relaxed text-warm-mist">
+                <ul className="mt-4 space-y-3 text-sm leading-relaxed text-graphite/85">
                   {shortlistReasons.map((reason) => (
                     <li key={reason} className="flex gap-3">
                       <span
@@ -292,7 +309,7 @@ export default async function Home() {
               >
                 A simple, honest process
               </h3>
-              <p className="mt-2 max-w-md text-sm leading-relaxed text-warm-mist">
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-graphite/85">
                 No middlemen, no call centres — just our team, from first message to snagging walkthrough.
               </p>
 
@@ -311,10 +328,10 @@ export default async function Home() {
                       ) : null}
                     </div>
                     <div className="pb-1">
-                      <p className="text-sm font-semibold text-graphite">
+                      <p className="text-sm font-bold text-graphite">
                         {step.title}
                       </p>
-                      <p className="mt-1 text-sm leading-relaxed text-warm-mist">
+                      <p className="mt-1 text-sm leading-relaxed text-graphite/85">
                         {step.body}
                       </p>
                     </div>
@@ -323,13 +340,6 @@ export default async function Home() {
               </ol>
             </div>
           </div>
-        </ScrollReveal>
-      </section>
-
-      {/* ── Project gallery ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
-        <ScrollReveal delay={0.04}>
-          <ProjectGallery />
         </ScrollReveal>
       </section>
 
@@ -372,7 +382,7 @@ export default async function Home() {
                     </div>
 
                     {/* Review body */}
-                    <p className="mt-4 flex-1 text-sm leading-relaxed text-warm-mist">
+                    <p className="mt-4 flex-1 text-sm leading-relaxed text-graphite/85">
                       {testimonial.content}
                     </p>
 
@@ -399,13 +409,6 @@ export default async function Home() {
           </div>
         </section>
       ) : null}
-
-      {/* ── Lead capture form ── */}
-      <section className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
-        <ScrollReveal delay={0.04}>
-          <LeadCaptureForm />
-        </ScrollReveal>
-      </section>
     </main>
   );
 }

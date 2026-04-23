@@ -5,9 +5,8 @@ import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 // A craftsman at work — warm, detailed, conveys precision and care.
-// Swap this URL (or pass backgroundSrc as a prop) to change the hero image.
-const DEFAULT_BG =
-  "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1920&q=85";
+// Using a local optimized image for maximum LCP performance.
+const DEFAULT_BG = "/hero-bg-opt.jpg";
 
 type HeroSectionProps = {
   children: React.ReactNode;
@@ -38,6 +37,8 @@ export function HeroSection({ children, backgroundSrc = DEFAULT_BG }: HeroSectio
         alt=""
         fill
         priority
+        loading="eager"
+        fetchPriority="high"
         sizes="100vw"
         className="object-cover object-center"
         aria-hidden="true"
