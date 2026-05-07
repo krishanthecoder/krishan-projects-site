@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 
 import { BrandLockup } from "@/components/brand/brand-lockup";
-import { MainNav } from "@/components/main-nav";
+import { Navbar } from "@/components/navbar";
+import { ScrollToTopButton } from "@/components/scroll-to-top";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -91,32 +92,11 @@ export default function RootLayout({
           Skip to main content
         </a>
 
-        {/* ── Sticky site header ── */}
-        <header className="sticky top-0 z-40 border-b border-graphite/8 bg-stone-white/95 backdrop-blur-sm">
-          <div className="mx-auto flex min-h-20 max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-10">
-            <Link
-              href="/"
-              className="transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-              aria-label={`${businessName} home`}
-            >
-              <BrandLockup />
-            </Link>
-
-            <div className="flex items-center gap-8">
-              <MainNav />
-
-              <a
-                href={`tel:${phoneNumber.replace(/\s/g, "")}`}
-                className="shrink-0 rounded-xl bg-gold px-4 py-2 text-sm font-bold text-stone-white shadow-sm transition-all hover:bg-gold/90 active:scale-95 active:bg-gold/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                aria-label={`Call us at ${phoneNumber}`}
-              >
-                {phoneNumber}
-              </a>
-            </div>
-          </div>
-        </header>
+        <Navbar businessName={businessName} phoneNumber={phoneNumber} />
 
         {children}
+
+        <ScrollToTopButton />
 
         {/* ── Site footer ── */}
         <footer className="border-t border-graphite/10 bg-parchment px-6 py-12 sm:px-10">

@@ -33,7 +33,7 @@ export function HeroSection({
   return (
     <section
       ref={ref}
-      className="relative flex min-h-[calc(100vh-5rem)] items-start overflow-hidden pt-16 sm:pt-20"
+      className="relative flex min-h-[calc(100svh-5rem)] items-start overflow-hidden pt-12 sm:min-h-[calc(100vh-5rem)] sm:pt-20"
       aria-label="Site hero"
     >
       {/* ── Static responsive background image ── */}

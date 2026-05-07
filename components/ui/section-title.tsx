@@ -16,11 +16,11 @@ export function SectionTitle({ as: Tag = "h2", id, eyebrow, title, description }
           {eyebrow}
         </p>
       ) : null}
-      <Tag id={id} className="text-4xl font-bold tracking-tight text-graphite sm:text-5xl lg:text-6xl">
+      <Tag id={id} className="text-3xl font-bold leading-tight tracking-tight text-graphite sm:text-5xl lg:text-6xl">
         {title}
       </Tag>
       {description ? (
-        <p className="max-w-2xl text-base leading-relaxed text-graphite/85 sm:text-lg">
+        <p className="max-w-2xl text-sm leading-relaxed text-graphite/85 sm:text-lg">
           {description}
         </p>
       ) : null}
