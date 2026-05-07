@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { useEffect, useState } from "react";
 
 type NavbarProps = {
@@ -17,12 +17,12 @@ const navLinks = [
   { name: "Contact", href: "/contact" },
 ];
 
-const menuPanel = {
+const menuPanel: Variants = {
   hidden: { clipPath: "circle(0px at calc(100% - 2rem) 2rem)", opacity: 0.95 },
   visible: {
     clipPath: "circle(150vmax at calc(100% - 2rem) 2rem)",
     opacity: 1,
-    transition: { type: "spring", stiffness: 180, damping: 26, mass: 0.8 },
+    transition: { stiffness: 180, damping: 26, mass: 0.8 },
   },
   exit: {
     clipPath: "circle(0px at calc(100% - 2rem) 2rem)",
