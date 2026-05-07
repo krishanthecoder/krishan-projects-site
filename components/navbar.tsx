@@ -16,6 +16,7 @@ const navLinks = [
   { name: "Projects", href: "/projects" },
   { name: "Contact", href: "/contact" },
 ];
+const mobileNavLinks = [{ name: "Home", href: "/" }, ...navLinks];
 
 const menuPanel: Variants = {
   hidden: { clipPath: "circle(0px at calc(100% - 2rem) 2rem)", opacity: 0.95 },
@@ -70,6 +71,7 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
     if (!isMenuOpen) return;
 
     const scrollY = window.scrollY;
+    const htmlElement = document.documentElement;
     document.body.style.position = "fixed";
     document.body.style.top = `-${scrollY}px`;
     document.body.style.width = "100%";
@@ -82,7 +84,12 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
       document.body.style.width = "";
       document.body.style.overflow = "";
       document.body.style.touchAction = "";
+      const previousScrollBehavior = htmlElement.style.scrollBehavior;
+      htmlElement.style.scrollBehavior = "auto";
       window.scrollTo(0, scrollY);
+      requestAnimationFrame(() => {
+        htmlElement.style.scrollBehavior = previousScrollBehavior;
+      });
     };
   }, [isMenuOpen]);
 
@@ -201,7 +208,7 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
               initial="hidden"
               animate="visible"
             >
-              {navLinks.map((link) => {
+              {mobileNavLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
                   <motion.li key={link.href} variants={linkItem}>

@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { BrandLockup } from "@/components/brand/brand-lockup";
 import { Navbar } from "@/components/navbar";
+import { RouteScrollReset } from "@/components/route-scroll-reset";
 import { ScrollToTopButton } from "@/components/scroll-to-top";
 import "./globals.css";
 
@@ -84,6 +85,8 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
       <body className="flex min-h-full flex-col bg-stone-white text-graphite">
+        <RouteScrollReset />
+
         {/* Skip link */}
         <a
           href="#main-content"

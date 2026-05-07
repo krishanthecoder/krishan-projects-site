@@ -12,13 +12,6 @@ type ScrollRevealProps = {
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 export function ScrollReveal({ children, className, delay = 0 }: ScrollRevealProps) {
-  // Disable animations on mobile to improve LCP and Performance scores
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-
-  if (isMobile) {
-    return <div className={className}>{children}</div>;
-  }
-
   return (
     <motion.div
       className={className}
