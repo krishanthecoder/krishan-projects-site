@@ -87,3 +87,15 @@ body {
     transform: rotate(2deg);
   }
 }
+
+@media (min-width: 1300px) {
+  .hero-fit-grid {
+    align-items: start;
+  }
+
+  /* Pull the reviews card up so it aligns with the left text block. */
+  .hero-fit-trust-inner {
+    transform: translateY(6.5rem);
+  }
+}
+

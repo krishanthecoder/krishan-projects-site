@@ -33,7 +33,7 @@ export function HeroSection({
   return (
     <section
       ref={ref}
-      className="relative flex min-h-[calc(100svh-5rem)] items-start overflow-hidden pt-12 sm:min-h-[calc(100vh-5rem)] sm:pt-20"
+      className="relative flex min-h-[calc(100svh-5rem)] items-start overflow-hidden py-16 sm:min-h-[calc(100vh-5rem)] sm:py-20 min-[1300px]:min-h-[calc(100vh-3rem)] min-[1300px]:py-20"
       aria-label="Site hero"
     >
       {/* ── Static responsive background image ── */}
@@ -63,21 +63,33 @@ export function HeroSection({
 
       {/* Curved transition into next section */}
       <svg
-        className="pointer-events-none absolute bottom-0 left-0 z-[1] h-36 w-full"
+        className="pointer-events-none absolute bottom-0 left-0 z-[1] h-44 w-full sm:h-48 min-[1300px]:hidden"
         viewBox="0 0 1000 240"
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        {/* Deeper downward curve (dips in the center) */}
+        {/* Below 1300px: immediate curvature (no flat shoulders), aligned near card divider */}
         <path
-          d="M0 0 C 250 200, 750 200, 1000 0 L1000 240 L0 240 Z"
+          d="M0 2 C 130 112, 370 158, 500 158 C 630 158, 870 112, 1000 2 L1000 240 L0 240 Z"
+          fill="#F9F9F8"
+        />
+      </svg>
+      <svg
+        className="pointer-events-none absolute bottom-0 left-0 z-[1] hidden h-20 w-full sm:h-24 min-[1300px]:block"
+        viewBox="0 0 1000 240"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {/* 1300px and above: keep the previous desktop curve shape */}
+        <path
+          d="M0 2 C 130 112, 370 158, 500 158 C 630 158, 870 112, 1000 2 L1000 240 L0 240 Z"
           fill="#F9F9F8"
         />
       </svg>
 
       {/* ── Content ── */}
       <motion.div
-        className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-8 sm:px-10 sm:pb-12"
+        className="relative z-10 mx-auto w-full max-w-6xl px-6 sm:px-10 min-[1300px]:pb-7"
         style={{ opacity: contentOpacity }}
       >
         {children}

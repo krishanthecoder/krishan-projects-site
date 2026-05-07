@@ -4,7 +4,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 export default function ServicesPage() {
   return (
     <main id="main-content" className="min-h-screen bg-stone-white">
-      <div className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
+      <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
         <ScrollReveal>
           <SectionTitle
             eyebrow="Our Expertise"

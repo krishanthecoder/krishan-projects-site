@@ -1,4 +1,5 @@
 import { HeroSection } from "@/components/hero-section";
+import { HowWeWorkSteps } from "@/components/how-we-work-steps";
 import { ProjectHero } from "@/components/project-hero";
 import { LocalBusinessJsonLd } from "@/components/seo/local-business-jsonld";
 import { TrustCards } from "@/components/trust-cards";
@@ -92,8 +93,8 @@ export default async function Home() {
           Uses the featured project image as the background if available,
           falls back to a warm stone gradient. */}
       <HeroSection>
-        <div className="relative grid gap-8 lg:grid-cols-[1fr_300px] lg:items-center">
-          <div>
+        <div className="hero-fit-grid relative grid gap-8 min-[1300px]:grid-cols-[1fr_300px] min-[1300px]:items-center">
+          <div className="hero-fit-copy">
             <ScrollReveal>
               <div className="inline-flex items-center gap-2 rounded-full bg-gold/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
                 <span aria-hidden="true" className="relative flex h-2 w-2 shrink-0">
@@ -105,7 +106,7 @@ export default async function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.04}>
-              <div className="mt-4">
+              <div className="hero-fit-title-wrap mt-6">
                 <SectionTitle
                   as="h1"
                   eyebrow={`Small ${primaryArea} Building Team`}
@@ -117,7 +118,7 @@ export default async function Home() {
 
             {/* Personal note from the team */}
             <ScrollReveal delay={0.08}>
-              <figure className="mt-4 flex max-w-xl items-start gap-3 rounded-2xl border border-gold/25 bg-gold/8 p-4 text-graphite">
+              <figure className="hero-fit-note mt-6 flex max-w-xl items-start gap-3 rounded-2xl border border-gold/25 bg-gold/8 p-5 text-graphite sm:p-6">
                 <span
                   aria-hidden="true"
                   className="font-serif text-3xl leading-none text-gold"
@@ -136,7 +137,7 @@ export default async function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.12}>
-              <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="hero-fit-cta mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
                 <a
                   href="/contact"
                   className="inline-flex items-center justify-center rounded-xl bg-graphite px-6 py-3 text-sm font-semibold text-stone-white shadow-sm transition hover:bg-graphite/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
@@ -153,7 +154,7 @@ export default async function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.16}>
-              <p className="mt-4 text-sm text-warm-mist">
+              <p className="hero-fit-call mt-6 text-sm leading-relaxed text-warm-mist sm:text-[0.95rem]">
                 Or call us on{" "}
                 <a
                   href={`tel:${phoneNumber.replace(/\s/g, "")}`}
@@ -167,15 +168,15 @@ export default async function Home() {
           </div>
 
           {/* Sticky-note style Trust Card for Desktop */}
-          <div className="hidden lg:block">
-            <div className="-translate-y-4">
+          <div className="hero-fit-trust hidden min-[1300px]:block">
+            <div className="hero-fit-trust-inner">
               <TrustCards />
             </div>
           </div>
         </div>
 
-        {/* Trust cards for mobile - shown below the CTA */}
-        <div className="mt-10 lg:hidden">
+        {/* Reviews card below CTA on sub-1300 layouts */}
+        <div className="mt-10 min-[1300px]:hidden">
           <TrustCards />
         </div>
 
@@ -310,7 +311,7 @@ export default async function Home() {
 
             {/* How we work */}
             <div
-              className="rounded-3xl border border-graphite/10 bg-parchment p-8 shadow-sm sm:p-10"
+              className="rounded-3xl border border-graphite/10 bg-parchment p-8 shadow-sm sm:p-10 lg:mt-10"
               aria-labelledby="how-we-work-heading"
             >
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
@@ -326,31 +327,7 @@ export default async function Home() {
                 No middlemen, no call centres — just our team, from first message to snagging walkthrough.
               </p>
 
-              <ol className="mt-8 space-y-6">
-                {processSteps.map((step, index) => (
-                  <li key={step.title} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-graphite text-xs font-bold text-stone-white">
-                        {index + 1}
-                      </span>
-                      {index < processSteps.length - 1 ? (
-                        <span
-                          aria-hidden="true"
-                          className="mt-1 w-px flex-1 bg-graphite/15"
-                        />
-                      ) : null}
-                    </div>
-                    <div className="pb-1">
-                      <p className="text-sm font-bold text-graphite">
-                        {step.title}
-                      </p>
-                      <p className="mt-1 text-sm leading-relaxed text-graphite/85">
-                        {step.body}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
+              <HowWeWorkSteps steps={processSteps.map((step) => ({ title: step.title, body: step.body }))} />
             </div>
           </div>
         </ScrollReveal>
