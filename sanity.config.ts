@@ -18,6 +18,10 @@ export default defineConfig({
   basePath: "/studio",
   projectId,
   dataset,
+  /** Classic per-document Publish (Content Releases hides/changes that flow by default). */
+  releases: {
+    enabled: false,
+  },
   plugins: [structureTool()],
   schema: {
     types: schemas,

@@ -41,11 +41,21 @@ export type GalleryProject = {
 
 export type GalleryImageItem = {
   _id: string;
+  /** Sanity project document id (multiple gallery rows can share one project). */
+  projectId: string;
   projectTitle: string;
   projectLocation?: string;
   projectValue?: number;
   services: string[];
+  /** Categories tagged on this image in Studio (gallery filter). */
+  galleryCategories: GalleryCategory[];
   image: SanityImage;
+};
+
+export type GalleryCategory = {
+  _id: string;
+  title: string;
+  slug: string;
 };
 
 export type Testimonial = {
@@ -106,9 +116,68 @@ const latestProjectsWithImagesQuery = groq`*[_type == "project"] | order(_create
       metadata{
         lqip
       }
+    },
+    galleryCategories[]->{
+      _id,
+      title,
+      "slug": slug.current
     }
   }
 }`;
+
+const galleryCategoriesQuery = groq`*[_type == "galleryCategory" && defined(slug.current)] | order(sortOrder asc, title asc) {
+  _id,
+  title,
+  "slug": slug.current
+}`;
+
+type GalleryImageFromGroq = SanityImage & {
+  _key?: string;
+  galleryCategories?: Array<{
+    _id: string;
+    title: string;
+    slug: string | null;
+  }> | null;
+};
+
+type ProjectRowForGallery = {
+  _id: string;
+  title: string;
+  projectLocation?: string;
+  projectValue?: number;
+  services?: string[];
+  images: GalleryImageFromGroq[] | null;
+};
+
+function galleryImagesFromProjects(projects: ProjectRowForGallery[]): GalleryImageItem[] {
+  return projects.flatMap((project) =>
+    (project.images ?? [])
+      .filter((img) => Boolean(img?.asset))
+      .map((img, index) => {
+        const { galleryCategories, ...rest } = img;
+        const normalized =
+          galleryCategories?.filter(
+            (c): c is GalleryCategory =>
+              Boolean(c?._id && typeof c.slug === "string" && c.slug.length > 0 && c.title),
+          ) ?? [];
+
+        return {
+          _id: `${project._id}-${index}`,
+          projectId: project._id,
+          projectTitle: project.title,
+          projectLocation: project.projectLocation,
+          projectValue: project.projectValue,
+          services: project.services ?? [],
+          galleryCategories: normalized,
+          image: rest as SanityImage,
+        };
+      }),
+  );
+}
+
+async function fetchLatestGalleryProjects(): Promise<ProjectRowForGallery[]> {
+  return sanityClient.fetch<ProjectRowForGallery[]>(latestProjectsWithImagesQuery);
+}
 
 export async function getAllProjects() {
   if (!sanityConfigured) {
@@ -136,27 +205,28 @@ export async function getLatestGalleryImages() {
     return [];
   }
 
-  const projects = await sanityClient.fetch<
-    Array<{
-      _id: string;
-      title: string;
-      projectLocation?: string;
-      projectValue?: number;
-      services?: string[];
-      images: SanityImage[] | null;
-    }>
-  >(latestProjectsWithImagesQuery);
+  const projects = await fetchLatestGalleryProjects();
+  return galleryImagesFromProjects(projects);
+}
 
-  return projects.flatMap((project) =>
-    (project.images ?? [])
-      .filter((image) => Boolean(image?.asset))
-      .map((image, index) => ({
-        _id: `${project._id}-${index}`,
-        projectTitle: project.title,
-        projectLocation: project.projectLocation,
-        projectValue: project.projectValue,
-        services: project.services ?? [],
-        image,
-      })),
-  ) as GalleryImageItem[];
+export async function getGalleryFilterData(): Promise<{
+  categories: GalleryCategory[];
+  images: GalleryImageItem[];
+}> {
+  if (!sanityConfigured) {
+    return { categories: [], images: [] };
+  }
+
+  const [rawCategories, projects] = await Promise.all([
+    sanityClient.fetch<Array<{ _id: string; title: string; slug: string | null }>>(galleryCategoriesQuery),
+    fetchLatestGalleryProjects(),
+  ]);
+
+  const categories: GalleryCategory[] = rawCategories
+    .filter((c): c is GalleryCategory => typeof c.slug === "string" && c.slug.length > 0 && Boolean(c.title));
+
+  return {
+    categories,
+    images: galleryImagesFromProjects(projects),
+  };
 }

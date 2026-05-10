@@ -1,4 +1,4 @@
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
 export const projectSchema = defineType({
   name: "project",
@@ -16,7 +16,7 @@ export const projectSchema = defineType({
       title: "Images",
       type: "array",
       of: [
-        {
+        defineArrayMember({
           type: "image",
           options: { hotspot: true },
           fields: [
@@ -28,8 +28,21 @@ export const projectSchema = defineType({
                 "Describe the image for accessibility and SEO (e.g. 'Kitchen renovation in Surrey with custom cabinets').",
               validation: (rule) => rule.required().min(10),
             }),
+            defineField({
+              name: "galleryCategories",
+              title: "Gallery categories",
+              type: "array",
+              description:
+                "Tags this photo appears under on the site gallery filter (optional).",
+              of: [
+                defineArrayMember({
+                  type: "reference",
+                  to: [{ type: "galleryCategory" }],
+                }),
+              ],
+            }),
           ],
-        },
+        }),
       ],
       validation: (rule) => rule.required().min(1),
     }),
@@ -60,7 +73,6 @@ export const projectSchema = defineType({
       type: "array",
       of: [{ type: "string" }],
       options: {
-        layout: "tags",
         list: [
           { title: "Plumbing", value: "Plumbing" },
           { title: "Renovation", value: "Renovation" },

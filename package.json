@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "sanity": "sanity",
+    "seed:gallery-categories": "node scripts/seed-gallery-categories.mjs",
+    "publish:gallery-category-drafts": "node scripts/publish-gallery-category-drafts.mjs",
     "cleanup:daily": "pkill -f \"next dev\" || true && rm -rf .next && npm cache clean --force"
   },
   "dependencies": {
