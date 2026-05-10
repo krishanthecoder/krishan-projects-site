@@ -99,3 +99,50 @@ body {
   }
 }
 
+/* ── Sub-1300px vertical rhythm: 20% less padding-top, bottom unchanged ──
+   Aligns with min-[1300px] layout tweaks. Targets shared py-* section/page spacing;
+   sm:* block follows so `py-16 sm:py-20` still resolves to reduced sm top padding. */
+@media (max-width: 1299px) {
+  .py-5 {
+    padding-top: calc(1.25rem * 0.8);
+    padding-bottom: 1.25rem;
+  }
+
+  .py-12 {
+    padding-top: calc(3rem * 0.8);
+    padding-bottom: 3rem;
+  }
+
+  .py-14 {
+    padding-top: calc(3.5rem * 0.8);
+    padding-bottom: 3.5rem;
+  }
+
+  .py-16 {
+    padding-top: calc(4rem * 0.8);
+    padding-bottom: 4rem;
+  }
+
+  .py-20 {
+    padding-top: calc(5rem * 0.8);
+    padding-bottom: 5rem;
+  }
+
+  .py-24 {
+    padding-top: calc(6rem * 0.8);
+    padding-bottom: 6rem;
+  }
+}
+
+@media (max-width: 1299px) and (min-width: 640px) {
+  .sm\:py-16 {
+    padding-top: calc(4rem * 0.8);
+    padding-bottom: 4rem;
+  }
+
+  .sm\:py-20 {
+    padding-top: calc(5rem * 0.8);
+    padding-bottom: 5rem;
+  }
+}
+

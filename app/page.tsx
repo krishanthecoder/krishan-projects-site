@@ -2,22 +2,11 @@ import { HeroSection } from "@/components/hero-section";
 import { HowWeWorkSteps } from "@/components/how-we-work-steps";
 import { ProjectHero } from "@/components/project-hero";
 import { LocalBusinessJsonLd } from "@/components/seo/local-business-jsonld";
+import { TestimonialCarousel } from "@/components/testimonial-carousel";
 import { TrustCards } from "@/components/trust-cards";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SectionTitle } from "@/components/ui/section-title";
 import { getAllTestimonials, getLatestProjectsForGallery } from "@/lib/sanity.queries";
-
-function formatPostedDate(dateString?: string) {
-  if (!dateString) return null;
-  const parsed = new Date(dateString);
-  if (Number.isNaN(parsed.getTime())) return null;
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(parsed);
-}
 
 const processSteps = [
   {
@@ -347,53 +336,11 @@ export default async function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.08}>
-              <div className="mt-12 grid gap-6 sm:grid-cols-2">
-                {testimonials.slice(0, 4).map((testimonial) => (
-                  <article
-                    key={testimonial._id}
-                    className="flex flex-col rounded-2xl border border-graphite/8 bg-stone-white p-6 shadow-sm"
-                  >
-                    {/* Stars */}
-                    <div
-                      className="flex items-center gap-1"
-                      aria-label={`Rating: ${testimonial.rating} out of 5`}
-                    >
-                      {Array.from({ length: 5 }).map((_, index) => (
-                        <span
-                          key={`${testimonial._id}-star-${index}`}
-                          aria-hidden="true"
-                          className={`text-sm leading-none ${
-                            index < testimonial.rating ? "text-gold" : "text-gold/25"
-                          }`}
-                        >
-                          ★
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Review body */}
-                    <p className="mt-4 flex-1 text-sm leading-relaxed text-graphite/85">
-                      {testimonial.content}
-                    </p>
-
-                    {/* Attribution */}
-                    <div className="mt-5 flex items-end justify-between gap-4 border-t border-graphite/8 pt-4">
-                      <div>
-                        <p className="text-sm font-semibold text-graphite">
-                          {testimonial.clientName}
-                        </p>
-                        {testimonial.jobTitle ? (
-                          <p className="mt-0.5 text-xs text-warm-mist">{testimonial.jobTitle}</p>
-                        ) : null}
-                      </div>
-                      {formatPostedDate(testimonial.createdAt) ? (
-                        <p className="shrink-0 text-xs text-warm-mist/70">
-                          {formatPostedDate(testimonial.createdAt)}
-                        </p>
-                      ) : null}
-                    </div>
-                  </article>
-                ))}
+              <div className="mt-12">
+                <TestimonialCarousel
+                  ariaLabelledBy="testimonials-heading"
+                  testimonials={testimonials.slice(0, 4)}
+                />
               </div>
             </ScrollReveal>
           </div>

@@ -102,27 +102,27 @@ export default function RootLayout({
         <ScrollToTopButton />
 
         {/* ── Site footer ── */}
-        <footer className="border-t border-graphite/10 bg-parchment px-6 py-12 sm:px-10">
-          <div className="mx-auto max-w-6xl">
+        <footer className="border-t border-gold/25 bg-graphite py-12 text-stone-white">
+          <div className="mx-auto max-w-6xl px-6 sm:px-10">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex flex-col gap-3">
                 <Link
                   href="/"
-                  className="transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                  className="transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-graphite"
                   aria-label={`${businessName} home`}
                 >
-                  <BrandLockup compact />
+                  <BrandLockup compact variant="inverted" />
                 </Link>
-                <p className="text-sm text-warm-mist">Serving {serviceAreasLabel}</p>
+                <p className="text-sm text-stone-white/75">Serving {serviceAreasLabel}</p>
               </div>
               <a
                 href={`tel:${phoneNumber.replace(/\s/g, "")}`}
-                className="text-sm font-semibold text-gold transition-colors hover:text-gold/75 focus-visible:outline-none focus-visible:underline"
+                className="text-sm font-semibold text-gold transition-colors hover:text-gold/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-graphite"
               >
                 {phoneNumber}
               </a>
             </div>
-            <p className="mt-6 text-xs text-warm-mist/70">
+            <p className="mt-6 text-xs text-stone-white/55">
               &copy; {new Date().getFullYear()} {businessName}. All rights reserved.
             </p>
           </div>

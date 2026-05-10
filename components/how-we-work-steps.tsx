@@ -1,6 +1,11 @@
 "use client";
 
-import { motion, useAnimationControls, useInView } from "framer-motion";
+import {
+  motion,
+  useAnimationControls,
+  useInView,
+  useReducedMotion,
+} from "framer-motion";
 import { useEffect, useRef } from "react";
 
 type Step = {
@@ -12,117 +17,153 @@ type HowWeWorkStepsProps = {
   steps: Step[];
 };
 
+const sequenceStart = 0.22;
+/** Time for a step number to pulse up to sustained gold */
+const numberGlowDuration = 0.4;
+/** Pause after the number glows before travel begins */
+const pauseBeforeTravel = 0.06;
+/** Glow travels down the connector toward the arrow */
+const travelDuration = 0.26;
+
+const segmentCycle =
+  numberGlowDuration + pauseBeforeTravel + travelDuration;
+
+const goldBg = "rgba(196,151,61,1)";
+const goldBgHold = "rgba(196,151,61,0.95)";
+const graphiteBg = "rgba(51,51,51,1)";
+const arrowDim = "rgba(51,51,51,0.25)";
+const arrowGold = "rgba(196,151,61,0.96)";
+
 export function HowWeWorkSteps({ steps }: HowWeWorkStepsProps) {
-  const listRef = useRef<HTMLOListElement | null>(null);
-  const isInView = useInView(listRef, { once: true, amount: 0.25 });
+  /** Gate animation until this block is well inside the viewport (not a sliver at the edge). */
+  const viewportAnchorRef = useRef<HTMLDivElement | null>(null);
+  const isInView = useInView(viewportAnchorRef, {
+    once: true,
+    /* Require ~half the steps list visible — avoids starting while still “below the fold edge”. */
+    amount: 0.45,
+    /* Shrink the observer root inward so the user must scroll the section into view comfortably. */
+    margin: "-72px 0px -100px 0px",
+  });
   const controls = useAnimationControls();
-  const lineDuration = 1.9;
-  const stepDelay = 0.9;
-  const sequenceStart = 0.3;
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!isInView) return;
-    controls.start("glow");
-  }, [controls, isInView]);
+    controls.start(reduceMotion ? "instant" : "sequence");
+  }, [controls, isInView, reduceMotion]);
 
   return (
-    <ol ref={listRef} className="mt-8 space-y-6">
+    <div ref={viewportAnchorRef}>
+      <ol className="mt-8 space-y-6">
       {steps.map((step, index) => (
         <li key={step.title} className="flex gap-4">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center self-stretch">
             <motion.span
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-graphite text-xs font-bold text-stone-white"
               initial="idle"
               animate={controls}
               variants={{
                 idle: {
-                  backgroundColor: "rgba(51,51,51,1)",
+                  backgroundColor: graphiteBg,
                   boxShadow: "0 0 0 rgba(196,151,61,0)",
                 },
-                glow: {
+                instant: {
+                  backgroundColor: goldBgHold,
+                  boxShadow: "0 0 12px rgba(196,151,61,0.55)",
+                  transition: { duration: 0 },
+                },
+                sequence: {
                   backgroundColor: [
-                    "rgba(51,51,51,1)",
-                    "rgba(196,151,61,1)",
-                    "rgba(196,151,61,0.95)",
+                    graphiteBg,
+                    goldBg,
+                    goldBgHold,
                   ],
                   boxShadow: [
                     "0 0 0 rgba(196,151,61,0)",
-                    "0 0 12px rgba(196,151,61,0.75)",
-                    "0 0 0 rgba(196,151,61,0)",
+                    "0 0 14px rgba(196,151,61,0.8)",
+                    "0 0 10px rgba(196,151,61,0.55)",
                   ],
+                  transition: {
+                    duration: numberGlowDuration,
+                    delay: sequenceStart + index * segmentCycle,
+                    ease: "easeOut",
+                    times: [0, 0.55, 1],
+                  },
                 },
-              }}
-              transition={{
-                duration: 0.8,
-                delay:
-                  index === 0
-                    ? sequenceStart * 0.7
-                    : sequenceStart + (index - 1) * stepDelay + lineDuration * 0.72,
-                ease: "easeInOut",
               }}
             >
               {index + 1}
             </motion.span>
             {index < steps.length - 1 ? (
-              <div aria-hidden="true" className="mt-1 flex flex-1 flex-col items-center">
+              <div
+                aria-hidden="true"
+                className="mt-1 flex min-h-[1.5rem] w-[3px] flex-1 flex-col items-stretch"
+              >
+                <div className="relative flex min-h-[1rem] flex-1 flex-col">
+                  {/* Dim track only behind the vertical stem */}
+                  <span className="pointer-events-none absolute inset-0 rounded-full bg-graphite/15" />
+                  {/* Glow travels top → bottom toward the arrow */}
+                  <motion.span
+                    className="relative z-[1] w-full flex-1 origin-top rounded-full bg-[rgba(196,151,61,0.96)] shadow-[0_0_10px_rgba(196,151,61,0.65)]"
+                    initial="idle"
+                    animate={controls}
+                    variants={{
+                      idle: {
+                        scaleY: 0,
+                      },
+                      instant: {
+                        scaleY: 1,
+                        transition: { duration: 0 },
+                      },
+                      sequence: {
+                        scaleY: [0, 1],
+                        transition: {
+                          duration: travelDuration,
+                          delay:
+                            sequenceStart +
+                            index * segmentCycle +
+                            numberGlowDuration +
+                            pauseBeforeTravel,
+                          /* Snappy: most of the motion early, sharp settle */
+                          ease: [0.14, 0.95, 0.28, 1],
+                        },
+                      },
+                    }}
+                  />
+                </div>
                 <motion.span
-                  className="w-[3px] flex-1 rounded-full bg-graphite/15"
+                  className="relative z-[2] mt-0.5 h-0 w-0 shrink-0 self-center border-l-[5px] border-r-[5px] border-t-[8px] border-l-transparent border-r-transparent border-t-graphite/20"
                   initial="idle"
                   animate={controls}
                   variants={{
                     idle: {
-                      opacity: 0.55,
-                      backgroundColor: "rgba(51,51,51,0.22)",
-                      boxShadow: "0 0 0 rgba(196,151,61,0)",
-                    },
-                    glow: {
-                      opacity: [0.55, 1, 0.72],
-                      backgroundColor: [
-                        "rgba(51,51,51,0.22)",
-                        "rgba(196,151,61,0.98)",
-                        "rgba(51,51,51,0.25)",
-                      ],
-                      boxShadow: [
-                        "0 0 0 rgba(196,151,61,0)",
-                        "0 0 14px rgba(196,151,61,0.85)",
-                        "0 0 0 rgba(196,151,61,0)",
-                      ],
-                    },
-                  }}
-                  transition={{
-                    duration: lineDuration,
-                    delay: sequenceStart + index * stepDelay,
-                    ease: "easeInOut",
-                  }}
-                />
-                <motion.span
-                  className="h-0 w-0 border-l-[5px] border-r-[5px] border-t-[8px] border-l-transparent border-r-transparent border-t-graphite/20"
-                  initial="idle"
-                  animate={controls}
-                  variants={{
-                    idle: {
-                      opacity: 0.7,
-                      borderTopColor: "rgba(51,51,51,0.25)",
+                      opacity: 0.65,
+                      borderTopColor: arrowDim,
                       filter: "drop-shadow(0 0 0 rgba(196,151,61,0))",
                     },
-                    glow: {
-                      opacity: [0.7, 1, 0.78],
-                      borderTopColor: [
-                        "rgba(51,51,51,0.25)",
-                        "rgba(196,151,61,0.98)",
-                        "rgba(51,51,51,0.28)",
-                      ],
+                    instant: {
+                      opacity: 1,
+                      borderTopColor: arrowGold,
+                      filter: "drop-shadow(0 0 6px rgba(196,151,61,0.7))",
+                      transition: { duration: 0 },
+                    },
+                    sequence: {
+                      opacity: [0.65, 1, 1],
+                      borderTopColor: [arrowDim, arrowGold, arrowGold],
                       filter: [
                         "drop-shadow(0 0 0 rgba(196,151,61,0))",
-                        "drop-shadow(0 0 8px rgba(196,151,61,0.8))",
-                        "drop-shadow(0 0 0 rgba(196,151,61,0))",
+                        "drop-shadow(0 0 10px rgba(196,151,61,0.85))",
+                        "drop-shadow(0 0 6px rgba(196,151,61,0.7))",
                       ],
+                      transition: {
+                        duration: 0.18,
+                        delay:
+                          sequenceStart +
+                          (index + 1) * segmentCycle,
+                        ease: [0.14, 0.95, 0.28, 1],
+                        times: [0, 0.42, 1],
+                      },
                     },
-                  }}
-                  transition={{
-                    duration: lineDuration,
-                    delay: sequenceStart + index * stepDelay,
-                    ease: "easeInOut",
                   }}
                 />
               </div>
@@ -130,10 +171,13 @@ export function HowWeWorkSteps({ steps }: HowWeWorkStepsProps) {
           </div>
           <div className="pb-1">
             <p className="text-sm font-bold text-graphite">{step.title}</p>
-            <p className="mt-1 text-sm leading-relaxed text-graphite/85">{step.body}</p>
+            <p className="mt-1 text-sm leading-relaxed text-graphite/85">
+              {step.body}
+            </p>
           </div>
         </li>
       ))}
-    </ol>
+      </ol>
+    </div>
   );
 }
