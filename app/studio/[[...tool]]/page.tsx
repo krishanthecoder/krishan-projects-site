@@ -4,19 +4,18 @@ import { NextStudio } from "next-sanity/studio";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 
+import { sanityApiVersion, sanityDataset, sanityProjectId } from "@/sanity/env";
 import { schemas } from "@/sanity/schemas";
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production";
-
 const studioConfig =
-  projectId &&
+  sanityProjectId &&
   defineConfig({
     name: "default",
     title: "Krishan Construction CMS",
     basePath: "/studio",
-    projectId,
-    dataset,
+    projectId: sanityProjectId,
+    dataset: sanityDataset,
+    apiVersion: sanityApiVersion,
     /** Keep in sync with sanity.config.ts (embedded Studio used this file only). */
     releases: {
       enabled: false,

@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { buildImageAltText } from "@/lib/project-image-alt";
 import type { GalleryProject } from "@/lib/sanity.queries";
 
 import { SanityImage } from "./sanity-image";
@@ -15,17 +18,6 @@ function formatGbpValue(value?: number) {
   }).format(value);
 }
 
-function formatProjectScope(services: string[] = []) {
-  const cleanedServices = services
-    .map((service) => service.trim())
-    .filter(Boolean)
-    .slice(0, 2);
-
-  if (cleanedServices.length === 0) return "home renovation";
-  if (cleanedServices.length === 1) return cleanedServices[0];
-  return `${cleanedServices[0]} and ${cleanedServices[1]}`;
-}
-
 export function ProjectHero({ project }: ProjectHeroProps) {
   if (!project?.image) {
     return (
@@ -37,21 +29,21 @@ export function ProjectHero({ project }: ProjectHeroProps) {
           A look inside the work we do.
         </h2>
         <p className="mt-3 max-w-sm text-base leading-relaxed text-stone-white/60">
-          Add a project image in Sanity Studio and this panel will pull in automatically.
+          Add a project with a slug and featured image in Sanity Studio and this panel will pull in automatically.
         </p>
       </section>
     );
   }
 
-  const heroAlt =
-    project.image.alt?.trim() ||
-    `${formatProjectScope(project.services)} project by ${project.title}${project.projectLocation ? ` in ${project.projectLocation}` : " in London"}`;
+  const heroAlt = buildImageAltText(
+    project.image.alt,
+    project.title,
+    project.services,
+    project.projectLocation,
+  );
 
-  return (
-    <section className="space-y-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-        From a recent job
-      </p>
+  const inner = (
+    <>
       <div className="relative h-96 overflow-hidden rounded-3xl border border-graphite/10 shadow-md sm:h-[28rem]">
         <SanityImage
           image={project.image}
@@ -61,7 +53,6 @@ export function ProjectHero({ project }: ProjectHeroProps) {
           sizes="(max-width: 768px) 100vw, 85vw"
           className="object-cover transition-transform duration-700 hover:scale-[1.02]"
         />
-        {/* Bottom gradient overlay */}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-graphite/85 via-graphite/30 to-transparent px-8 py-7">
           <h2 className="text-2xl font-bold tracking-tight text-stone-white sm:text-3xl">
             {project.title}
@@ -76,6 +67,25 @@ export function ProjectHero({ project }: ProjectHeroProps) {
           ) : null}
         </div>
       </div>
+    </>
+  );
+
+  return (
+    <section className="space-y-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+        From a recent job
+      </p>
+      {project.slug ? (
+        <Link
+          href={`/projects/${project.slug}`}
+          className="block rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-parchment"
+          aria-label={`View project: ${project.title}`}
+        >
+          {inner}
+        </Link>
+      ) : (
+        inner
+      )}
     </section>
   );
 }

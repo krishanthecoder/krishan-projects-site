@@ -5,40 +5,9 @@
  * Run: npm run seed:gallery-categories
  */
 
-import { readFileSync, existsSync } from "node:fs";
-import { resolve } from "node:path";
 import { createClient } from "next-sanity";
 
-function loadEnvFiles() {
-  for (const name of [".env", ".env.local"]) {
-    const p = resolve(process.cwd(), name);
-    if (!existsSync(p)) continue;
-    const text = readFileSync(p, "utf8");
-    for (const rawLine of text.split("\n")) {
-      const line = rawLine.trim();
-      if (!line || line.startsWith("#")) continue;
-      const eq = line.indexOf("=");
-      if (eq === -1) continue;
-      const key = line.slice(0, eq).trim();
-      let val = line.slice(eq + 1).trim();
-      if (
-        (val.startsWith('"') && val.endsWith('"')) ||
-        (val.startsWith("'") && val.endsWith("'"))
-      ) {
-        val = val.slice(1, -1);
-      }
-      if (process.env[key] === undefined) process.env[key] = val;
-    }
-  }
-}
-
-loadEnvFiles();
-
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production";
-const apiVersion =
-  process.env.NEXT_PUBLIC_SANITY_API_VERSION ?? "2026-04-21";
-const token = process.env.SANITY_API_WRITE_TOKEN;
+import { loadEnvFiles, resolveSanityWriteTokenOrExit } from "./load-env.mjs";
 
 /** Stable IDs so seed does not duplicate; skips create if doc already exists (Studio edits kept). */
 const DEFAULT_CATEGORIES = [
@@ -59,18 +28,20 @@ const DEFAULT_CATEGORIES = [
 ];
 
 async function main() {
+  loadEnvFiles();
+
+  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   if (!projectId) {
     console.error(
       "Missing NEXT_PUBLIC_SANITY_PROJECT_ID (set in .env.local or the shell).",
     );
     process.exit(1);
   }
-  if (!token) {
-    console.error(
-      "Missing SANITY_API_WRITE_TOKEN. Create a token with Editor (or write) rights at sanity.io/manage.",
-    );
-    process.exit(1);
-  }
+
+  const token = resolveSanityWriteTokenOrExit();
+  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production";
+  const apiVersion =
+    process.env.NEXT_PUBLIC_SANITY_API_VERSION ?? "2026-04-21";
 
   const client = createClient({
     projectId,

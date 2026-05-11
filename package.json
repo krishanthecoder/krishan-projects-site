@@ -9,6 +9,7 @@
     "lint": "eslint",
     "sanity": "sanity",
     "seed:gallery-categories": "node scripts/seed-gallery-categories.mjs",
+    "seed:example-project": "node scripts/seed-example-project.mjs",
     "publish:gallery-category-drafts": "node scripts/publish-gallery-category-drafts.mjs",
     "migrate:gallery-category-refs-weak": "node scripts/weakify-gallery-category-refs.mjs",
     "cleanup:daily": "pkill -f \"next dev\" || true && rm -rf .next && npm cache clean --force"
