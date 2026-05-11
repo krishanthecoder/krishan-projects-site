@@ -17,6 +17,10 @@ const studioConfig =
     basePath: "/studio",
     projectId,
     dataset,
+    /** Keep in sync with sanity.config.ts (embedded Studio used this file only). */
+    releases: {
+      enabled: false,
+    },
     plugins: [structureTool()],
     schema: {
       types: schemas,

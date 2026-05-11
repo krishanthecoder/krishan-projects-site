@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Link from "next/link";
 
-import { BrandLockup } from "@/components/brand/brand-lockup";
-import { Navbar } from "@/components/navbar";
 import { RouteScrollReset } from "@/components/route-scroll-reset";
-import { ScrollToTopButton } from "@/components/scroll-to-top";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,7 +24,6 @@ const serviceAreas = (process.env.NEXT_PUBLIC_BUSINESS_SERVICE_AREAS ?? "London,
 const primaryArea = serviceAreas[0] ?? "London";
 const serviceAreasLabel = serviceAreas.join(", ");
 const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL ?? "https://krishanprojects.co.uk";
-const phoneNumber = process.env.NEXT_PUBLIC_BUSINESS_PHONE ?? "07572138829";
 
 export const metadata: Metadata = {
   metadataBase: new URL(websiteUrl),
@@ -84,49 +79,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="flex min-h-full flex-col bg-stone-white text-graphite">
+      <body className="min-h-full bg-stone-white text-graphite">
         <RouteScrollReset />
-
-        {/* Skip link */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-stone-white focus:px-3 focus:py-2 focus:text-graphite focus:shadow-md focus:outline-none focus:ring-2 focus:ring-gold"
-        >
-          Skip to main content
-        </a>
-
-        <Navbar businessName={businessName} phoneNumber={phoneNumber} />
-
         {children}
-
-        <ScrollToTopButton />
-
-        {/* ── Site footer ── */}
-        <footer className="border-t border-gold/25 bg-graphite py-12 text-stone-white">
-          <div className="mx-auto max-w-6xl px-6 sm:px-10">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-col gap-3">
-                <Link
-                  href="/"
-                  className="transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-graphite"
-                  aria-label={`${businessName} home`}
-                >
-                  <BrandLockup compact variant="inverted" />
-                </Link>
-                <p className="text-sm text-stone-white/75">Serving {serviceAreasLabel}</p>
-              </div>
-              <a
-                href={`tel:${phoneNumber.replace(/\s/g, "")}`}
-                className="text-sm font-semibold text-gold transition-colors hover:text-gold/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-graphite"
-              >
-                {phoneNumber}
-              </a>
-            </div>
-            <p className="mt-6 text-xs text-stone-white/55">
-              &copy; {new Date().getFullYear()} {businessName}. All rights reserved.
-            </p>
-          </div>
-        </footer>
       </body>
     </html>
   );

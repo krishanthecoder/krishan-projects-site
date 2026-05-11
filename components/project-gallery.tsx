@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -58,11 +58,6 @@ type ProjectGalleryProps = {
   showHeadline?: boolean;
 };
 
-type GalleryCategoryMenuState = {
-  open: boolean;
-  highlightIndex: number;
-};
-
 export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
   const [images, setImages] = useState<GalleryImageItem[]>([]);
   const [categories, setCategories] = useState<GalleryCategory[]>([]);
@@ -70,14 +65,8 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [categoryMenu, setCategoryMenu] = useState<GalleryCategoryMenuState>({
-    open: false,
-    highlightIndex: 0,
-  });
   const lastFocusedRef = useRef<HTMLElement | null>(null);
   const filteredLengthRef = useRef(0);
-  const categoryTriggerRef = useRef<HTMLButtonElement>(null);
-  const categoryListRef = useRef<HTMLDivElement>(null);
 
   const filteredImages = useMemo(() => {
     if (!selectedSlug) return images;
@@ -91,32 +80,9 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
     [categories, selectedSlug],
   );
 
-  const categoryOptions = useMemo(
-    () => [
-      { slug: "", title: "All Job Categories" },
-      ...categories.map((c) => ({ slug: c.slug, title: c.title })),
-    ],
-    [categories],
-  );
-
-  const categoryTriggerLabel = selectedSlug
-    ? selectedCategoryTitle || "Category"
-    : "All Job Categories";
-
-  const selectedCategoryOptionIndex = useMemo(
-    () =>
-      Math.max(
-        0,
-        categoryOptions.findIndex((o) => o.slug === selectedSlug),
-      ),
-    [categoryOptions, selectedSlug],
-  );
-
   const selectCategorySlug = useCallback((slug: string) => {
     setSelectedSlug(slug);
     setSelectedIndex(null);
-    setCategoryMenu((prev) => ({ ...prev, open: false }));
-    categoryTriggerRef.current?.focus();
   }, []);
 
   const closeModal = useCallback(() => {
@@ -165,27 +131,6 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
   useLayoutEffect(() => {
     filteredLengthRef.current = filteredImages.length;
   }, [filteredImages.length]);
-
-  useLayoutEffect(() => {
-    if (!categoryMenu.open) return;
-    categoryListRef.current?.focus();
-  }, [categoryMenu.open]);
-
-  useEffect(() => {
-    if (!categoryMenu.open) return;
-    const onPointerDown = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (
-        categoryTriggerRef.current?.contains(target) ||
-        categoryListRef.current?.contains(target)
-      ) {
-        return;
-      }
-      setCategoryMenu((prev) => ({ ...prev, open: false }));
-    };
-    document.addEventListener("mousedown", onPointerDown);
-    return () => document.removeEventListener("mousedown", onPointerDown);
-  }, [categoryMenu.open]);
 
   useEffect(() => {
     let active = true;
@@ -255,144 +200,50 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
         ) : null}
 
         {!isLoading && !hasError && images.length > 0 ? (
-          <div className="relative z-10 flex flex-col gap-2 sm:max-w-md">
-            <label
+          <div className="relative z-10 flex flex-col gap-3">
+            <p
               id="gallery-category-filter-label"
-              htmlFor="gallery-category-filter"
               className="text-xs font-semibold uppercase tracking-[0.15em] text-warm-mist"
             >
-              Select categories to see job pictures
-            </label>
-            <div className="relative">
+              Filter by job category
+            </p>
+            <div
+              role="radiogroup"
+              aria-labelledby="gallery-category-filter-label"
+              className="flex flex-wrap gap-2"
+            >
               <button
-                ref={categoryTriggerRef}
                 type="button"
-                id="gallery-category-filter"
-                aria-haspopup="listbox"
-                aria-expanded={categoryMenu.open}
-                aria-controls="gallery-category-listbox"
-                aria-labelledby="gallery-category-filter-label"
-                onClick={() => {
-                  setCategoryMenu((prev) =>
-                    prev.open
-                      ? { ...prev, open: false }
-                      : {
-                          open: true,
-                          highlightIndex: selectedCategoryOptionIndex,
-                        },
-                  );
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    event.preventDefault();
-                    setCategoryMenu((prev) => ({ ...prev, open: false }));
-                    return;
-                  }
-                  if (
-                    event.key === "ArrowDown" ||
-                    event.key === "ArrowUp" ||
-                    event.key === "Enter" ||
-                    event.key === " "
-                  ) {
-                    if (!categoryMenu.open && event.key !== "Escape") {
-                      event.preventDefault();
-                      setCategoryMenu({
-                        open: true,
-                        highlightIndex: selectedCategoryOptionIndex,
-                      });
-                    }
-                  }
-                }}
-                className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-graphite/15 bg-stone-white px-4 py-3 text-left text-sm text-graphite outline-none transition hover:border-graphite/25 focus-visible:border-gold focus-visible:ring-2 focus-visible:ring-gold/25"
+                role="radio"
+                aria-checked={selectedSlug === ""}
+                onClick={() => selectCategorySlug("")}
+                className={`cursor-pointer rounded-full border px-4 py-2.5 text-sm font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+                  selectedSlug === ""
+                    ? "border-gold bg-gold/15 text-graphite shadow-sm"
+                    : "border-graphite/15 bg-stone-white text-graphite hover:border-graphite/30 hover:bg-parchment"
+                }`}
               >
-                <span className="min-w-0 truncate">{categoryTriggerLabel}</span>
-                <ChevronDown
-                  className={`h-4 w-4 shrink-0 text-graphite/60 transition-transform duration-200 ${categoryMenu.open ? "rotate-180" : ""}`}
-                  aria-hidden
-                />
+                All job categories
               </button>
-
-              {categoryMenu.open ? (
-                <div
-                  ref={categoryListRef}
-                  id="gallery-category-listbox"
-                  role="listbox"
-                  aria-labelledby="gallery-category-filter-label"
-                  tabIndex={-1}
-                  className="absolute left-0 right-0 top-full z-30 mt-1 max-h-60 overflow-auto rounded-xl border border-graphite/15 bg-stone-white py-1 shadow-lg shadow-graphite/10 outline-none ring-1 ring-black/5"
-                  onKeyDown={(event) => {
-                    const last = categoryOptions.length - 1;
-                    if (event.key === "Escape") {
-                      event.preventDefault();
-                      setCategoryMenu((prev) => ({ ...prev, open: false }));
-                      categoryTriggerRef.current?.focus();
-                      return;
-                    }
-                    if (event.key === "ArrowDown") {
-                      event.preventDefault();
-                      setCategoryMenu((prev) => ({
-                        ...prev,
-                        highlightIndex:
-                          prev.highlightIndex >= last ? 0 : prev.highlightIndex + 1,
-                      }));
-                      return;
-                    }
-                    if (event.key === "ArrowUp") {
-                      event.preventDefault();
-                      setCategoryMenu((prev) => ({
-                        ...prev,
-                        highlightIndex:
-                          prev.highlightIndex <= 0 ? last : prev.highlightIndex - 1,
-                      }));
-                      return;
-                    }
-                    if (event.key === "Home") {
-                      event.preventDefault();
-                      setCategoryMenu((prev) => ({ ...prev, highlightIndex: 0 }));
-                      return;
-                    }
-                    if (event.key === "End") {
-                      event.preventDefault();
-                      setCategoryMenu((prev) => ({ ...prev, highlightIndex: last }));
-                      return;
-                    }
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      const choice =
-                        categoryOptions[categoryMenu.highlightIndex];
-                      if (choice) selectCategorySlug(choice.slug);
-                    }
-                  }}
-                >
-                  {categoryOptions.map((option, index) => {
-                    const selected = option.slug === selectedSlug;
-                    const highlighted = index === categoryMenu.highlightIndex;
-                    return (
-                      <div
-                        key={option.slug === "" ? "__all" : option.slug}
-                        role="option"
-                        aria-selected={selected}
-                        tabIndex={-1}
-                        className={`cursor-pointer px-4 py-2.5 text-sm outline-none transition ${
-                          highlighted
-                            ? "bg-gold/15 text-graphite"
-                            : "text-graphite hover:bg-parchment"
-                        } ${selected ? "font-semibold" : "font-normal"}`}
-                        onMouseEnter={() =>
-                          setCategoryMenu((prev) => ({
-                            ...prev,
-                            highlightIndex: index,
-                          }))
-                        }
-                        onMouseDown={(event) => event.preventDefault()}
-                        onClick={() => selectCategorySlug(option.slug)}
-                      >
-                        {option.title}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : null}
+              {categories.map((category) => {
+                const active = selectedSlug === category.slug;
+                return (
+                  <button
+                    key={category._id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => selectCategorySlug(category.slug)}
+                    className={`cursor-pointer rounded-full border px-4 py-2.5 text-sm font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+                      active
+                        ? "border-gold bg-gold/15 text-graphite shadow-sm"
+                        : "border-graphite/15 bg-stone-white text-graphite hover:border-graphite/30 hover:bg-parchment"
+                    }`}
+                  >
+                    {category.title}
+                  </button>
+                );
+              })}
             </div>
           </div>
         ) : null}
@@ -432,7 +283,7 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
             <span className="font-semibold text-graphite">
               {selectedCategoryTitle || "this category"}
             </span>{" "}
-            yet. Try another category or choose &ldquo;All Job Categories&rdquo;.
+            yet. Try another category or tap &ldquo;All job categories&rdquo;.
           </p>
         ) : null}
 

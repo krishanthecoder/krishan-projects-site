@@ -18,7 +18,17 @@ export const galleryCategorySchema = defineType({
       title: "Slug",
       type: "slug",
       options: { source: "title", maxLength: 96 },
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.custom((value) => {
+          const current =
+            value && typeof value === "object" && "current" in value
+              ? (value as { current?: string }).current
+              : typeof value === "string"
+                ? value
+                : undefined;
+          if (current && current.trim().length > 0) return true;
+          return "Add a slug (use Generate from the title). Publishing needs a slug.";
+        }),
     }),
     defineField({
       name: "sortOrder",
@@ -26,7 +36,12 @@ export const galleryCategorySchema = defineType({
       type: "number",
       description: "Lower numbers appear first in the gallery filter dropdown.",
       initialValue: 0,
-      validation: (rule) => rule.integer(),
+      validation: (rule) =>
+        rule.custom((value) => {
+          if (value === undefined || value === null) return true;
+          if (typeof value === "number" && Number.isInteger(value)) return true;
+          return "Use a whole number (e.g. 0, 1, 2). Decimals are not allowed.";
+        }),
     }),
   ],
   preview: {

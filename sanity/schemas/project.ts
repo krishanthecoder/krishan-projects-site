@@ -38,6 +38,8 @@ export const projectSchema = defineType({
                 defineArrayMember({
                   type: "reference",
                   to: [{ type: "galleryCategory" }],
+                  /** Lets you remove a category from Studio even if some photos still list it. */
+                  options: { weak: true },
                 }),
               ],
             }),
