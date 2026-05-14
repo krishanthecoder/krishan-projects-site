@@ -62,6 +62,31 @@ export const projectSchema = defineType({
       ],
     }),
     defineField({
+      name: "beforeImage",
+      title: "Before photo (optional)",
+      type: "image",
+      options: { hotspot: true },
+      description:
+        "Optional “before” shot paired with the featured image as the “after” on the project page. Leave empty to show only the featured image.",
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description: "Describe the before state for accessibility and SEO.",
+          validation: imageAltWhenAsset(10),
+        }),
+      ],
+    }),
+    defineField({
+      name: "beforeAfterAligned",
+      title: "Same angle before & after",
+      type: "boolean",
+      description:
+        "When on, the site shows a drag-to-compare slider (best when both photos match the same viewpoint). Turn off if the angles differ — visitors see labelled side-by-side images instead.",
+      initialValue: false,
+    }),
+    defineField({
       name: "galleryCategories",
       title: "Gallery filter tags (project)",
       type: "array",

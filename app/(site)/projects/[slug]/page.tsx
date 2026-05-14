@@ -1,18 +1,23 @@
 import type { Metadata } from "next";
 import type { PortableTextBlock } from "@portabletext/types";
 import type { ReactNode } from "react";
+import type { Image } from "sanity";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PortableText, type PortableTextComponents } from "@portabletext/react";
 
+import { ProjectFeaturedMedia } from "@/components/project-featured-media";
 import { ProjectPhotoGrid } from "@/components/project-photo-grid";
+import { ProjectJsonLd } from "@/components/seo/project-json-ld";
 import { SanityImage } from "@/components/sanity-image";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { buildImageAltText } from "@/lib/project-image-alt";
+import { buildProjectMetaDescription } from "@/lib/seo/build-project-meta-description";
 import {
   getAllProjectSlugs,
   getProjectBySlug,
 } from "@/lib/sanity.queries";
+import { urlFor } from "@/src/sanity/lib/imageHelpers";
 
 const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Krishan Projects";
 
@@ -139,11 +144,75 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = await getProjectBySlug(slug);
   if (!project) {
-    return { title: `Project | ${businessName}` };
+    return {
+      title: "Project",
+      robots: { index: false, follow: true },
+    };
   }
+
+  const description = buildProjectMetaDescription(project);
+  const canonicalPath = `/projects/${project.slug}`;
+  const ogImages = project.featuredImage?.asset
+    ? [
+        {
+          url: urlFor(project.featuredImage as Image)
+            .width(1200)
+            .height(630)
+            .fit("crop")
+            .auto("format")
+            .url(),
+          width: 1200,
+          height: 630,
+          alt: buildImageAltText(
+            project.featuredImage.alt,
+            project.title,
+            project.services,
+            project.projectLocation,
+          ),
+        },
+      ]
+    : undefined;
+
+  const keywords = Array.from(
+    new Set(
+      [
+        ...(project.services ?? []).map((s) => s.trim()).filter(Boolean),
+        ...(project.projectLocation ? [project.projectLocation] : []),
+        project.title,
+        "home renovation",
+        "building works",
+        businessName,
+      ].filter(Boolean),
+    ),
+  ).slice(0, 24);
+
+  const publishedTime = project.startDate
+    ? `${project.startDate}T12:00:00.000Z`
+    : undefined;
+
   return {
-    title: `${project.title} | ${businessName}`,
-    description: `${project.title} — ${project.projectLocation ?? "Recent project"}.`,
+    title: project.title,
+    description,
+    keywords,
+    alternates: { canonical: canonicalPath },
+    openGraph: {
+      title: `${project.title} | ${businessName}`,
+      description,
+      url: canonicalPath,
+      siteName: businessName,
+      locale: "en_GB",
+      type: "article",
+      images: ogImages,
+      publishedTime,
+      modifiedTime: project._updatedAt,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} | ${businessName}`,
+      description,
+      images: ogImages?.map((img) => img.url),
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -156,8 +225,25 @@ export default async function ProjectDetailPage({
   const project = await getProjectBySlug(slug);
   if (!project) notFound();
 
+  const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL ?? "https://krishanprojects.co.uk";
+  const siteOrigin = websiteUrl.replace(/\/$/, "");
+  const canonicalUrl = `${siteOrigin}/projects/${project.slug}`;
+  const metaDescription = buildProjectMetaDescription(project);
+  const heroImageUrl =
+    project.featuredImage?.asset
+      ? urlFor(project.featuredImage as Image)
+          .width(1200)
+          .height(630)
+          .fit("crop")
+          .auto("format")
+          .url()
+      : undefined;
+
   const heroRef = project.featuredImage?.asset?._ref;
-  const dedupedThumbs = project.images.filter((img) => img.asset?._ref !== heroRef);
+  const beforeRef = project.beforeImage?.asset?._ref;
+  const dedupedThumbs = project.images.filter(
+    (img) => img.asset?._ref !== heroRef && img.asset?._ref !== beforeRef,
+  );
   const thumbnailImages =
     dedupedThumbs.length > 0 ? dedupedThumbs : project.images;
 
@@ -170,6 +256,14 @@ export default async function ProjectDetailPage({
 
   return (
     <main id="main-content" className="min-h-screen bg-stone-white">
+      <ProjectJsonLd
+        canonicalUrl={canonicalUrl}
+        siteUrl={siteOrigin}
+        businessName={businessName}
+        title={project.title}
+        description={metaDescription}
+        heroImageUrl={heroImageUrl}
+      />
       <div className="mx-auto max-w-6xl px-6 py-10 sm:px-10 sm:py-14">
         <ScrollReveal>
           <Link
@@ -233,22 +327,35 @@ export default async function ProjectDetailPage({
 
         {project.featuredImage ? (
           <ScrollReveal delay={0.04} className="mt-10">
-            <div className="relative h-72 overflow-hidden rounded-3xl border border-graphite/10 shadow-md sm:h-[28rem]">
-              <SanityImage
-                image={project.featuredImage}
-                alt={buildImageAltText(
-                  project.featuredImage.alt,
-                  project.title,
-                  project.services,
-                  project.projectLocation,
-                )}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 90vw"
-                className="object-cover"
+            {project.beforeImage?.asset ? (
+              <ProjectFeaturedMedia
+                afterImage={project.featuredImage}
+                beforeImage={project.beforeImage}
+                useSlider={project.beforeAfterAligned}
+                projectTitle={project.title}
+                projectLocation={project.projectLocation}
+                services={project.services}
+                afterAltFromCms={project.featuredImage.alt}
+                beforeAltFromCms={project.beforeImage.alt}
               />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-graphite/70 to-transparent px-6 py-6 sm:px-8 sm:py-8" />
-            </div>
+            ) : (
+              <div className="relative h-72 overflow-hidden rounded-3xl border border-graphite/10 shadow-md sm:h-[28rem]">
+                <SanityImage
+                  image={project.featuredImage}
+                  alt={buildImageAltText(
+                    project.featuredImage.alt,
+                    project.title,
+                    project.services,
+                    project.projectLocation,
+                  )}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, 90vw"
+                  className="object-cover"
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-graphite/70 to-transparent px-6 py-6 sm:px-8 sm:py-8" />
+              </div>
+            )}
           </ScrollReveal>
         ) : null}
 

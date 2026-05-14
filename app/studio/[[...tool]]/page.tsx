@@ -4,6 +4,7 @@ import { NextStudio } from "next-sanity/studio";
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 
+import { deskStructure } from "@/sanity/deskStructure";
 import { sanityApiVersion, sanityDataset, sanityProjectId } from "@/sanity/env";
 import { schemas } from "@/sanity/schemas";
 
@@ -16,11 +17,18 @@ const studioConfig =
     projectId: sanityProjectId,
     dataset: sanityDataset,
     apiVersion: sanityApiVersion,
-    /** Keep in sync with sanity.config.ts (embedded Studio used this file only). */
+    /** Keep in sync with `sanity.config.ts` (embedded Studio loads this file, not the root config). */
     releases: {
       enabled: false,
     },
-    plugins: [structureTool()],
+    document: {
+      newDocumentOptions: (prev) => prev.filter((item) => item.templateId !== "siteSettings"),
+    },
+    plugins: [
+      structureTool({
+        structure: deskStructure,
+      }),
+    ],
     schema: {
       types: schemas,
     },

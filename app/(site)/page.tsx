@@ -6,7 +6,7 @@ import { TestimonialCarousel } from "@/components/testimonial-carousel";
 import { TrustCards } from "@/components/trust-cards";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SectionTitle } from "@/components/ui/section-title";
-import { getAllTestimonials, getLatestProjectsForGallery } from "@/lib/sanity.queries";
+import { getAllTestimonials, getHomepageFeaturedProjectFromSettings, getLatestProjectsForGallery } from "@/lib/sanity.queries";
 
 const processSteps = [
   {
@@ -56,9 +56,12 @@ const shortlistReasons = [
 ];
 
 export default async function Home() {
-  const latestProjects = await getLatestProjectsForGallery();
+  const [latestProjects, homepageFeaturedOverride] = await Promise.all([
+    getLatestProjectsForGallery(),
+    getHomepageFeaturedProjectFromSettings(),
+  ]);
   const testimonials = await getAllTestimonials();
-  const featuredProject = latestProjects[0] ?? null;
+  const featuredProject = homepageFeaturedOverride ?? latestProjects[0] ?? null;
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Krishan Projects";
   const serviceArea = (process.env.NEXT_PUBLIC_BUSINESS_SERVICE_AREAS ?? "London, South Ockendon, Grays")
     .split(",")
@@ -79,8 +82,8 @@ export default async function Home() {
       />
 
       {/* ── Parallax hero ──
-          Uses the featured project image as the background if available,
-          falls back to a warm stone gradient. */}
+          Uses the homepage featured project (Homepage settings in Sanity) or the latest project
+          for the background image when available; otherwise a warm stone gradient. */}
       <HeroSection>
         <div className="hero-fit-grid relative grid gap-8 min-[1300px]:grid-cols-[1fr_300px] min-[1300px]:items-center">
           <div className="hero-fit-copy">

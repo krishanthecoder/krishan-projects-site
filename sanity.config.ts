@@ -1,6 +1,7 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 
+import { deskStructure } from "./sanity/deskStructure";
 import { sanityApiVersion, sanityDataset, sanityProjectId } from "./sanity/env";
 import { schemas } from "./sanity/schemas";
 
@@ -21,7 +22,15 @@ export default defineConfig({
   releases: {
     enabled: false,
   },
-  plugins: [structureTool()],
+  /** Stop “Create new” templates for the singleton homepage settings document. */
+  document: {
+    newDocumentOptions: (prev) => prev.filter((item) => item.templateId !== "siteSettings"),
+  },
+  plugins: [
+    structureTool({
+      structure: deskStructure,
+    }),
+  ],
   schema: {
     types: schemas,
   },

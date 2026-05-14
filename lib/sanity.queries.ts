@@ -1,6 +1,6 @@
 import groq from "groq";
 
-import { sanityClient, sanityConfigured } from "./sanity.client";
+import { sanityClient, sanityConfigured, sanityFetchOptions } from "./sanity.client";
 
 export type SanityImage = {
   _type: "image";
@@ -67,6 +67,7 @@ export type ProjectDetail = {
   _id: string;
   slug: string;
   title: string;
+  _updatedAt?: string;
   startDate?: string;
   endDate?: string;
   projectLocation?: string;
@@ -74,6 +75,10 @@ export type ProjectDetail = {
   services: string[];
   description: PortableTextBlock[];
   featuredImage: SanityImage | null;
+  /** Optional “before” paired with featured “after” on the project page. */
+  beforeImage: SanityImage | null;
+  /** When true and both images exist, UI uses a comparison slider; otherwise side-by-side. */
+  beforeAfterAligned: boolean;
   images: SanityImage[];
 };
 
@@ -123,6 +128,42 @@ const allProjectsQuery = groq`*[_type == "project"] | order(_createdAt desc){
   projectValue,
   services
 }`;
+
+const siteSettingsHomepageFeaturedQuery = groq`coalesce(
+  *[_id == "siteSettings"][0],
+  *[_type == "siteSettings"] | order(select(_id == "siteSettings" => 0, 1) asc, coalesce(_updatedAt, _createdAt) desc)[0]
+) {
+  "useManual": coalesce(chooseHomepageProjectManually, false),
+  "featured": homepageFeaturedProject->{
+    _id,
+    "slug": slug.current,
+    title,
+    projectLocation,
+    projectValue,
+    services,
+    "image": select(
+      defined(featuredImage.asset) => featuredImage{
+        ...,
+        asset->{
+          _id,
+          metadata{
+            lqip
+          }
+        }
+      },
+      defined(images[0].asset) => images[0]{
+        ...,
+        asset->{
+          _id,
+          metadata{
+            lqip
+          }
+        }
+      }
+    )
+  }
+}
+`;
 
 const latestProjectsForGalleryQuery = groq`*[_type == "project"] | order(_createdAt desc)[0...6]{
   _id,
@@ -193,6 +234,7 @@ const galleryCategoriesQuery = groq`*[_type == "galleryCategory" && defined(slug
 
 const projectBySlugQuery = groq`*[_type == "project" && slug.current == $slug][0]{
   _id,
+  _updatedAt,
   "slug": slug.current,
   title,
   startDate,
@@ -201,6 +243,16 @@ const projectBySlugQuery = groq`*[_type == "project" && slug.current == $slug][0
   projectValue,
   services,
   description,
+  beforeAfterAligned,
+  beforeImage{
+    ...,
+    asset->{
+      _id,
+      metadata{
+        lqip
+      }
+    }
+  },
   featuredImage{
     ...,
     asset->{
@@ -222,6 +274,11 @@ const projectBySlugQuery = groq`*[_type == "project" && slug.current == $slug][0
 }`;
 
 const allProjectSlugsQuery = groq`*[_type == "project" && defined(slug.current)].slug.current`;
+
+const projectSitemapEntriesQuery = groq`*[_type == "project" && defined(slug.current)]{
+  "slug": slug.current,
+  _updatedAt
+}`;
 
 const allTestimonialsQuery = groq`*[_type == "testimonial"] | order(_createdAt desc){
   _id,
@@ -273,7 +330,8 @@ function projectGalleryCategories(project: ProjectRowForGallery): GalleryCategor
 }
 
 function stripImageFields(img: GalleryImageFromGroq): SanityImage {
-  const { _key: _k, ...rest } = img;
+  const { _key, ...rest } = img;
+  void _key;
   return rest as SanityImage;
 }
 
@@ -321,28 +379,76 @@ function galleryImagesFromProjects(projects: ProjectRowForGallery[]): GalleryIma
 }
 
 async function fetchGalleryProjectRows(): Promise<ProjectRowForGallery[]> {
-  return sanityClient.fetch<ProjectRowForGallery[]>(galleryProjectsRowQuery);
+  return sanityClient.fetch<ProjectRowForGallery[]>(
+    galleryProjectsRowQuery,
+    {},
+    sanityFetchOptions(),
+  );
 }
 
 export async function getAllProjects() {
   if (!sanityConfigured) {
     return [];
   }
-  return sanityClient.fetch<Project[]>(allProjectsQuery);
+  return sanityClient.fetch<Project[]>(allProjectsQuery, {}, sanityFetchOptions());
 }
 
 export async function getAllTestimonials() {
   if (!sanityConfigured) {
     return [];
   }
-  return sanityClient.fetch<Testimonial[]>(allTestimonialsQuery);
+  return sanityClient.fetch<Testimonial[]>(allTestimonialsQuery, {}, sanityFetchOptions());
+}
+
+type SiteSettingsFeaturedRow = {
+  useManual: boolean;
+  featured: {
+    _id: string;
+    slug: string | null;
+    title: string;
+    projectLocation?: string;
+    projectValue?: number;
+    services?: string[];
+    image: (SanityImage & { asset?: SanityImage["asset"] }) | null;
+  } | null;
+} | null;
+
+export async function getHomepageFeaturedProjectFromSettings(): Promise<GalleryProject | null> {
+  if (!sanityConfigured) {
+    return null;
+  }
+  const row = await sanityClient.fetch<SiteSettingsFeaturedRow | null>(
+    siteSettingsHomepageFeaturedQuery,
+    {},
+    sanityFetchOptions(),
+  );
+  if (!row?.useManual) {
+    return null;
+  }
+  const p = row.featured;
+  if (!p?.image?.asset || typeof p.slug !== "string" || p.slug.length === 0) {
+    return null;
+  }
+  return {
+    _id: p._id,
+    slug: p.slug,
+    title: p.title,
+    projectLocation: p.projectLocation,
+    projectValue: p.projectValue,
+    services: p.services ?? [],
+    image: p.image as SanityImage,
+  };
 }
 
 export async function getLatestProjectsForGallery() {
   if (!sanityConfigured) {
     return [];
   }
-  return sanityClient.fetch<GalleryProject[]>(latestProjectsForGalleryQuery);
+  return sanityClient.fetch<GalleryProject[]>(
+    latestProjectsForGalleryQuery,
+    {},
+    sanityFetchOptions(),
+  );
 }
 
 export async function getLatestGalleryImages() {
@@ -363,7 +469,11 @@ export async function getGalleryFilterData(): Promise<{
   }
 
   const [rawCategories, projects] = await Promise.all([
-    sanityClient.fetch<Array<{ _id: string; title: string; slug: string | null }>>(galleryCategoriesQuery),
+    sanityClient.fetch<Array<{ _id: string; title: string; slug: string | null }>>(
+      galleryCategoriesQuery,
+      {},
+      sanityFetchOptions(),
+    ),
     fetchGalleryProjectRows(),
   ]);
 
@@ -380,16 +490,24 @@ export async function getProjectBySlug(slug: string): Promise<ProjectDetail | nu
   if (!sanityConfigured || !slug) {
     return null;
   }
-  const doc = await sanityClient.fetch<ProjectDetail | null>(projectBySlugQuery, { slug });
+  const doc = await sanityClient.fetch<ProjectDetail | null>(
+    projectBySlugQuery,
+    { slug },
+    sanityFetchOptions(),
+  );
   if (!doc?.slug) return null;
   const images = (doc.images ?? []).filter((img) => Boolean(img?.asset)) as SanityImage[];
   const featured =
     doc.featuredImage && doc.featuredImage.asset ? (doc.featuredImage as SanityImage) : null;
   const cardFallback = images[0] ?? null;
+  const before =
+    doc.beforeImage && doc.beforeImage.asset ? (doc.beforeImage as SanityImage) : null;
   return {
     ...doc,
     images,
     featuredImage: featured ?? cardFallback,
+    beforeImage: before,
+    beforeAfterAligned: Boolean(doc.beforeAfterAligned),
   };
 }
 
@@ -397,6 +515,27 @@ export async function getAllProjectSlugs(): Promise<string[]> {
   if (!sanityConfigured) {
     return [];
   }
-  const slugs = await sanityClient.fetch<string[]>(allProjectSlugsQuery);
+  const slugs = await sanityClient.fetch<string[]>(
+    allProjectSlugsQuery,
+    {},
+    sanityFetchOptions(),
+  );
   return slugs.filter((s) => typeof s === "string" && s.length > 0);
+}
+
+export type ProjectSitemapEntry = {
+  slug: string;
+  _updatedAt?: string;
+};
+
+export async function getProjectSitemapEntries(): Promise<ProjectSitemapEntry[]> {
+  if (!sanityConfigured) {
+    return [];
+  }
+  const rows = await sanityClient.fetch<ProjectSitemapEntry[]>(
+    projectSitemapEntriesQuery,
+    {},
+    sanityFetchOptions(),
+  );
+  return rows.filter((r) => typeof r.slug === "string" && r.slug.length > 0);
 }
