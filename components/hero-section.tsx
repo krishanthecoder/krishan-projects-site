@@ -3,24 +3,24 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-// Optimized local hero assets for responsive loading.
-const DEFAULT_BG_DESKTOP = "/hero-bg-desktop.jpg";
-const DEFAULT_BG_MOBILE = "/hero-bg-mobile.jpg";
+import { HERO_DEFAULT_BACKGROUND } from "@/lib/hero-defaults";
 
 type HeroSectionProps = {
   children: React.ReactNode;
-  /** Optional desktop hero image override. */
+  /** Sanity desktop hero URL; omit for default stone background. */
   backgroundSrcDesktop?: string;
-  /** Optional mobile hero image override. */
+  /** Sanity mobile hero URL; falls back to desktop when omitted. */
   backgroundSrcMobile?: string;
 };
 
 export function HeroSection({
   children,
-  backgroundSrcDesktop = DEFAULT_BG_DESKTOP,
-  backgroundSrcMobile = DEFAULT_BG_MOBILE,
+  backgroundSrcDesktop,
+  backgroundSrcMobile,
 }: HeroSectionProps) {
   const ref = useRef<HTMLElement>(null);
+  const mobileSrc = backgroundSrcMobile ?? backgroundSrcDesktop;
+  const showBackgroundImage = Boolean(backgroundSrcDesktop || mobileSrc);
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -36,18 +36,27 @@ export function HeroSection({
       className="relative flex min-h-[calc(100svh-5rem)] items-start overflow-hidden py-16 sm:min-h-[calc(100vh-5rem)] sm:py-20 min-[1300px]:min-h-[calc(100vh-3rem)] min-[1300px]:py-20"
       aria-label="Site hero"
     >
-      {/* ── Static responsive background image ── */}
-      <picture className="absolute inset-0">
-        <source media="(max-width: 767px)" srcSet={backgroundSrcMobile} />
-        <img
-          src={backgroundSrcDesktop}
-          alt=""
-          className="h-full w-full object-cover object-center"
-          loading="eager"
-          fetchPriority="high"
-          aria-hidden="true"
-        />
-      </picture>
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: HERO_DEFAULT_BACKGROUND }}
+        aria-hidden="true"
+      />
+
+      {showBackgroundImage ? (
+        <picture className="absolute inset-0">
+          {mobileSrc ? <source media="(max-width: 767px)" srcSet={mobileSrc} /> : null}
+          {backgroundSrcDesktop ? (
+            <img
+              src={backgroundSrcDesktop}
+              alt=""
+              className="h-full w-full object-cover object-center"
+              loading="eager"
+              fetchPriority="high"
+              aria-hidden="true"
+            />
+          ) : null}
+        </picture>
+      ) : null}
 
       {/* ── Overlay ────────────────────────────────────────────────────────── */}
       {/* Global dark tint over the hero image */}

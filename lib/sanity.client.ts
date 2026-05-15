@@ -29,6 +29,21 @@ export const sanityClient = createClient({
   useCdn: resolveUseCdn(),
 });
 
+/** Server-only client for reading drafts in development (requires SANITY_API_READ_TOKEN or SANITY_API_WRITE_TOKEN). */
+const previewToken =
+  process.env.SANITY_API_READ_TOKEN ?? process.env.SANITY_API_WRITE_TOKEN;
+
+export const sanityPreviewClient =
+  sanityConfigured && previewToken
+    ? createClient({
+        projectId: sanityProjectId!,
+        dataset: sanityDataset,
+        apiVersion: sanityApiVersion,
+        useCdn: false,
+        token: previewToken,
+      })
+    : null;
+
 /**
  * Next.js fetch cache options for all GROQ reads. Tune `SANITY_REVALIDATE_SECONDS` (default 60)
  * to trade freshness vs. origin load. Tag `sanity` enables on-demand purge via `/api/revalidate`.

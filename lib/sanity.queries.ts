@@ -1,6 +1,13 @@
 import groq from "groq";
+import type { Image } from "sanity";
 
-import { sanityClient, sanityConfigured, sanityFetchOptions } from "./sanity.client";
+import {
+  sanityClient,
+  sanityConfigured,
+  sanityFetchOptions,
+  sanityPreviewClient,
+} from "./sanity.client";
+import { urlFor } from "@/src/sanity/lib/imageHelpers";
 
 export type SanityImage = {
   _type: "image";
@@ -128,6 +135,33 @@ const allProjectsQuery = groq`*[_type == "project"] | order(_createdAt desc){
   projectValue,
   services
 }`;
+
+const siteSettingsHomepageHeroQuery = groq`coalesce(
+  *[_id == "siteSettings"][0],
+  *[_type == "siteSettings"] | order(select(_id == "siteSettings" => 0, 1) asc, coalesce(_updatedAt, _createdAt) desc)[0]
+) {
+  heroSectionImage{
+    _type,
+    alt,
+    asset->{
+      _id,
+      metadata{
+        lqip
+      }
+    }
+  },
+  heroSectionImageMobile{
+    _type,
+    alt,
+    asset->{
+      _id,
+      metadata{
+        lqip
+      }
+    }
+  }
+}
+`;
 
 const siteSettingsHomepageFeaturedQuery = groq`coalesce(
   *[_id == "siteSettings"][0],
@@ -413,14 +447,71 @@ type SiteSettingsFeaturedRow = {
   } | null;
 } | null;
 
+type HomepageSettingsFetchOptions = {
+  client: typeof sanityClient;
+  useDraftPreview: boolean;
+};
+
+function getHomepageSettingsFetchOptions(): HomepageSettingsFetchOptions | null {
+  if (!sanityConfigured) return null;
+  const previewClient =
+    process.env.NODE_ENV === "development" ? sanityPreviewClient : null;
+  return {
+    client: previewClient ?? sanityClient,
+    useDraftPreview: previewClient !== null,
+  };
+}
+
+function homepageSettingsFetchParams(useDraftPreview: boolean) {
+  return {
+    ...sanityFetchOptions(["homepage"]),
+    ...(useDraftPreview
+      ? { perspective: "previewDrafts" as const, cache: "no-store" as const }
+      : {}),
+  };
+}
+
+function imageHasAsset(image: unknown): image is SanityImage & { asset: NonNullable<SanityImage["asset"]> } {
+  if (!image || typeof image !== "object") return false;
+  const asset = (image as SanityImage).asset;
+  return Boolean(asset && (asset._ref || (asset as { _id?: string })._id));
+}
+
+function buildHeroImageUrl(image: unknown, width: number): string | undefined {
+  if (!imageHasAsset(image)) return undefined;
+  return urlFor(image as Image).width(width).quality(85).auto("format").url();
+}
+
+export type HomepageHeroBackgrounds = {
+  desktop: string;
+  mobile: string;
+};
+
+export async function getHomepageHeroBackgrounds(): Promise<HomepageHeroBackgrounds | null> {
+  const fetchOpts = getHomepageSettingsFetchOptions();
+  if (!fetchOpts) return null;
+
+  const row = await fetchOpts.client.fetch<{
+    heroSectionImage?: unknown;
+    heroSectionImageMobile?: unknown;
+  } | null>(siteSettingsHomepageHeroQuery, {}, homepageSettingsFetchParams(fetchOpts.useDraftPreview));
+
+  const desktop = buildHeroImageUrl(row?.heroSectionImage, 1920);
+  if (!desktop) return null;
+
+  const mobile = buildHeroImageUrl(row?.heroSectionImageMobile, 1080) ?? desktop;
+  return { desktop, mobile };
+}
+
 export async function getHomepageFeaturedProjectFromSettings(): Promise<GalleryProject | null> {
-  if (!sanityConfigured) {
+  const fetchOpts = getHomepageSettingsFetchOptions();
+  if (!fetchOpts) {
     return null;
   }
-  const row = await sanityClient.fetch<SiteSettingsFeaturedRow | null>(
+  const row = await fetchOpts.client.fetch<SiteSettingsFeaturedRow | null>(
     siteSettingsHomepageFeaturedQuery,
     {},
-    sanityFetchOptions(),
+    homepageSettingsFetchParams(fetchOpts.useDraftPreview),
   );
   if (!row?.useManual) {
     return null;

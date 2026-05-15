@@ -2,7 +2,7 @@ import { defineField, defineType } from "sanity";
 
 export const galleryCategorySchema = defineType({
   name: "galleryCategory",
-  title: "Gallery category",
+  title: "Filter Project Tags",
   type: "document",
   fields: [
     defineField({
@@ -34,7 +34,7 @@ export const galleryCategorySchema = defineType({
       name: "sortOrder",
       title: "Sort order",
       type: "number",
-      description: "Lower numbers appear first in the gallery filter dropdown.",
+      description: "Lower numbers appear first in the project gallery filter dropdown.",
       initialValue: 0,
       validation: (rule) =>
         rule.custom((value) => {

@@ -29,7 +29,7 @@ export function ProjectHero({ project }: ProjectHeroProps) {
           A look inside the work we do.
         </h2>
         <p className="mt-3 max-w-sm text-base leading-relaxed text-stone-white/60">
-          In Sanity, open <strong className="font-semibold text-stone-white/85">Homepage settings</strong>,
+          In Sanity, open <strong className="font-semibold text-stone-white/85">Homepage Settings</strong>,
           turn on <strong className="font-semibold text-stone-white/85">Choose a specific project</strong>, pick
           a published job, then publish — or add a project with a slug and image to fall back automatically.
         </p>

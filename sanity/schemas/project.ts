@@ -88,10 +88,10 @@ export const projectSchema = defineType({
     }),
     defineField({
       name: "galleryCategories",
-      title: "Gallery filter tags (project)",
+      title: "Filter project tags",
       type: "array",
       description:
-        "Categories this project appears under on the Recent Projects gallery filter. Applies to the whole job and every photo in the gallery below.",
+        "Tags this project appears under in the Recent Projects gallery filter. Applies to the whole job and every photo in the gallery below.",
       of: [
         defineArrayMember({
           type: "reference",

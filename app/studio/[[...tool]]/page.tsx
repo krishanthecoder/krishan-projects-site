@@ -1,38 +1,22 @@
 "use client";
 
-import { NextStudio } from "next-sanity/studio";
-import { defineConfig } from "sanity";
-import { structureTool } from "sanity/structure";
+import dynamic from "next/dynamic";
 
-import { deskStructure } from "@/sanity/deskStructure";
-import { sanityApiVersion, sanityDataset, sanityProjectId } from "@/sanity/env";
-import { schemas } from "@/sanity/schemas";
+import { createStudioConfig } from "@/sanity/studioConfig";
 
-const studioConfig =
-  sanityProjectId &&
-  defineConfig({
-    name: "default",
-    title: "Krishan Construction CMS",
-    basePath: "/studio",
-    projectId: sanityProjectId,
-    dataset: sanityDataset,
-    apiVersion: sanityApiVersion,
-    /** Keep in sync with `sanity.config.ts` (embedded Studio loads this file, not the root config). */
-    releases: {
-      enabled: false,
-    },
-    document: {
-      newDocumentOptions: (prev) => prev.filter((item) => item.templateId !== "siteSettings"),
-    },
-    plugins: [
-      structureTool({
-        structure: deskStructure,
-      }),
-    ],
-    schema: {
-      types: schemas,
-    },
-  });
+const studioConfig = createStudioConfig();
+
+const NextStudio = dynamic(
+  () => import("next-sanity/studio").then((mod) => mod.NextStudio),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full min-h-0 flex-1 items-center justify-center bg-stone-white">
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-stone-300 border-t-stone-800" />
+      </div>
+    ),
+  },
+);
 
 export default function StudioPage() {
   if (!studioConfig) {
@@ -41,8 +25,9 @@ export default function StudioPage() {
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-amber-950 shadow-sm">
           <h1 className="text-xl font-semibold">Studio is not configured yet</h1>
           <p className="mt-3 text-sm leading-relaxed">
-            Add <code>NEXT_PUBLIC_SANITY_PROJECT_ID</code> (and optionally <code>NEXT_PUBLIC_SANITY_DATASET</code>)
-            to <code>.env.local</code>, then restart the dev server.
+            Add <code>NEXT_PUBLIC_SANITY_PROJECT_ID</code> (and optionally{" "}
+            <code>NEXT_PUBLIC_SANITY_DATASET</code>) to <code>.env.local</code>, then restart
+            the dev server.
           </p>
         </div>
       </main>

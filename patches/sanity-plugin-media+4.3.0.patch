@@ -1,0 +1,105 @@
+diff --git a/node_modules/sanity-plugin-media/src/components/Controls/index.tsx b/node_modules/sanity-plugin-media/src/components/Controls/index.tsx
+index d8eabef..4c74954 100644
+--- a/node_modules/sanity-plugin-media/src/components/Controls/index.tsx
++++ b/node_modules/sanity-plugin-media/src/components/Controls/index.tsx
+@@ -10,6 +10,7 @@ import SearchFacets from '../SearchFacets'
+ import SearchFacetsControl from '../SearchFacetsControl'
+ import TagIcon from '../TagIcon'
+ import TextInputSearch from '../TextInputSearch'
++import UnusedAssetsToggle from '../UnusedAssetsToggle'
+ 
+ const Controls = () => {
+   // Redux
+@@ -66,6 +67,10 @@ const Controls = () => {
+               <TextInputSearch />
+             </Box>
+ 
++            <Box marginX={2}>
++              <UnusedAssetsToggle />
++            </Box>
++
+             <Box display={['none', 'none', 'block']}>
+               <SearchFacets />
+ 
+@@ -75,6 +80,7 @@ const Controls = () => {
+ 
+             <Box display={['block', 'block', 'none']} marginX={2}>
+               <Inline space={2} style={{whiteSpace: 'nowrap'}}>
++                <UnusedAssetsToggle />
+                 {/* Filters button (small) */}
+                 <Button
+                   fontSize={1}
+diff --git a/node_modules/sanity-plugin-media/src/components/UnusedAssetsToggle/index.tsx b/node_modules/sanity-plugin-media/src/components/UnusedAssetsToggle/index.tsx
+new file mode 100644
+index 0000000..3e2c8ec
+--- /dev/null
++++ b/node_modules/sanity-plugin-media/src/components/UnusedAssetsToggle/index.tsx
+@@ -0,0 +1,68 @@
++import {Button} from '@sanity/ui'
++import {useCallback, useEffect, useMemo, useRef} from 'react'
++import {useDispatch} from 'react-redux'
++
++import {inputs} from '../../config/searchFacets'
++import useTypedSelector from '../../hooks/useTypedSelector'
++import {searchActions} from '../../modules/search'
++
++const STORAGE_KEY = 'sanity-plugin-media.showUnusedOnly'
++
++function isUnusedOnlyFacet(
++  facet: {name: string; operatorType: string; value: unknown} | undefined
++): boolean {
++  return facet?.name === 'inUse' && facet.operatorType === 'is' && facet.value === 'false'
++}
++
++export default function UnusedAssetsToggle() {
++  const dispatch = useDispatch()
++  const facets = useTypedSelector(state => state.search.facets)
++  const inUseFacet = useMemo(() => facets.find(facet => facet.name === 'inUse'), [facets])
++  const unusedOnly = isUnusedOnlyFacet(inUseFacet)
++  const restoredPreference = useRef(false)
++
++  const setUnusedOnly = useCallback(
++    (enabled: boolean) => {
++      dispatch(searchActions.facetsRemoveByName({facetName: 'inUse'}))
++
++      if (enabled) {
++        dispatch(
++          searchActions.facetsAdd({
++            facet: {
++              ...inputs.inUse,
++              operatorType: 'is',
++              value: 'false'
++            }
++          })
++        )
++      }
++
++      if (typeof window !== 'undefined') {
++        window.localStorage.setItem(STORAGE_KEY, enabled ? '1' : '0')
++      }
++    },
++    [dispatch]
++  )
++
++  useEffect(() => {
++    if (restoredPreference.current || typeof window === 'undefined') {
++      return
++    }
++
++    restoredPreference.current = true
++
++    if (window.localStorage.getItem(STORAGE_KEY) === '1' && !isUnusedOnlyFacet(inUseFacet)) {
++      setUnusedOnly(true)
++    }
++  }, [inUseFacet, setUnusedOnly])
++
++  return (
++    <Button
++      fontSize={1}
++      mode={unusedOnly ? 'default' : 'ghost'}
++      onClick={() => setUnusedOnly(!unusedOnly)}
++      text="Asset not in use"
++      tone={unusedOnly ? 'primary' : 'default'}
++    />
++  )
++}

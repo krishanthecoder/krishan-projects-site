@@ -8,11 +8,13 @@
     "start": "next start",
     "lint": "eslint",
     "sanity": "sanity",
+    "studio:dev": "sanity dev",
     "seed:gallery-categories": "node scripts/seed-gallery-categories.mjs",
     "seed:example-project": "node scripts/seed-example-project.mjs",
     "publish:gallery-category-drafts": "node scripts/publish-gallery-category-drafts.mjs",
     "migrate:gallery-category-refs-weak": "node scripts/weakify-gallery-category-refs.mjs",
-    "cleanup:daily": "pkill -f \"next dev\" || true && rm -rf .next && npm cache clean --force"
+    "cleanup:daily": "pkill -f \"next dev\" || true && rm -rf .next && npm cache clean --force",
+    "postinstall": "patch-package && node scripts/patch-sanity-plugin-media-dist.mjs"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
@@ -28,6 +30,7 @@
     "react-hook-form": "^7.73.1",
     "resend": "^6.12.2",
     "sanity": "^5.21.0",
+    "sanity-plugin-media": "^4.3.0",
     "styled-components": "^6.4.1"
   },
   "devDependencies": {
@@ -38,6 +41,7 @@
     "@types/styled-components": "^5.1.36",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "patch-package": "^8.0.1",
     "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "typescript": "^5"
