@@ -18,15 +18,15 @@ type HowWeWorkStepsProps = {
 };
 
 const sequenceStart = 0.22;
-/** Time for a step number to pulse up to sustained gold */
-const numberGlowDuration = 0.4;
-/** Pause after the number glows before travel begins */
+/** Time for a step number to transition to gold */
+const numberColorDuration = 0.4;
+/** Pause after the number turns gold before travel begins */
 const pauseBeforeTravel = 0.06;
 /** Glow travels down the connector toward the arrow */
 const travelDuration = 0.26;
 
 const segmentCycle =
-  numberGlowDuration + pauseBeforeTravel + travelDuration;
+  numberColorDuration + pauseBeforeTravel + travelDuration;
 
 const goldBg = "rgba(196,151,61,1)";
 const goldBgHold = "rgba(196,151,61,0.95)";
@@ -65,26 +65,15 @@ export function HowWeWorkSteps({ steps }: HowWeWorkStepsProps) {
               variants={{
                 idle: {
                   backgroundColor: graphiteBg,
-                  boxShadow: "0 0 0 rgba(196,151,61,0)",
                 },
                 instant: {
                   backgroundColor: goldBgHold,
-                  boxShadow: "0 0 12px rgba(196,151,61,0.55)",
                   transition: { duration: 0 },
                 },
                 sequence: {
-                  backgroundColor: [
-                    graphiteBg,
-                    goldBg,
-                    goldBgHold,
-                  ],
-                  boxShadow: [
-                    "0 0 0 rgba(196,151,61,0)",
-                    "0 0 14px rgba(196,151,61,0.8)",
-                    "0 0 10px rgba(196,151,61,0.55)",
-                  ],
+                  backgroundColor: [graphiteBg, goldBg, goldBgHold],
                   transition: {
-                    duration: numberGlowDuration,
+                    duration: numberColorDuration,
                     delay: sequenceStart + index * segmentCycle,
                     ease: "easeOut",
                     times: [0, 0.55, 1],
@@ -102,9 +91,9 @@ export function HowWeWorkSteps({ steps }: HowWeWorkStepsProps) {
                 <div className="relative flex min-h-[1rem] flex-1 flex-col">
                   {/* Dim track only behind the vertical stem */}
                   <span className="pointer-events-none absolute inset-0 rounded-full bg-graphite/15" />
-                  {/* Glow travels top → bottom toward the arrow */}
+                  {/* Gold fill travels top → bottom toward the arrow */}
                   <motion.span
-                    className="relative z-[1] w-full flex-1 origin-top rounded-full bg-[rgba(196,151,61,0.96)] shadow-[0_0_10px_rgba(196,151,61,0.65)]"
+                    className="relative z-[1] w-full flex-1 origin-top rounded-full bg-[rgba(196,151,61,0.96)]"
                     initial="idle"
                     animate={controls}
                     variants={{
@@ -122,7 +111,7 @@ export function HowWeWorkSteps({ steps }: HowWeWorkStepsProps) {
                           delay:
                             sequenceStart +
                             index * segmentCycle +
-                            numberGlowDuration +
+                            numberColorDuration +
                             pauseBeforeTravel,
                           /* Snappy: most of the motion early, sharp settle */
                           ease: [0.14, 0.95, 0.28, 1],
@@ -139,22 +128,15 @@ export function HowWeWorkSteps({ steps }: HowWeWorkStepsProps) {
                     idle: {
                       opacity: 0.65,
                       borderTopColor: arrowDim,
-                      filter: "drop-shadow(0 0 0 rgba(196,151,61,0))",
                     },
                     instant: {
                       opacity: 1,
                       borderTopColor: arrowGold,
-                      filter: "drop-shadow(0 0 6px rgba(196,151,61,0.7))",
                       transition: { duration: 0 },
                     },
                     sequence: {
                       opacity: [0.65, 1, 1],
                       borderTopColor: [arrowDim, arrowGold, arrowGold],
-                      filter: [
-                        "drop-shadow(0 0 0 rgba(196,151,61,0))",
-                        "drop-shadow(0 0 10px rgba(196,151,61,0.85))",
-                        "drop-shadow(0 0 6px rgba(196,151,61,0.7))",
-                      ],
                       transition: {
                         duration: 0.18,
                         delay:

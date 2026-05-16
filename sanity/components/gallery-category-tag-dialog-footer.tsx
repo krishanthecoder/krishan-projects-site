@@ -85,9 +85,8 @@ export function GalleryCategoryTagDialogFooter({
     if (isIncompleteGalleryTag(value)) {
       toast.push({
         status: "error",
-        title: "Title and slug required",
-        description:
-          "Enter a title, generate a slug, then click Add tag to add this filter tag to the project.",
+        title: "Title required",
+        description: "Enter at least 2 characters for the tag title, then click Add tag.",
       });
       return;
     }

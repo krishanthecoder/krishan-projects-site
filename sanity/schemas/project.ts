@@ -1,7 +1,7 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { GalleryCategoriesField } from "../components/gallery-categories-field";
 import { GalleryCategoriesInput } from "../components/gallery-categories-input";
-import { GalleryCategoryTagArrayItem } from "../components/gallery-category-tag-array-item";
 
 /** Alt is only validated once an asset exists, so the upload step is not treated as invalid. */
 function imageAltWhenAsset(minLen: number) {
@@ -48,6 +48,21 @@ export const projectSchema = defineType({
         }),
     }),
     defineField({
+      name: "galleryCategories",
+      title: "Filter project tags",
+      type: "array",
+      description:
+        "Choose how visitors find this job on the Recent Projects gallery — e.g. Tiling, Painting, Blockwork.",
+      of: [defineArrayMember({ type: "galleryCategoryTag" })],
+      options: {
+        disableActions: ["add", "duplicate", "copy"],
+      },
+      components: {
+        field: GalleryCategoriesField,
+        input: GalleryCategoriesInput,
+      },
+    }),
+    defineField({
       name: "featuredImage",
       title: "Featured image",
       type: "image",
@@ -90,24 +105,6 @@ export const projectSchema = defineType({
       initialValue: false,
     }),
     defineField({
-      name: "galleryCategories",
-      title: "Filter project tags",
-      type: "array",
-      description:
-        "Tags for the Recent Projects gallery filter. Reuse an existing tag from other projects, or add a new one with a title and generated slug.",
-      of: [
-        defineArrayMember({
-          type: "galleryCategoryTag",
-          components: {
-            item: GalleryCategoryTagArrayItem,
-          },
-        }),
-      ],
-      components: {
-        input: GalleryCategoriesInput,
-      },
-    }),
-    defineField({
       name: "startDate",
       title: "Start date",
       type: "date",
@@ -129,8 +126,18 @@ export const projectSchema = defineType({
       name: "projectValue",
       title: "Price (GBP)",
       type: "number",
-      description: "Numeric amount only (e.g. 25000). The site adds the £ symbol.",
-      validation: (rule) => rule.min(0),
+      description:
+        "Numeric amount only (e.g. 25000). The site adds the £ symbol when set (optional).",
+      validation: (rule) =>
+        rule.custom((value) => {
+          if (value === undefined || value === null) {
+            return true;
+          }
+          if (typeof value === "number" && !Number.isNaN(value) && value >= 0) {
+            return true;
+          }
+          return "Enter a valid amount (0 or greater), or leave blank.";
+        }),
     }),
     defineField({
       name: "projectLocation",
@@ -172,15 +179,15 @@ export const projectSchema = defineType({
     }),
     defineField({
       name: "services",
-      title: "Services",
+      title: "Additional Services",
       type: "array",
+      description:
+        "These show as pills on the project page (after your filter tags). They do not control gallery filtering.",
       of: [{ type: "string" }],
       options: {
         list: [
-          { title: "Plumbing", value: "Plumbing" },
+          { title: "Refurbishment", value: "Refurbishment" },
           { title: "Renovation", value: "Renovation" },
-          { title: "Electrical", value: "Electrical" },
-          { title: "Civil Works", value: "Civil Works" },
           { title: "Finishing", value: "Finishing" },
         ],
       },

@@ -1,6 +1,7 @@
 import { defineField, defineType } from "sanity";
 
 import { GalleryCategoryTagInput } from "../components/gallery-category-tag-input";
+import { GalleryCategoryTagTitleInput } from "../components/gallery-category-tag-title-input";
 import { galleryTagSlugSource } from "../lib/gallery-tag-slug";
 
 /** Inline filter tag on a project (title + slug generated from title). */
@@ -37,7 +38,7 @@ export const galleryCategoryTagSchema = defineType({
                 ? value
                 : undefined;
           if (current && current.trim().length > 0) return true;
-          return "Add a slug (use Generate from the title).";
+          return "Slug is generated from the title.";
         }),
     }),
   ],

@@ -28,6 +28,7 @@ export function RouteScrollReset() {
         | PerformanceNavigationTiming
         | undefined;
 
+      // Refresh on the same URL: restore scroll from sessionStorage.
       if (navigationEntry?.type === "reload") {
         const savedScrollY = sessionStorage.getItem(scrollKey);
         if (savedScrollY) {
@@ -49,6 +50,7 @@ export function RouteScrollReset() {
       return;
     }
 
+    // In-app navigation or first visit to a route: start at the top.
     const htmlElement = document.documentElement;
     const previousScrollBehavior = htmlElement.style.scrollBehavior;
     htmlElement.style.scrollBehavior = "auto";

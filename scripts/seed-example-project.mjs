@@ -155,7 +155,7 @@ async function main() {
     projectValue: 42000,
     startDate: "2025-01-15",
     endDate: "2025-03-20",
-    services: ["Renovation", "Finishing", "Electrical"],
+    services: ["Renovation", "Finishing"],
     galleryCategories,
     featuredImage,
     images,

@@ -1,6 +1,7 @@
 import groq from "groq";
 import type { Image } from "sanity";
 
+import { sortGalleryCategoriesAlphabetically } from "./gallery-category-sort";
 import {
   sanityClient,
   sanityConfigured,
@@ -87,6 +88,7 @@ export type ProjectDetail = {
   /** When true and both images exist, UI uses a comparison slider; otherwise side-by-side. */
   beforeAfterAligned: boolean;
   images: SanityImage[];
+  galleryCategories?: GalleryCategory[];
 };
 
 export type GalleryImageItem = {
@@ -270,6 +272,11 @@ const projectBySlugQuery = groq`*[_type == "project" && slug.current == $slug][0
   projectLocation,
   projectValue,
   services,
+  galleryCategories[]{
+    "_id": _key,
+    title,
+    "slug": slug.current
+  },
   description,
   beforeAfterAligned,
   beforeImage{
@@ -371,9 +378,7 @@ function deriveGalleryCategoriesFromProjects(
     }
   }
 
-  return Array.from(bySlug.values()).sort((a, b) =>
-    a.title.localeCompare(b.title, "en", { sensitivity: "base" }),
-  );
+  return sortGalleryCategoriesAlphabetically(Array.from(bySlug.values()));
 }
 
 function stripImageFields(img: GalleryImageFromGroq): SanityImage {
@@ -603,6 +608,13 @@ export async function getProjectBySlug(slug: string): Promise<ProjectDetail | nu
     featuredImage: featured ?? cardFallback,
     beforeImage: before,
     beforeAfterAligned: Boolean(doc.beforeAfterAligned),
+    galleryCategories: normalizeResolvedCategories(
+      doc.galleryCategories as Array<{
+        _id?: string;
+        title?: string;
+        slug: string | null;
+      }> | null,
+    ),
   };
 }
 

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { sortGalleryCategoriesAlphabetically } from "@/lib/gallery-category-sort";
 import { buildImageAltText } from "@/lib/project-image-alt";
 import {
   type GalleryCategory,
@@ -73,6 +74,11 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
+  const sortedCategories = useMemo(
+    () => sortGalleryCategoriesAlphabetically(categories),
+    [categories],
+  );
+
   const filteredProjects = useMemo(() => {
     if (!selectedSlug) return projects;
     return projects.filter((p) =>
@@ -81,8 +87,8 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
   }, [projects, selectedSlug]);
 
   const selectedCategoryTitle = useMemo(
-    () => categories.find((c) => c.slug === selectedSlug)?.title ?? "",
-    [categories, selectedSlug],
+    () => sortedCategories.find((c) => c.slug === selectedSlug)?.title ?? "",
+    [selectedSlug, sortedCategories],
   );
 
   const selectCategorySlug = useCallback((slug: string) => {
@@ -166,7 +172,7 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
             >
               All Projects
             </button>
-            {categories.map((category) => {
+            {sortedCategories.map((category) => {
               const active = selectedSlug === category.slug;
               return (
                 <button

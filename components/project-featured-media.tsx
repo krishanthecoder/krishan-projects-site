@@ -26,6 +26,10 @@ const beforeAfterLabelBefore =
 const beforeAfterLabelAfter =
   "rounded-full bg-gold px-3 py-1 text-xs font-bold uppercase tracking-wide text-stone-white";
 
+/** Matches the circular handle `border-2` (2px). */
+const comparisonDividerGoldClass = "w-0.5";
+const comparisonDividerWhiteClass = "w-1.5";
+
 export function ProjectFeaturedMedia({
   afterImage,
   beforeImage,
@@ -145,7 +149,7 @@ function FeaturedComparisonSlider({
     const track = trackRef.current;
     if (!track) return;
     draggingRef.current = true;
-    track.setPointerCapture(e.pointerId);
+    e.currentTarget.setPointerCapture(e.pointerId);
     setFromClientX(e.clientX);
   };
 
@@ -205,22 +209,38 @@ function FeaturedComparisonSlider({
           />
         </div>
 
-        {/* Divider + on-image handle (Common Ninja–style) */}
+        {/* Wide touch strip + visible divider + handle */}
         <div
-          className="pointer-events-none absolute inset-y-0 z-10 w-[3px] bg-stone-white shadow-[0_0_10px_rgba(0,0,0,0.4)]"
-          style={{ left: `${splitPct}%`, transform: "translateX(-50%)" }}
-          aria-hidden
-        />
-
-        <div
-          className="absolute top-1/2 z-20 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-ew-resize select-none items-center justify-center gap-0 rounded-full bg-stone-white shadow-[0_4px_14px_rgba(0,0,0,0.2)] ring-1 ring-graphite/15"
+          className="absolute inset-y-0 z-20 flex w-16 -translate-x-1/2 cursor-ew-resize touch-none select-none items-center justify-center sm:w-12"
           style={{ left: `${splitPct}%` }}
           onPointerDown={onPointerDownHandle}
-          role="presentation"
-          aria-hidden
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          role="slider"
+          aria-label="Drag to compare before and after"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={splitPct}
         >
-          <ChevronLeft className="size-[15px] shrink-0 text-graphite" strokeWidth={2.25} />
-          <ChevronRight className="-ml-0.5 size-[15px] shrink-0 text-graphite" strokeWidth={2.25} />
+          <div
+            className={`pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 bg-stone-white shadow-[0_0_0_1px_rgba(0,0,0,0.12),0_0_16px_rgba(0,0,0,0.35)] ${comparisonDividerWhiteClass}`}
+            aria-hidden
+          />
+          <div
+            className={`pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 bg-gold ${comparisonDividerGoldClass}`}
+            aria-hidden
+          />
+          <div
+            className="relative flex h-14 w-14 items-center justify-center gap-0 rounded-full border-2 border-gold bg-stone-white shadow-[0_6px_24px_rgba(0,0,0,0.32)] ring-4 ring-stone-white/90 active:scale-95 sm:h-12 sm:w-12 sm:ring-2"
+            aria-hidden
+          >
+            <ChevronLeft className="size-4 shrink-0 text-graphite sm:size-[15px]" strokeWidth={2.5} />
+            <ChevronRight
+              className="-ml-0.5 size-4 shrink-0 text-graphite sm:size-[15px]"
+              strokeWidth={2.5}
+            />
+          </div>
         </div>
 
         <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-between px-5 pt-5 sm:px-7 sm:pt-6">

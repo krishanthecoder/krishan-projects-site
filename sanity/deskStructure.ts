@@ -1,6 +1,12 @@
 import type { StructureResolver } from "sanity/structure";
 
 import { HomepageSettingsStructurePane } from "./components/homepage-settings-structure-pane";
+import {
+  HOMEPAGE_SETTINGS_LIST_ITEM_ID,
+  HOMEPAGE_SETTINGS_MIDDLE_PANE_ID,
+} from "./structurePaneIds";
+
+export { HOMEPAGE_SETTINGS_LIST_ITEM_ID, HOMEPAGE_SETTINGS_MIDDLE_PANE_ID } from "./structurePaneIds";
 
 const HIDDEN_DESK_TYPES = new Set(["siteSettings", "media.tag"]);
 
@@ -11,10 +17,10 @@ export const deskStructure: StructureResolver = (S) =>
     .items([
       S.listItem()
         .title("Homepage Settings")
-        .id("homepageSettingsSingleton")
+        .id(HOMEPAGE_SETTINGS_LIST_ITEM_ID)
         .child(
           S.component()
-            .id("homepageSettingsMiddlePane")
+            .id(HOMEPAGE_SETTINGS_MIDDLE_PANE_ID)
             .title("Homepage Settings")
             .component(HomepageSettingsStructurePane),
         ),

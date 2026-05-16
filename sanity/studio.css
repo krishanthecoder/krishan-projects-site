@@ -71,3 +71,37 @@ button.kp-studio-save-btn:disabled {
   opacity: 0.5 !important;
   cursor: not-allowed !important;
 }
+
+/* Project — prominent gallery filter tags */
+.kp-gallery-categories-prominent {
+  background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%) !important;
+  border-color: #93c5fd !important;
+  box-shadow: 0 1px 2px rgb(29 78 216 / 8%), 0 8px 24px rgb(29 78 216 / 6%) !important;
+}
+
+.kp-gallery-categories-prominent__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  flex-shrink: 0;
+}
+
+.kp-gallery-categories-prominent__hint {
+  color: #1e40af;
+  font-weight: 500;
+}
+
+.kp-gallery-categories-prominent .kp-gallery-chip-field {
+  min-height: 3.25rem;
+  border-color: #bfdbfe;
+  background: #fff;
+  box-shadow: inset 0 1px 2px rgb(15 23 42 / 4%);
+}
+
+.kp-gallery-categories-prominent .kp-gallery-categories-existing {
+  background: rgb(255 255 255 / 72%) !important;
+  border-color: #bfdbfe !important;
+}

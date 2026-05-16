@@ -11,6 +11,7 @@ import { ProjectPhotoGrid } from "@/components/project-photo-grid";
 import { ProjectJsonLd } from "@/components/seo/project-json-ld";
 import { SanityImage } from "@/components/sanity-image";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { sortLabelsAlphabetically } from "@/lib/gallery-category-sort";
 import { buildImageAltText } from "@/lib/project-image-alt";
 import { buildProjectMetaDescription } from "@/lib/seo/build-project-meta-description";
 import {
@@ -250,9 +251,14 @@ export default async function ProjectDetailPage({
   const startLabel = formatUkDate(project.startDate);
   const endLabel = formatUkDate(project.endDate);
   const priceLabel = formatGbpValue(project.projectValue);
-  const serviceLabels = (project.services ?? [])
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const servicePillLabels = sortLabelsAlphabetically([
+    ...(project.galleryCategories ?? []).map((tag) => tag.title),
+    ...(project.services ?? []),
+  ]);
+  const showServicesRow = servicePillLabels.length > 0;
+
+  const metadataPillClassName =
+    "inline-flex rounded-full border border-gold/35 bg-parchment/80 px-3 py-1 text-xs font-semibold tracking-tight text-graphite sm:text-sm";
 
   return (
     <main id="main-content" className="min-h-screen bg-stone-white">
@@ -306,15 +312,12 @@ export default async function ProjectDetailPage({
                 <dd>{priceLabel}</dd>
               </div>
             ) : null}
-            {serviceLabels.length > 0 ? (
+            {showServicesRow ? (
               <div className="basis-full pt-1">
                 <dt className="font-semibold text-graphite">Services</dt>
                 <dd className="mt-2 flex flex-wrap gap-2">
-                  {serviceLabels.map((label) => (
-                    <span
-                      key={label}
-                      className="inline-flex rounded-full border border-gold/35 bg-parchment/80 px-3 py-1 text-xs font-semibold tracking-tight text-graphite sm:text-sm"
-                    >
+                  {servicePillLabels.map((label) => (
+                    <span key={label} className={metadataPillClassName}>
                       {label}
                     </span>
                   ))}
