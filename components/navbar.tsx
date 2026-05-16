@@ -158,7 +158,7 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
 
       <button
         type="button"
-        className={`fixed right-4 top-4 z-[60] inline-flex h-11 w-11 items-center justify-center rounded-full border transition md:hidden ${
+        className={`fixed right-4 top-4 z-[100] inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border transition-transform duration-200 ease-out hover:scale-110 md:hidden ${
           isMenuOpen
             ? "border-stone-white/25 bg-slate-900/70"
             : "border-graphite/15 bg-stone-white/85"

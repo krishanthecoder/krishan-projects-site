@@ -124,8 +124,8 @@ const allProjectsQuery = groq`*[_type == "project"] | order(_createdAt desc){
       }
     }
   },
-  galleryCategories[]->{
-    _id,
+  galleryCategories[]{
+    "_id": _key,
     title,
     "slug": slug.current
   },
@@ -244,8 +244,8 @@ const galleryProjectsRowQuery = groq`*[_type == "project" && defined(slug.curren
       }
     }
   },
-  galleryCategories[]->{
-    _id,
+  galleryCategories[]{
+    "_id": _key,
     title,
     "slug": slug.current
   },
@@ -258,12 +258,6 @@ const galleryProjectsRowQuery = groq`*[_type == "project" && defined(slug.curren
       }
     }
   }
-}`;
-
-const galleryCategoriesQuery = groq`*[_type == "galleryCategory" && defined(slug.current)] | order(sortOrder asc, title asc) {
-  _id,
-  title,
-  "slug": slug.current
 }`;
 
 const projectBySlugQuery = groq`*[_type == "project" && slug.current == $slug][0]{
@@ -361,6 +355,25 @@ function normalizeResolvedCategories(
 
 function projectGalleryCategories(project: ProjectRowForGallery): GalleryCategory[] {
   return normalizeResolvedCategories(project.galleryCategories);
+}
+
+/** Unique filter tags across projects, sorted A–Z (replaces the old galleryCategory document list). */
+function deriveGalleryCategoriesFromProjects(
+  projects: ProjectRowForGallery[],
+): GalleryCategory[] {
+  const bySlug = new Map<string, GalleryCategory>();
+
+  for (const project of projects) {
+    for (const tag of projectGalleryCategories(project)) {
+      if (!bySlug.has(tag.slug)) {
+        bySlug.set(tag.slug, tag);
+      }
+    }
+  }
+
+  return Array.from(bySlug.values()).sort((a, b) =>
+    a.title.localeCompare(b.title, "en", { sensitivity: "base" }),
+  );
 }
 
 function stripImageFields(img: GalleryImageFromGroq): SanityImage {
@@ -559,17 +572,8 @@ export async function getGalleryFilterData(): Promise<{
     return { categories: [], projects: [] };
   }
 
-  const [rawCategories, projects] = await Promise.all([
-    sanityClient.fetch<Array<{ _id: string; title: string; slug: string | null }>>(
-      galleryCategoriesQuery,
-      {},
-      sanityFetchOptions(),
-    ),
-    fetchGalleryProjectRows(),
-  ]);
-
-  const categories: GalleryCategory[] = rawCategories
-    .filter((c): c is GalleryCategory => typeof c.slug === "string" && c.slug.length > 0 && Boolean(c.title));
+  const projects = await fetchGalleryProjectRows();
+  const categories = deriveGalleryCategoriesFromProjects(projects);
 
   return {
     categories,

@@ -1,0 +1,73 @@
+/**
+ * Document footer Publish actions — match Homepage Settings size and colour.
+ * Sanity UI puts padding on an inner span; override that span so sizing matches the custom pane button.
+ */
+:root {
+  --kp-publish-btn-padding: 10px 20px;
+  --kp-publish-btn-font-size: 0.875rem;
+  --kp-publish-btn-min-height: 40px;
+  --kp-publish-btn-bg: #1d4ed8;
+}
+
+button[data-testid^="action-publish"],
+button[data-testid="action-published"],
+button[data-testid="action-publishing"] {
+  box-sizing: border-box !important;
+  min-height: var(--kp-publish-btn-min-height) !important;
+  padding: 0 !important;
+  background-color: var(--kp-publish-btn-bg) !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+/* @sanity/ui Button — padding lives on the inner wrapper span */
+button[data-testid^="action-publish"] > span,
+button[data-testid="action-published"] > span,
+button[data-testid="action-publishing"] > span {
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: var(--kp-publish-btn-min-height) !important;
+  padding: var(--kp-publish-btn-padding) !important;
+  font-size: var(--kp-publish-btn-font-size) !important;
+  line-height: 1.25 !important;
+}
+
+button[data-testid^="action-publish"]:disabled,
+button[data-testid="action-published"]:disabled,
+button[data-testid="action-publishing"]:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Tag dialog footer — fixed below scrollable fields */
+.kp-gallery-tag-dialog-footer-host {
+  flex-shrink: 0;
+  border-top: 1px solid var(--card-border-color);
+  background: var(--card-bg-color);
+}
+
+.kp-gallery-tag-dialog-footer {
+  width: 100%;
+}
+
+/* Tag dialog “Add tag” (matches Publish sizing) */
+button.kp-studio-save-btn {
+  box-sizing: border-box !important;
+  min-height: var(--kp-publish-btn-min-height) !important;
+  padding: var(--kp-publish-btn-padding) !important;
+  font-size: var(--kp-publish-btn-font-size) !important;
+  line-height: 1.25 !important;
+  background-color: var(--kp-publish-btn-bg) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+button.kp-studio-save-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}

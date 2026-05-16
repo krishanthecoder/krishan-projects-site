@@ -4,7 +4,7 @@ import { StarRatingInput } from "../components/star-rating-input";
 
 export const testimonialSchema = defineType({
   name: "testimonial",
-  title: "Testimonial",
+  title: "Testimonials",
   type: "document",
   fields: [
     defineField({

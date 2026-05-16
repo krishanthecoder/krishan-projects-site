@@ -170,7 +170,7 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
               const active = selectedSlug === category.slug;
               return (
                 <button
-                  key={category._id}
+                  key={category.slug}
                   type="button"
                   role="radio"
                   aria-checked={active}

@@ -70,27 +70,21 @@ async function uploadImageFromUrl(client, { url, filename }) {
   return client.assets.upload("image", buf, { filename });
 }
 
-async function ensureGalleryCategoryIds(client) {
-  const ids = await client.fetch(
-    `*[_type == "galleryCategory" && defined(slug.current)] | order(sortOrder asc) [0...2]._id`,
-  );
-  if (Array.isArray(ids) && ids.length > 0) {
-    return ids;
-  }
-
-  const fallbackId = "galleryCategory-seed-example-general";
-  const existing = await client.fetch(`*[_id == $id][0]._id`, { id: fallbackId });
-  if (!existing) {
-    await client.create({
-      _id: fallbackId,
-      _type: "galleryCategory",
+function exampleGalleryTags() {
+  return [
+    {
+      _type: "galleryCategoryTag",
+      _key: "tag-renovation",
+      title: "Renovation",
+      slug: { _type: "slug", current: "renovation" },
+    },
+    {
+      _type: "galleryCategoryTag",
+      _key: "tag-general",
       title: "General",
       slug: { _type: "slug", current: "general" },
-      sortOrder: 999,
-    });
-    console.log(`Created fallback gallery category: ${fallbackId}`);
-  }
-  return [fallbackId];
+    },
+  ];
 }
 
 async function main() {
@@ -127,13 +121,7 @@ async function main() {
     return;
   }
 
-  const categoryIds = await ensureGalleryCategoryIds(client);
-  const galleryCategories = categoryIds.map((ref) => ({
-    _type: "reference",
-    _key: `cat-${ref}`,
-    _ref: ref,
-    _weak: true,
-  }));
+  const galleryCategories = exampleGalleryTags();
 
   console.log("Uploading example images…");
   const uploaded = [];

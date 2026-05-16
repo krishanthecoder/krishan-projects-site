@@ -9,10 +9,8 @@
     "lint": "eslint",
     "sanity": "sanity",
     "studio:dev": "sanity dev",
-    "seed:gallery-categories": "node scripts/seed-gallery-categories.mjs",
     "seed:example-project": "node scripts/seed-example-project.mjs",
-    "publish:gallery-category-drafts": "node scripts/publish-gallery-category-drafts.mjs",
-    "migrate:gallery-category-refs-weak": "node scripts/weakify-gallery-category-refs.mjs",
+    "migrate:gallery-categories-to-inline": "node scripts/migrate-gallery-categories-to-inline.mjs",
     "cleanup:daily": "pkill -f \"next dev\" || true && rm -rf .next && npm cache clean --force",
     "postinstall": "patch-package && node scripts/patch-sanity-plugin-media-dist.mjs"
   },

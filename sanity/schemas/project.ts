@@ -1,5 +1,8 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { GalleryCategoriesInput } from "../components/gallery-categories-input";
+import { GalleryCategoryTagArrayItem } from "../components/gallery-category-tag-array-item";
+
 /** Alt is only validated once an asset exists, so the upload step is not treated as invalid. */
 function imageAltWhenAsset(minLen: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sanity Rule chain is not typed here
@@ -17,7 +20,7 @@ function imageAltWhenAsset(minLen: number) {
 
 export const projectSchema = defineType({
   name: "project",
-  title: "Project",
+  title: "Projects",
   type: "document",
   fields: [
     defineField({
@@ -91,14 +94,18 @@ export const projectSchema = defineType({
       title: "Filter project tags",
       type: "array",
       description:
-        "Tags this project appears under in the Recent Projects gallery filter. Applies to the whole job and every photo in the gallery below.",
+        "Tags for the Recent Projects gallery filter. Reuse an existing tag from other projects, or add a new one with a title and generated slug.",
       of: [
         defineArrayMember({
-          type: "reference",
-          to: [{ type: "galleryCategory" }],
-          weak: true,
+          type: "galleryCategoryTag",
+          components: {
+            item: GalleryCategoryTagArrayItem,
+          },
         }),
       ],
+      components: {
+        input: GalleryCategoriesInput,
+      },
     }),
     defineField({
       name: "startDate",

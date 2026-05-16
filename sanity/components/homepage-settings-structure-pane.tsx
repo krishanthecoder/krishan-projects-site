@@ -11,6 +11,7 @@ import {
 } from "../../lib/hero-defaults";
 
 import { sanityApiVersion } from "../env";
+import { studioPublishButtonStyle } from "../styles/publish-button";
 
 const SITE_SETTINGS_ID = "siteSettings";
 const SITE_SETTINGS_TYPE = "siteSettings";
@@ -606,16 +607,7 @@ const selectStyle: CSSProperties = {
   color: "#0f172a",
 };
 
-const primaryBtn: CSSProperties = {
-  padding: "10px 20px",
-  fontSize: "0.875rem",
-  fontWeight: 600,
-  color: "#fff",
-  background: "#1d4ed8",
-  border: "none",
-  borderRadius: 6,
-  cursor: "pointer",
-};
+const primaryBtn: CSSProperties = studioPublishButtonStyle;
 
 const sectionDivider: CSSProperties = {
   marginTop: 28,
