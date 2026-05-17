@@ -1,0 +1,351 @@
+"use client";
+
+import Link from "next/link";
+import { LayoutGroup, motion, useReducedMotion } from "framer-motion";
+import { ArrowRight, Check } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { useScrollSpy } from "@/hooks/use-scroll-spy";
+import { scrollToSection } from "@/lib/scroll-to-section";
+import { serviceOfferings, type ServiceOffering } from "@/lib/services-content";
+
+import { TradeMobilePicker } from "./trade-mobile-picker";
+import type { ServicesPageProps } from "./types";
+
+const SERVICES_SCROLL_OFFSET = 148;
+
+const sidebarActiveTransition = {
+  type: "spring" as const,
+  stiffness: 380,
+  damping: 34,
+  mass: 0.85,
+};
+
+function TradeSidebarLink({
+  service,
+  isActive,
+  reduceMotion,
+  onSelect,
+}: {
+  service: ServiceOffering;
+  isActive: boolean;
+  reduceMotion: boolean | null;
+  onSelect: () => void;
+}) {
+  const Icon = service.icon;
+
+  return (
+    <li className="relative">
+      {isActive &&
+        (reduceMotion ? (
+          <span
+            className="absolute inset-0 rounded-xl border-l-[3px] border-gold bg-parchment shadow-sm"
+            aria-hidden
+          />
+        ) : (
+          <motion.span
+            layoutId="services-trade-active"
+            className="absolute inset-0 rounded-xl border-l-[3px] border-gold bg-parchment shadow-sm"
+            transition={sidebarActiveTransition}
+            aria-hidden
+          />
+        ))}
+      <button
+        type="button"
+        id={`nav-${service.id}`}
+        aria-current={isActive ? "true" : undefined}
+        className={`relative z-[1] flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+          isActive
+            ? "text-graphite"
+            : "text-graphite/75 hover:bg-parchment/50 hover:text-graphite"
+        }`}
+        onClick={onSelect}
+      >
+        <Icon
+          className={`h-4 w-4 shrink-0 text-gold transition-opacity duration-200 ${
+            isActive ? "opacity-100" : "opacity-80"
+          }`}
+          aria-hidden
+        />
+        {service.shortLabel}
+      </button>
+    </li>
+  );
+}
+
+function ServiceDetailArticle({
+  service,
+  layoutIndex,
+}: {
+  service: ServiceOffering;
+  layoutIndex: number;
+}) {
+  const Icon = service.icon;
+  const isEven = layoutIndex % 2 === 0;
+
+  return (
+    <article
+      id={service.id}
+      className="relative scroll-mt-36 max-lg:scroll-mt-[var(--services-scroll-anchor,9.25rem)]"
+    >
+      <div
+        className={`relative grid gap-8 lg:grid-cols-2 lg:items-start ${
+          isEven ? "" : "lg:[&>*:first-child]:order-2"
+        }`}
+      >
+        <div
+          className={`rounded-3xl p-8 sm:p-10 ${
+            isEven
+              ? "bg-graphite text-stone-white"
+              : "border border-graphite/10 bg-parchment text-graphite"
+          }`}
+        >
+          <Icon className="h-10 w-10 text-gold" strokeWidth={1.75} aria-hidden />
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            {service.shortLabel}
+          </p>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+            {service.title}
+          </h2>
+          <p
+            className={`mt-4 text-base font-medium leading-relaxed ${
+              isEven ? "text-stone-white/90" : "text-graphite/90"
+            }`}
+          >
+            {service.summary}
+          </p>
+        </div>
+        <div className="lg:pt-4">
+          <p className="text-sm leading-relaxed text-graphite/85">{service.description}</p>
+          <div className="mt-6 border-t border-graphite/10 pt-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-warm-mist">
+              Typical scope
+            </p>
+            <ul className="mt-3 space-y-2.5">
+              {service.includes.map((item) => (
+                <li
+                  key={item}
+                  className="flex gap-2.5 text-sm leading-snug text-graphite/85"
+                >
+                  <Check
+                    className="mt-0.5 h-4 w-4 shrink-0 text-gold"
+                    strokeWidth={2.5}
+                    aria-hidden
+                  />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/** Services page — sidebar scrollspy + trade detail sections. */
+export function ServicesPageContent({
+  primaryArea,
+  serviceAreasLabel,
+  phoneNumber,
+}: ServicesPageProps) {
+  const reduceMotion = useReducedMotion();
+  const telHref = `tel:${phoneNumber.replace(/\s/g, "")}`;
+
+  const tradeSectionIds = useMemo(
+    () => serviceOfferings.map((service) => service.id),
+    [],
+  );
+
+  const getMobileScrollAnchorBottom = useCallback(() => {
+    const anchor = document.getElementById("services-mobile-picker-anchor");
+    if (anchor) return anchor.getBoundingClientRect().bottom + 8;
+
+    const picker = document.getElementById("services-mobile-trade-picker");
+    return picker ? picker.getBoundingClientRect().bottom + 8 : SERVICES_SCROLL_OFFSET;
+  }, []);
+
+  const syncMobileScrollAnchor = useCallback(() => {
+    if (!window.matchMedia("(max-width: 1023px)").matches) return;
+    document.documentElement.style.setProperty(
+      "--services-scroll-anchor",
+      `${getMobileScrollAnchorBottom()}px`,
+    );
+  }, [getMobileScrollAnchorBottom]);
+
+  useEffect(() => {
+    syncMobileScrollAnchor();
+    window.addEventListener("resize", syncMobileScrollAnchor);
+    window.addEventListener("scroll", syncMobileScrollAnchor, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", syncMobileScrollAnchor);
+      window.removeEventListener("scroll", syncMobileScrollAnchor);
+    };
+  }, [syncMobileScrollAnchor]);
+
+  const getScrollSpyOffset = useCallback(() => {
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      return getMobileScrollAnchorBottom();
+    }
+    return SERVICES_SCROLL_OFFSET;
+  }, [getMobileScrollAnchorBottom]);
+
+  const scrollSpyTradeId = useScrollSpy(tradeSectionIds, {
+    offset: getScrollSpyOffset,
+  });
+
+  const [pickerTradeId, setPickerTradeId] = useState<string | null>(null);
+  const activeTradeId = pickerTradeId ?? scrollSpyTradeId;
+
+  const scrollToTrade = useCallback(
+    (tradeId: string) => {
+      const element = document.getElementById(tradeId);
+      if (!element) return;
+
+      const isMobileLayout = window.matchMedia("(max-width: 1023px)").matches;
+
+      if (isMobileLayout) {
+        syncMobileScrollAnchor();
+        scrollToSection(element, getMobileScrollAnchorBottom());
+        return;
+      }
+
+      element.scrollIntoView({ behavior: "auto", block: "start" });
+    },
+    [getMobileScrollAnchorBottom, syncMobileScrollAnchor],
+  );
+
+  const handlePickerSelect = useCallback(
+    (tradeId: string) => {
+      setPickerTradeId(tradeId);
+      scrollToTrade(tradeId);
+    },
+    [scrollToTrade],
+  );
+
+  useEffect(() => {
+    if (pickerTradeId != null && scrollSpyTradeId === pickerTradeId) {
+      setPickerTradeId(null);
+    }
+  }, [pickerTradeId, scrollSpyTradeId]);
+
+  return (
+    <>
+      <section aria-labelledby="services-trades-heading">
+        <h2
+          id="services-trades-heading"
+          className="text-xl font-bold tracking-tight text-graphite sm:text-2xl"
+        >
+          Our trades
+        </h2>
+        <p className="mt-1 text-sm text-warm-mist">
+          Scroll through each trade, or jump straight to one from the menu.
+        </p>
+
+        <div
+          id="services-mobile-trade-picker"
+          className="sticky top-16 z-30 -mx-6 mt-6 border-b border-graphite/8 bg-stone-white/95 px-6 py-3 backdrop-blur-sm sm:-mx-10 sm:px-10 lg:hidden"
+        >
+          <TradeMobilePicker activeTradeId={activeTradeId} onSelect={handlePickerSelect} />
+        </div>
+
+        <div className="mt-6 lg:mt-10 lg:grid lg:grid-cols-[minmax(12.5rem,14rem)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:gap-14">
+          <nav
+            aria-label="Browse by trade"
+            className="hidden lg:block lg:sticky lg:top-24 lg:self-start"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+              Browse by trade
+            </p>
+            <LayoutGroup id="services-trade-nav">
+              <ul className="mt-4 space-y-1">
+                {serviceOfferings.map((service) => (
+                  <TradeSidebarLink
+                    key={service.id}
+                    service={service}
+                    isActive={activeTradeId === service.id}
+                    reduceMotion={reduceMotion}
+                    onSelect={() => scrollToTrade(service.id)}
+                  />
+                ))}
+              </ul>
+            </LayoutGroup>
+          </nav>
+
+          <div
+            id="services-trades-panel"
+            aria-labelledby={`nav-${activeTradeId}`}
+            className="mt-8 space-y-16 lg:mt-0 lg:space-y-20"
+          >
+            {serviceOfferings.map((service, index) => (
+              <ServiceDetailArticle
+                key={service.id}
+                service={service}
+                layoutIndex={index}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="relative mt-16 overflow-hidden rounded-3xl sm:mt-20"
+        aria-labelledby="services-cta-heading"
+      >
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-gold via-gold to-gold/80"
+          aria-hidden
+        />
+        <div
+          className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-stone-white/15 blur-2xl"
+          aria-hidden
+        />
+        <div className="relative grid gap-8 p-8 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-white/70">
+              Next step
+            </p>
+            <h2
+              id="services-cta-heading"
+              className="mt-3 text-2xl font-bold tracking-tight text-stone-white sm:text-3xl"
+            >
+              Not sure which trade you need first?
+            </h2>
+            <p className="mt-3 max-w-lg text-sm leading-relaxed text-stone-white/85">
+              Describe what you are planning — an extension, a bathroom, a full
+              redecoration, or something in between. We will visit, advise on the
+              right order of works, and send a clear written quote.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-graphite px-6 py-3 text-sm font-bold text-stone-white shadow-lg transition hover:bg-graphite/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-white focus-visible:ring-offset-2 focus-visible:ring-offset-gold"
+            >
+              Request a quote
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+            <a
+              href={telHref}
+              className="inline-flex items-center justify-center rounded-xl border border-stone-white/40 bg-stone-white/10 px-6 py-3 text-sm font-semibold text-stone-white backdrop-blur-sm transition hover:bg-stone-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-white focus-visible:ring-offset-2 focus-visible:ring-offset-gold"
+            >
+              Call {phoneNumber}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <p className="mt-10 text-center text-sm text-warm-mist">
+        See recent work in our{" "}
+        <Link
+          href="/gallery"
+          className="font-semibold text-graphite underline decoration-gold/50 underline-offset-2 hover:decoration-gold"
+        >
+          project gallery
+        </Link>
+        .
+      </p>
+    </>
+  );
+}
