@@ -6,6 +6,8 @@ type UseScrollSpyOptions = {
   /** Pixels from the top of the viewport (navbar + scroll margin). */
   offset?: number | (() => number);
   enabled?: boolean;
+  /** Skip updates while true (e.g. during a programmatic jump). */
+  shouldSkipUpdate?: () => boolean;
 };
 
 /**
@@ -14,7 +16,7 @@ type UseScrollSpyOptions = {
  */
 export function useScrollSpy(
   sectionIds: string[],
-  { offset = 148, enabled = true }: UseScrollSpyOptions = {},
+  { offset = 148, enabled = true, shouldSkipUpdate }: UseScrollSpyOptions = {},
 ) {
   const fallbackId = sectionIds[0] ?? "";
   const [activeId, setActiveId] = useState(fallbackId);
@@ -27,6 +29,8 @@ export function useScrollSpy(
     const resolveOffset = () => (typeof offset === "function" ? offset() : offset);
 
     const updateActiveSection = () => {
+      if (shouldSkipUpdate?.()) return;
+
       const anchorLine = resolveOffset();
       let current = sectionIds[0];
 
@@ -86,7 +90,7 @@ export function useScrollSpy(
       window.removeEventListener("load", scheduleLayoutUpdate);
       resizeObserver?.disconnect();
     };
-  }, [sectionIds, offset, enabled]);
+  }, [sectionIds, offset, enabled, shouldSkipUpdate]);
 
   return activeId;
 }

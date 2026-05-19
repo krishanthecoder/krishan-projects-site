@@ -6,10 +6,9 @@ import { ArrowRight, Check } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
-import { scrollToSection } from "@/lib/scroll-to-section";
 import { serviceOfferings, type ServiceOffering } from "@/lib/services-content";
 
-import { TradeMobilePicker } from "./trade-mobile-picker";
+import { TradeMobileNav } from "./trade-mobile-nav";
 import type { ServicesPageProps } from "./types";
 
 const SERVICES_SCROLL_OFFSET = 148;
@@ -76,45 +75,32 @@ function TradeSidebarLink({
 function ServiceDetailArticle({
   service,
   layoutIndex,
+  isMobileActive,
+  isDesktopLayout,
 }: {
   service: ServiceOffering;
   layoutIndex: number;
+  isMobileActive: boolean;
+  isDesktopLayout: boolean;
 }) {
   const Icon = service.icon;
   const isEven = layoutIndex % 2 === 0;
+  const hideOnMobile = !isDesktopLayout && !isMobileActive;
 
   return (
     <article
       id={service.id}
-      className="relative scroll-mt-36 max-lg:scroll-mt-[var(--services-scroll-anchor,9.25rem)]"
+      role={isDesktopLayout ? undefined : "tabpanel"}
+      aria-labelledby={isDesktopLayout ? undefined : `mobile-tab-${service.id}`}
+      aria-hidden={hideOnMobile ? true : undefined}
+      className={`relative scroll-mt-36 max-lg:scroll-mt-0${hideOnMobile ? " max-lg:hidden" : ""}`}
     >
       <div
         className={`relative grid gap-8 lg:grid-cols-2 lg:items-start ${
           isEven ? "" : "lg:[&>*:first-child]:order-2"
         }`}
       >
-        <div
-          className={`rounded-3xl p-8 sm:p-10 ${
-            isEven
-              ? "bg-graphite text-stone-white"
-              : "border border-graphite/10 bg-parchment text-graphite"
-          }`}
-        >
-          <Icon className="h-10 w-10 text-gold" strokeWidth={1.75} aria-hidden />
-          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-            {service.shortLabel}
-          </p>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            {service.title}
-          </h2>
-          <p
-            className={`mt-4 text-base font-medium leading-relaxed ${
-              isEven ? "text-stone-white/90" : "text-graphite/90"
-            }`}
-          >
-            {service.summary}
-          </p>
-        </div>
+        <FeatureCard isEven={isEven} service={service} Icon={Icon} />
         <div className="lg:pt-4">
           <p className="text-sm leading-relaxed text-graphite/85">{service.description}</p>
           <div className="mt-6 border-t border-graphite/10 pt-6">
@@ -143,6 +129,41 @@ function ServiceDetailArticle({
   );
 }
 
+function FeatureCard({
+  service,
+  isEven,
+  Icon,
+}: {
+  service: ServiceOffering;
+  isEven: boolean;
+  Icon: ServiceOffering["icon"];
+}) {
+  return (
+    <div
+      className={`rounded-3xl p-8 sm:p-10 ${
+        isEven
+          ? "bg-graphite text-stone-white"
+          : "border border-graphite/10 bg-parchment text-graphite"
+      }`}
+    >
+      <Icon className="h-10 w-10 text-gold" strokeWidth={1.75} aria-hidden />
+      <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+        {service.shortLabel}
+      </p>
+      <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+        {service.title}
+      </h2>
+      <p
+        className={`mt-4 text-base font-medium leading-relaxed ${
+          isEven ? "text-stone-white/90" : "text-graphite/90"
+        }`}
+      >
+        {service.summary}
+      </p>
+    </div>
+  );
+}
+
 /** Services page — sidebar scrollspy + trade detail sections. */
 export function ServicesPageContent({
   primaryArea,
@@ -157,78 +178,63 @@ export function ServicesPageContent({
     [],
   );
 
-  const getMobileScrollAnchorBottom = useCallback(() => {
-    const anchor = document.getElementById("services-mobile-picker-anchor");
-    if (anchor) return anchor.getBoundingClientRect().bottom + 8;
-
-    const picker = document.getElementById("services-mobile-trade-picker");
-    return picker ? picker.getBoundingClientRect().bottom + 8 : SERVICES_SCROLL_OFFSET;
-  }, []);
-
-  const syncMobileScrollAnchor = useCallback(() => {
-    if (!window.matchMedia("(max-width: 1023px)").matches) return;
-    document.documentElement.style.setProperty(
-      "--services-scroll-anchor",
-      `${getMobileScrollAnchorBottom()}px`,
-    );
-  }, [getMobileScrollAnchorBottom]);
-
-  useEffect(() => {
-    syncMobileScrollAnchor();
-    window.addEventListener("resize", syncMobileScrollAnchor);
-    window.addEventListener("scroll", syncMobileScrollAnchor, { passive: true });
-
-    return () => {
-      window.removeEventListener("resize", syncMobileScrollAnchor);
-      window.removeEventListener("scroll", syncMobileScrollAnchor);
-    };
-  }, [syncMobileScrollAnchor]);
-
-  const getScrollSpyOffset = useCallback(() => {
-    if (window.matchMedia("(max-width: 1023px)").matches) {
-      return getMobileScrollAnchorBottom();
+  const [isDesktopLayout, setIsDesktopLayout] = useState(false);
+  const [mobileTradeId, setMobileTradeId] = useState(() => {
+    if (typeof window === "undefined") {
+      return serviceOfferings[0].id;
     }
-    return SERVICES_SCROLL_OFFSET;
-  }, [getMobileScrollAnchorBottom]);
 
-  const scrollSpyTradeId = useScrollSpy(tradeSectionIds, {
-    offset: getScrollSpyOffset,
+    const hash = window.location.hash.slice(1);
+    return serviceOfferings.some((service) => service.id === hash)
+      ? hash
+      : serviceOfferings[0].id;
   });
 
-  const [pickerTradeId, setPickerTradeId] = useState<string | null>(null);
-  const activeTradeId = pickerTradeId ?? scrollSpyTradeId;
+  const applyTradeFromHash = useCallback(() => {
+    const hash = window.location.hash.slice(1);
+    if (!tradeSectionIds.includes(hash)) return;
 
-  const scrollToTrade = useCallback(
-    (tradeId: string) => {
-      const element = document.getElementById(tradeId);
-      if (!element) return;
+    setMobileTradeId(hash);
 
-      const isMobileLayout = window.matchMedia("(max-width: 1023px)").matches;
-
-      if (isMobileLayout) {
-        syncMobileScrollAnchor();
-        scrollToSection(element, getMobileScrollAnchorBottom());
-        return;
-      }
-
-      element.scrollIntoView({ behavior: "auto", block: "start" });
-    },
-    [getMobileScrollAnchorBottom, syncMobileScrollAnchor],
-  );
-
-  const handlePickerSelect = useCallback(
-    (tradeId: string) => {
-      setPickerTradeId(tradeId);
-      scrollToTrade(tradeId);
-    },
-    [scrollToTrade],
-  );
+    if (window.matchMedia("(min-width: 1024px)").matches) {
+      const section = document.getElementById(hash);
+      section?.scrollIntoView({ behavior: "auto", block: "start" });
+    }
+  }, [tradeSectionIds]);
 
   useEffect(() => {
-    if (pickerTradeId != null && scrollSpyTradeId === pickerTradeId) {
-      setPickerTradeId(null);
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const updateLayout = () => setIsDesktopLayout(mediaQuery.matches);
+
+    updateLayout();
+    mediaQuery.addEventListener("change", updateLayout);
+    return () => mediaQuery.removeEventListener("change", updateLayout);
+  }, []);
+
+  useEffect(() => {
+    applyTradeFromHash();
+    window.addEventListener("hashchange", applyTradeFromHash);
+    return () => window.removeEventListener("hashchange", applyTradeFromHash);
+  }, [applyTradeFromHash]);
+
+  const scrollSpyTradeId = useScrollSpy(tradeSectionIds, {
+    offset: SERVICES_SCROLL_OFFSET,
+    enabled: isDesktopLayout,
+  });
+
+  const scrollToTrade = useCallback((tradeId: string) => {
+    const section = document.getElementById(tradeId);
+    if (!section) return;
+    section.scrollIntoView({ behavior: "auto", block: "start" });
+  }, []);
+
+  const handleMobileTradeSelect = useCallback((tradeId: string) => {
+    setMobileTradeId(tradeId);
+
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      window.history.replaceState(null, "", `#${tradeId}`);
     }
-  }, [pickerTradeId, scrollSpyTradeId]);
+  }, []);
 
   return (
     <>
@@ -239,15 +245,21 @@ export function ServicesPageContent({
         >
           Our trades
         </h2>
-        <p className="mt-1 text-sm text-warm-mist">
-          Scroll through each trade, or jump straight to one from the menu.
+        <p className="mt-1 text-sm text-warm-mist lg:max-w-xl">
+          <span className="lg:hidden">Tap a trade to see what we cover on your job.</span>
+          <span className="hidden lg:inline">
+            Jump to a trade in the sidebar, or scroll through each section below.
+          </span>
         </p>
 
         <div
           id="services-mobile-trade-picker"
-          className="sticky top-16 z-30 -mx-6 mt-6 border-b border-graphite/8 bg-stone-white/95 px-6 py-3 backdrop-blur-sm sm:-mx-10 sm:px-10 lg:hidden"
+          className="mt-6 border-b border-graphite/8 pb-3 lg:hidden"
         >
-          <TradeMobilePicker activeTradeId={activeTradeId} onSelect={handlePickerSelect} />
+          <TradeMobileNav
+            activeTradeId={mobileTradeId}
+            onSelect={handleMobileTradeSelect}
+          />
         </div>
 
         <div className="mt-6 lg:mt-10 lg:grid lg:grid-cols-[minmax(12.5rem,14rem)_minmax(0,1fr)] lg:items-start lg:gap-10 xl:gap-14">
@@ -264,7 +276,7 @@ export function ServicesPageContent({
                   <TradeSidebarLink
                     key={service.id}
                     service={service}
-                    isActive={activeTradeId === service.id}
+                    isActive={scrollSpyTradeId === service.id}
                     reduceMotion={reduceMotion}
                     onSelect={() => scrollToTrade(service.id)}
                   />
@@ -275,14 +287,15 @@ export function ServicesPageContent({
 
           <div
             id="services-trades-panel"
-            aria-labelledby={`nav-${activeTradeId}`}
-            className="mt-8 space-y-16 lg:mt-0 lg:space-y-20"
+            className="mt-6 space-y-16 lg:mt-0 lg:space-y-20"
           >
             {serviceOfferings.map((service, index) => (
               <ServiceDetailArticle
                 key={service.id}
                 service={service}
                 layoutIndex={index}
+                isMobileActive={mobileTradeId === service.id}
+                isDesktopLayout={isDesktopLayout}
               />
             ))}
           </div>
