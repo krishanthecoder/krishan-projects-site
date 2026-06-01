@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 
 type NavbarProps = {
   businessName: string;
@@ -17,6 +17,12 @@ const navLinks = [
   { name: "Contact", href: "/contact" },
 ];
 const mobileNavLinks = [{ name: "Home", href: "/" }, ...navLinks];
+
+/** Home is exact-match only; other items stay active on nested routes (e.g. /projects/[slug]). */
+function isNavLinkActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 const menuPanel: Variants = {
   hidden: { clipPath: "circle(0px at calc(100% - 2rem) 2rem)", opacity: 0.95 },
@@ -47,6 +53,13 @@ const linkItem = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.22 } },
 };
 
+const mobileNavLinkClass = (isActive: boolean) =>
+  [
+    "block rounded-xl px-4 py-3 text-4xl font-bold tracking-tight transition duration-200",
+    "hover:translate-x-1 hover:scale-[1.06] hover:underline hover:underline-offset-8",
+    isActive ? "text-gold" : "text-stone-white",
+  ].join(" ");
+
 export function Navbar({ businessName, phoneNumber }: NavbarProps) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -66,6 +79,18 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (pathname !== "/") return;
+
+    event.preventDefault();
+    setIsMenuOpen(false);
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    window.scrollTo({ top: 0, left: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
+  };
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -107,6 +132,7 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
         >
           <Link
             href="/"
+            onClick={handleLogoClick}
             className="transition duration-200 hover:scale-105 hover:brightness-115 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
             aria-label={`${businessName} home`}
           >
@@ -126,7 +152,7 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
         <div className="hidden items-center gap-8 md:flex">
           <nav aria-label="Main navigation" className="flex items-center gap-8">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const isActive = isNavLinkActive(pathname, link.href);
               return (
                 <Link
                   key={link.href}
@@ -209,17 +235,13 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
               animate="visible"
             >
               {mobileNavLinks.map((link) => {
-                const isActive = pathname === link.href;
+                const isActive = isNavLinkActive(pathname, link.href);
                 return (
                   <motion.li key={link.href} variants={linkItem}>
                     <Link
                       href={link.href}
                       onClick={() => setIsMenuOpen(false)}
-                      className={`block rounded-xl px-4 py-3 text-4xl font-bold tracking-tight text-stone-white transition duration-200 ${
-                        isActive
-                            ? "text-gold"
-                          : "hover:translate-x-1 hover:scale-[1.02] hover:underline hover:underline-offset-8"
-                      }`}
+                      className={mobileNavLinkClass(isActive)}
                     >
                       {link.name}
                     </Link>

@@ -254,7 +254,7 @@ export function TestimonialCarousel({
   const canNext = activePage < pageCount - 1;
 
   const navButtonClass =
-    "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-graphite/15 bg-stone-white text-graphite shadow-sm transition hover:border-gold/50 hover:text-gold disabled:pointer-events-none disabled:opacity-35";
+    "inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-graphite/15 bg-stone-white text-graphite shadow-sm transition hover:border-gold/50 hover:text-gold disabled:cursor-not-allowed disabled:pointer-events-none disabled:opacity-35";
 
   return (
     <div
@@ -351,7 +351,7 @@ export function TestimonialCarousel({
                 type="button"
                 aria-label={`Go to page ${page + 1} of ${pageCount}`}
                 aria-current={page === activePage ? true : undefined}
-                className={`h-2.5 w-2.5 rounded-full transition ${
+                className={`h-2.5 w-2.5 cursor-pointer rounded-full transition ${
                   page === activePage
                     ? "scale-110 bg-gold shadow-sm"
                     : "bg-graphite/25 hover:bg-graphite/40"

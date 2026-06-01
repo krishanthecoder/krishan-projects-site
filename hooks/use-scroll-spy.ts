@@ -2,21 +2,122 @@
 
 import { useEffect, useState } from "react";
 
+type ScrollSpyMode = "anchor" | "anchored-visibility";
+
 type UseScrollSpyOptions = {
-  /** Pixels from the top of the viewport (navbar + scroll margin). */
+  /**
+   * Viewport Y (px) for the activation line — e.g. the "Browse by trade" heading.
+   */
   offset?: number | (() => number);
   enabled?: boolean;
-  /** Skip updates while true (e.g. during a programmatic jump). */
   shouldSkipUpdate?: () => boolean;
+  /** Element whose top edge is compared to the anchor (default: section root). */
+  getMarkerElement?: (sectionId: string) => HTMLElement | null;
+  /** Full section bounds for visibility (default: same as marker). */
+  getSectionElement?: (sectionId: string) => HTMLElement | null;
+  /**
+   * `anchor` — last section whose marker has crossed the anchor line.
+   * `anchored-visibility` — among started sections, pick the most visible slice
+   * between the anchor and `visibilityPaneEndRatio` (better for tall sections).
+   */
+  mode?: ScrollSpyMode;
+  visibilityPaneEndRatio?: number;
 };
 
+/** Last section whose marker top has reached or passed the anchor line. */
+function getActiveSectionByAnchor(
+  sectionIds: string[],
+  anchorTop: number,
+  getMarkerElement: (sectionId: string) => HTMLElement | null,
+): string {
+  let activeId = sectionIds[0];
+
+  for (const id of sectionIds) {
+    const marker = getMarkerElement(id);
+    if (!marker) continue;
+
+    if (marker.getBoundingClientRect().top <= anchorTop) {
+      activeId = id;
+    }
+  }
+
+  return activeId;
+}
+
 /**
- * Returns the section active at the anchor line — the one whose top has crossed
- * it while the next section has not.
+ * Picks the section with the most content visible between the anchor line and
+ * the lower edge of the reading pane. Uses full section bounds (not marker gates)
+ * so a trade is not stuck active while the next trade already fills the screen.
  */
+function getActiveSectionAnchoredVisibility(
+  sectionIds: string[],
+  anchorTop: number,
+  getMarkerElement: (sectionId: string) => HTMLElement | null,
+  getSectionElement: (sectionId: string) => HTMLElement | null,
+  paneEndRatio: number,
+): string {
+  const paneBottom = window.innerHeight * paneEndRatio;
+  let activeId = sectionIds[0];
+  let maxVisible = 0;
+
+  for (const id of sectionIds) {
+    const section = getSectionElement(id);
+    if (!section) continue;
+
+    const { top: sectionTop, bottom: sectionBottom } =
+      section.getBoundingClientRect();
+    const visibleTop = Math.max(sectionTop, anchorTop);
+    const visibleBottom = Math.min(sectionBottom, paneBottom);
+    const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+    if (visibleHeight > maxVisible) {
+      maxVisible = visibleHeight;
+      activeId = id;
+    }
+  }
+
+  if (maxVisible <= 0) {
+    return getActiveSectionByAnchor(sectionIds, anchorTop, getMarkerElement);
+  }
+
+  return activeId;
+}
+
+function resolveActiveSection(
+  sectionIds: string[],
+  anchorTop: number,
+  options: UseScrollSpyOptions,
+): string {
+  const getMarkerElement =
+    options.getMarkerElement ?? ((id: string) => document.getElementById(id));
+  const getSectionElement =
+    options.getSectionElement ?? getMarkerElement;
+  const mode = options.mode ?? "anchor";
+
+  if (mode === "anchored-visibility") {
+    return getActiveSectionAnchoredVisibility(
+      sectionIds,
+      anchorTop,
+      getMarkerElement,
+      getSectionElement,
+      options.visibilityPaneEndRatio ?? 0.65,
+    );
+  }
+
+  return getActiveSectionByAnchor(sectionIds, anchorTop, getMarkerElement);
+}
+
 export function useScrollSpy(
   sectionIds: string[],
-  { offset = 148, enabled = true, shouldSkipUpdate }: UseScrollSpyOptions = {},
+  {
+    offset = 148,
+    enabled = true,
+    shouldSkipUpdate,
+    getMarkerElement,
+    getSectionElement,
+    mode = "anchor",
+    visibilityPaneEndRatio,
+  }: UseScrollSpyOptions = {},
 ) {
   const fallbackId = sectionIds[0] ?? "";
   const [activeId, setActiveId] = useState(fallbackId);
@@ -30,34 +131,14 @@ export function useScrollSpy(
 
     const updateActiveSection = () => {
       if (shouldSkipUpdate?.()) return;
-
-      const anchorLine = resolveOffset();
-      let current = sectionIds[0];
-
-      for (let index = 0; index < sectionIds.length; index++) {
-        const id = sectionIds[index];
-        const element = document.getElementById(id);
-        if (!element) continue;
-
-        const top = element.getBoundingClientRect().top;
-        const nextElement =
-          index + 1 < sectionIds.length
-            ? document.getElementById(sectionIds[index + 1])
-            : null;
-        const nextTop =
-          nextElement?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY;
-
-        if (top <= anchorLine && nextTop > anchorLine) {
-          current = id;
-          break;
-        }
-
-        if (top <= anchorLine) {
-          current = id;
-        }
-      }
-
-      setActiveId(current);
+      setActiveId(
+        resolveActiveSection(sectionIds, resolveOffset(), {
+          getMarkerElement,
+          getSectionElement,
+          mode,
+          visibilityPaneEndRatio,
+        }),
+      );
     };
 
     const scheduleLayoutUpdate = () => {
@@ -72,16 +153,20 @@ export function useScrollSpy(
     window.addEventListener("resize", scheduleLayoutUpdate);
     window.addEventListener("load", scheduleLayoutUpdate);
 
-    const elements = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter((element): element is HTMLElement => element != null);
+    const observedElements = new Set<HTMLElement>();
+    for (const id of sectionIds) {
+      const marker = getMarkerElement?.(id) ?? document.getElementById(id);
+      const section = getSectionElement?.(id) ?? marker;
+      if (marker) observedElements.add(marker);
+      if (section) observedElements.add(section);
+    }
 
     const resizeObserver =
       typeof ResizeObserver !== "undefined"
         ? new ResizeObserver(scheduleLayoutUpdate)
         : null;
 
-    elements.forEach((element) => resizeObserver?.observe(element));
+    observedElements.forEach((element) => resizeObserver?.observe(element));
 
     return () => {
       cancelAnimationFrame(layoutRafId);
@@ -90,7 +175,16 @@ export function useScrollSpy(
       window.removeEventListener("load", scheduleLayoutUpdate);
       resizeObserver?.disconnect();
     };
-  }, [sectionIds, offset, enabled, shouldSkipUpdate]);
+  }, [
+    sectionIds,
+    offset,
+    enabled,
+    shouldSkipUpdate,
+    getMarkerElement,
+    getSectionElement,
+    mode,
+    visibilityPaneEndRatio,
+  ]);
 
   return activeId;
 }

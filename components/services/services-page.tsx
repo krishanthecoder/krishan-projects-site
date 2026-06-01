@@ -3,15 +3,19 @@
 import Link from "next/link";
 import { LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
 import { serviceOfferings, type ServiceOffering } from "@/lib/services-content";
+import { scrollToSectionAligned, getSiteHeaderScrollOffset } from "@/lib/scroll-to-section";
 
 import { TradeMobileNav } from "./trade-mobile-nav";
 import type { ServicesPageProps } from "./types";
 
-const SERVICES_SCROLL_OFFSET = 148;
+const tradeMarkerId = (tradeId: string) => `${tradeId}-marker`;
+
+const tradeNavRowClass =
+  "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold";
 
 const sidebarActiveTransition = {
   type: "spring" as const,
@@ -19,6 +23,26 @@ const sidebarActiveTransition = {
   damping: 34,
   mass: 0.85,
 };
+
+function TradeNavRow({
+  service,
+  className = "",
+}: {
+  service: ServiceOffering;
+  className?: string;
+}) {
+  const Icon = service.icon;
+
+  return (
+    <>
+      <Icon
+        className="h-4 w-4 shrink-0 text-gold opacity-80"
+        aria-hidden
+      />
+      <span className={className}>{service.shortLabel}</span>
+    </>
+  );
+}
 
 function TradeSidebarLink({
   service,
@@ -31,8 +55,6 @@ function TradeSidebarLink({
   reduceMotion: boolean | null;
   onSelect: () => void;
 }) {
-  const Icon = service.icon;
-
   return (
     <li className="relative">
       {isActive &&
@@ -53,20 +75,14 @@ function TradeSidebarLink({
         type="button"
         id={`nav-${service.id}`}
         aria-current={isActive ? "true" : undefined}
-        className={`relative z-[1] flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+        className={`relative z-[1] ${tradeNavRowClass} transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
           isActive
             ? "text-graphite"
             : "text-graphite/75 hover:bg-parchment/50 hover:text-graphite"
         }`}
         onClick={onSelect}
       >
-        <Icon
-          className={`h-4 w-4 shrink-0 text-gold transition-opacity duration-200 ${
-            isActive ? "opacity-100" : "opacity-80"
-          }`}
-          aria-hidden
-        />
-        {service.shortLabel}
+        <TradeNavRow service={service} />
       </button>
     </li>
   );
@@ -93,8 +109,15 @@ function ServiceDetailArticle({
       role={isDesktopLayout ? undefined : "tabpanel"}
       aria-labelledby={isDesktopLayout ? undefined : `mobile-tab-${service.id}`}
       aria-hidden={hideOnMobile ? true : undefined}
-      className={`relative scroll-mt-36 max-lg:scroll-mt-0${hideOnMobile ? " max-lg:hidden" : ""}`}
+      className={`relative${isDesktopLayout ? " scroll-mt-32" : " max-lg:scroll-mt-0"}${hideOnMobile ? " max-lg:hidden" : ""}`}
     >
+      {isDesktopLayout ? (
+        <div
+          id={tradeMarkerId(service.id)}
+          className="pointer-events-none absolute left-0 top-0 h-0 w-px"
+          aria-hidden
+        />
+      ) : null}
       <div
         className={`relative grid gap-8 lg:grid-cols-2 lg:items-start ${
           isEven ? "" : "lg:[&>*:first-child]:order-2"
@@ -172,11 +195,31 @@ export function ServicesPageContent({
 }: ServicesPageProps) {
   const reduceMotion = useReducedMotion();
   const telHref = `tel:${phoneNumber.replace(/\s/g, "")}`;
+  const tradeNavAnchorRef = useRef<HTMLParagraphElement>(null);
 
   const tradeSectionIds = useMemo(
     () => serviceOfferings.map((service) => service.id),
     [],
   );
+
+  const getTradeAnchorTop = useCallback(() => {
+    const anchor = tradeNavAnchorRef.current;
+    if (!anchor) return getSiteHeaderScrollOffset();
+    return anchor.getBoundingClientRect().top;
+  }, []);
+
+  /** Sidebar clicks must clear the site header; spy still uses the browse heading. */
+  const getTradeScrollOffset = useCallback(() => {
+    return Math.max(getSiteHeaderScrollOffset(), getTradeAnchorTop());
+  }, [getTradeAnchorTop]);
+
+  const getTradeMarker = useCallback((tradeId: string) => {
+    return document.getElementById(tradeMarkerId(tradeId));
+  }, []);
+
+  const getTradeSection = useCallback((tradeId: string) => {
+    return document.getElementById(tradeId);
+  }, []);
 
   const [isDesktopLayout, setIsDesktopLayout] = useState(false);
   const [mobileTradeId, setMobileTradeId] = useState(() => {
@@ -190,6 +233,15 @@ export function ServicesPageContent({
       : serviceOfferings[0].id;
   });
 
+  const scrollTradeIntoView = useCallback(
+    (tradeId: string, behavior: ScrollBehavior) => {
+      const section = getTradeSection(tradeId);
+      if (!section) return;
+      scrollToSectionAligned(section, getTradeScrollOffset(), { behavior });
+    },
+    [getTradeScrollOffset, getTradeSection],
+  );
+
   const applyTradeFromHash = useCallback(() => {
     const hash = window.location.hash.slice(1);
     if (!tradeSectionIds.includes(hash)) return;
@@ -197,10 +249,9 @@ export function ServicesPageContent({
     setMobileTradeId(hash);
 
     if (window.matchMedia("(min-width: 1024px)").matches) {
-      const section = document.getElementById(hash);
-      section?.scrollIntoView({ behavior: "auto", block: "start" });
+      scrollTradeIntoView(hash, "auto");
     }
-  }, [tradeSectionIds]);
+  }, [tradeSectionIds, scrollTradeIntoView]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
@@ -218,15 +269,19 @@ export function ServicesPageContent({
   }, [applyTradeFromHash]);
 
   const scrollSpyTradeId = useScrollSpy(tradeSectionIds, {
-    offset: SERVICES_SCROLL_OFFSET,
+    offset: getTradeAnchorTop,
     enabled: isDesktopLayout,
+    mode: "anchored-visibility",
+    getMarkerElement: getTradeMarker,
+    getSectionElement: getTradeSection,
   });
 
-  const scrollToTrade = useCallback((tradeId: string) => {
-    const section = document.getElementById(tradeId);
-    if (!section) return;
-    section.scrollIntoView({ behavior: "auto", block: "start" });
-  }, []);
+  const scrollToTrade = useCallback(
+    (tradeId: string) => {
+      scrollTradeIntoView(tradeId, reduceMotion ? "auto" : "smooth");
+    },
+    [reduceMotion, scrollTradeIntoView],
+  );
 
   const handleMobileTradeSelect = useCallback((tradeId: string) => {
     setMobileTradeId(tradeId);
@@ -267,7 +322,11 @@ export function ServicesPageContent({
             aria-label="Browse by trade"
             className="hidden lg:block lg:sticky lg:top-24 lg:self-start"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold">
+            <p
+              ref={tradeNavAnchorRef}
+              id="services-trade-nav-anchor"
+              className="text-xs font-semibold uppercase tracking-[0.18em] text-gold"
+            >
               Browse by trade
             </p>
             <LayoutGroup id="services-trade-nav">

@@ -13,7 +13,47 @@ export function scrollToSection(
   window.scrollTo({ top: targetTop, left: 0, behavior });
 }
 
-/** Scroll to anchor and nudge again if layout shifted (sticky bars, margins, etc.). */
+function nudgeToAnchor(
+  element: HTMLElement,
+  anchorTopPx: number,
+) {
+  const delta = element.getBoundingClientRect().top - anchorTopPx;
+  if (Math.abs(delta) > 2) {
+    window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+  }
+}
+
+function waitForScrollSettle(onSettled: () => void) {
+  let lastScrollY = window.scrollY;
+  let stableFrames = 0;
+  let frameId = 0;
+  let settled = false;
+
+  const finish = () => {
+    if (settled) return;
+    settled = true;
+    cancelAnimationFrame(frameId);
+    onSettled();
+  };
+
+  const poll = () => {
+    const currentScrollY = window.scrollY;
+    stableFrames = Math.abs(currentScrollY - lastScrollY) < 0.5 ? stableFrames + 1 : 0;
+    lastScrollY = currentScrollY;
+
+    if (stableFrames >= 4) {
+      finish();
+      return;
+    }
+
+    frameId = requestAnimationFrame(poll);
+  };
+
+  frameId = requestAnimationFrame(poll);
+  window.setTimeout(finish, 900);
+}
+
+/** Scroll to anchor and nudge again after layout / smooth scrolling settles. */
 export function scrollToSectionAligned(
   element: HTMLElement,
   anchorTopPx: number,
@@ -21,8 +61,22 @@ export function scrollToSectionAligned(
 ) {
   scrollToSection(element, anchorTopPx, { behavior });
 
-  const delta = element.getBoundingClientRect().top - anchorTopPx;
-  if (Math.abs(delta) > 2) {
-    window.scrollBy({ top: delta, left: 0, behavior });
+  const finalize = () => {
+    nudgeToAnchor(element, anchorTopPx);
+    requestAnimationFrame(() => nudgeToAnchor(element, anchorTopPx));
+  };
+
+  if (behavior === "auto") {
+    requestAnimationFrame(() => requestAnimationFrame(finalize));
+    return;
   }
+
+  waitForScrollSettle(finalize);
+}
+
+/** Bottom edge of the sticky site header plus a small content gap. */
+export function getSiteHeaderScrollOffset(extraGapPx = 12) {
+  const header = document.querySelector("header");
+  if (!header) return 112;
+  return header.getBoundingClientRect().bottom + extraGapPx;
 }

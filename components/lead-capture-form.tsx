@@ -105,7 +105,12 @@ export function LeadCaptureForm() {
         </label>
 
         <label className={labelBase}>
-          Phone <span className="font-normal normal-case tracking-normal text-warm-mist/60">(optional)</span>
+          <span className="inline-flex items-baseline gap-1.5">
+            <span>Phone</span>
+            <span className="font-normal normal-case tracking-normal text-warm-mist/60">
+              (optional)
+            </span>
+          </span>
           <input
             {...register("phone")}
             className={inputBase}

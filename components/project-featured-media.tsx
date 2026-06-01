@@ -184,7 +184,8 @@ function FeaturedComparisonSlider({
         role="group"
         aria-labelledby={labelId}
       >
-        <div className="pointer-events-none absolute inset-0">
+        {/* After — base layer; pill is covered when the before layer expands rightward */}
+        <div className="pointer-events-none absolute inset-0 z-0">
           <SanityImage
             image={afterImage}
             alt={afterAlt}
@@ -193,10 +194,16 @@ function FeaturedComparisonSlider({
             sizes={HERO_SIZES}
             className="object-cover"
           />
+          <span
+            className={`absolute right-5 top-5 z-[1] sm:right-7 sm:top-6 ${beforeAfterLabelAfter}`}
+          >
+            After
+          </span>
         </div>
 
+        {/* Before — clipped above after; pill clips with this layer on the left */}
         <div
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 z-10"
           style={{ clipPath: `inset(0 ${clipRight} 0 0)` }}
         >
           <SanityImage
@@ -207,6 +214,11 @@ function FeaturedComparisonSlider({
             sizes={HERO_SIZES}
             className="object-cover"
           />
+          <span
+            className={`absolute left-5 top-5 z-[1] sm:left-7 sm:top-6 ${beforeAfterLabelBefore}`}
+          >
+            Before
+          </span>
         </div>
 
         {/* Wide touch strip + visible divider + handle */}
@@ -243,10 +255,6 @@ function FeaturedComparisonSlider({
           </div>
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-between px-5 pt-5 sm:px-7 sm:pt-6">
-          <span className={beforeAfterLabelBefore}>Before</span>
-          <span className={beforeAfterLabelAfter}>After</span>
-        </div>
       </div>
 
       <label htmlFor={`${labelId}-range`} className="sr-only">
