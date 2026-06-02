@@ -146,9 +146,226 @@ body {
   }
 }
 
+/* Lead form — icon inside field, before placeholder text. */
+.kp-lead-icon-field {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(51 51 51 / 0.15);
+  background-color: #f9f9f8;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.kp-lead-icon-field--textarea {
+  align-items: flex-start;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.kp-lead-icon-field--textarea .kp-lead-icon-field__icon {
+  margin-top: 0.2rem;
+}
+
+.kp-lead-icon-field:focus-within {
+  border-color: #c4973d;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgb(196 151 61 / 0.25);
+}
+
+.kp-lead-icon-field--error {
+  border-color: rgb(225 29 72 / 0.4);
+}
+
+.kp-lead-icon-field--error:focus-within {
+  border-color: rgb(225 29 72 / 0.55);
+  box-shadow: 0 0 0 3px rgb(225 29 72 / 0.12);
+}
+
+.kp-lead-icon-field__icon {
+  flex-shrink: 0;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: #8c8780;
+}
+
+.kp-lead-icon-field__control {
+  min-width: 0;
+  flex: 1;
+}
+
+.kp-lead-icon-field__input {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0.625rem 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #333333;
+  text-transform: none;
+  letter-spacing: normal;
+  outline: none;
+}
+
+.kp-lead-icon-field__input::placeholder {
+  color: rgb(140 135 128 / 0.85);
+}
+
+.kp-lead-icon-field__input--textarea {
+  min-height: 6.5rem;
+  resize: vertical;
+  padding: 0;
+}
+
+.kp-branded-select--embedded .kp-lead-select {
+  border: none;
+  background: transparent;
+  padding: 0.625rem 2rem 0.625rem 0;
+  box-shadow: none;
+}
+
+.kp-branded-select--embedded .kp-lead-select:hover,
+.kp-branded-select--embedded .kp-lead-select:focus-visible {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.kp-branded-select--embedded .kp-lead-select-wrap::after {
+  right: 0;
+}
+
+/* Lead form — branded project type select (custom listbox). */
+.kp-branded-select {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-transform: none;
+}
+
+.kp-lead-select-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.kp-lead-select-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  pointer-events: none;
+  transform: translateY(-35%) rotate(45deg);
+  border-right: 2px solid #c4973d;
+  border-bottom: 2px solid #c4973d;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.kp-lead-select-wrap:has(.kp-lead-select:focus-visible)::after,
+.kp-branded-select:has(.kp-lead-select[aria-expanded="true"]) .kp-lead-select-wrap::after {
+  border-color: #333333;
+}
+
+.kp-branded-select:has(.kp-lead-select[aria-expanded="true"]) .kp-lead-select-wrap::after {
+  transform: translateY(-15%) rotate(225deg);
+}
+
+.kp-lead-select {
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0.625rem 2.75rem 0.625rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(51 51 51 / 0.15);
+  background-color: #f9f9f8;
+  color: #333333;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.kp-lead-select:hover {
+  border-color: rgb(196 151 61 / 0.45);
+  background-color: #ffffff;
+}
+
+.kp-lead-select:focus-visible {
+  border-color: #c4973d;
+  box-shadow: 0 0 0 3px rgb(196 151 61 / 0.25);
+}
+
+.kp-lead-select--placeholder {
+  color: #8c8780;
+}
+
+.kp-lead-select-list {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(51 51 51 / 0.12);
+  background-color: #f9f9f8;
+  box-shadow:
+    0 4px 6px rgb(51 51 51 / 0.04),
+    0 16px 40px rgb(51 51 51 / 0.1);
+  max-height: 15rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.kp-lead-select-option {
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: #333333;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.kp-lead-select-option.is-highlighted {
+  background-color: #edebe5;
+}
+
+.kp-lead-select-option.is-selected {
+  background-color: rgb(196 151 61 / 0.18);
+  color: #333333;
+  font-weight: 600;
+}
+
+.kp-lead-select-option.is-selected.is-highlighted {
+  background-color: rgb(196 151 61 / 0.28);
+}
+
 /* Desktop cursor affordance: clickable controls show hand cursor. */
 @media (min-width: 1024px) {
   a[href],
+  .kp-lead-select,
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   input[type="button"]:not(:disabled),

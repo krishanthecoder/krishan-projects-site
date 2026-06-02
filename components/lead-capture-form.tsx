@@ -1,30 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import {
+  AtSign,
+  ListChecks,
+  MapPin,
+  MessageSquareText,
+  Smartphone,
+  UserRound,
+} from "lucide-react";
+
+import { BrandedSelect } from "@/components/ui/branded-select";
+import { FormIconField } from "@/components/ui/form-icon-field";
+import { leadProjectTypeOptions } from "@/lib/lead-form-project-types";
 
 type LeadFormValues = {
   name: string;
   email: string;
-  phone?: string;
+  phone: string;
+  postcode: string;
   projectType: string;
   message: string;
 };
 
-const inputBase =
-  "w-full rounded-xl border border-graphite/15 bg-stone-white px-4 py-2.5 text-sm text-graphite placeholder:text-warm-mist/60 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/25";
-
-const labelBase = "flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-graphite/70";
+const iconInputClass = "kp-lead-icon-field__input";
 
 export function LeadCaptureForm() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<LeadFormValues>();
+  } = useForm<LeadFormValues>({
+    defaultValues: { projectType: "" },
+  });
 
   const onSubmit = async (values: LeadFormValues) => {
     setStatusMessage(null);
@@ -36,7 +49,10 @@ export function LeadCaptureForm() {
       body: JSON.stringify(values),
     });
 
-    const payload = (await response.json()) as { message?: string };
+    const payload = (await response.json()) as {
+      message?: string;
+      confirmationEmailSent?: boolean;
+    };
 
     if (!response.ok) {
       setStatusMessage(payload.message ?? "Unable to submit your request.");
@@ -44,7 +60,11 @@ export function LeadCaptureForm() {
       return;
     }
 
-    setStatusMessage("Thanks. We've got your message and will come back to you today.");
+    setStatusMessage(
+      payload.confirmationEmailSent
+        ? "Thanks — we've got your message and sent a confirmation to your email. We'll be in touch as soon as possible."
+        : "Thanks — we've got your message. We'll be in touch as soon as possible.",
+    );
     setIsSuccess(true);
     reset();
   };
@@ -67,23 +87,17 @@ export function LeadCaptureForm() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-5 sm:grid-cols-2">
-        <label className={labelBase}>
-          Full Name
+        <FormIconField icon={UserRound} error={errors.name?.message}>
           <input
             {...register("name", { required: "Name is required." })}
-            className={inputBase}
-            placeholder="Jane Smith"
+            className={iconInputClass}
+            placeholder="Full name *"
+            aria-label="Full name"
             autoComplete="name"
           />
-          {errors.name ? (
-            <p className="text-xs font-normal normal-case tracking-normal text-rose-600" role="alert">
-              {errors.name.message}
-            </p>
-          ) : null}
-        </label>
+        </FormIconField>
 
-        <label className={labelBase}>
-          Email Address
+        <FormIconField icon={AtSign} error={errors.email?.message}>
           <input
             {...register("email", {
               required: "Email is required.",
@@ -92,56 +106,74 @@ export function LeadCaptureForm() {
                 message: "Enter a valid email address.",
               },
             })}
-            className={inputBase}
-            placeholder="you@example.com"
+            className={iconInputClass}
+            placeholder="Email address *"
+            aria-label="Email address"
             type="email"
             autoComplete="email"
           />
-          {errors.email ? (
-            <p className="text-xs font-normal normal-case tracking-normal text-rose-600" role="alert">
-              {errors.email.message}
-            </p>
-          ) : null}
-        </label>
+        </FormIconField>
 
-        <label className={labelBase}>
-          <span className="inline-flex items-baseline gap-1.5">
-            <span>Phone</span>
-            <span className="font-normal normal-case tracking-normal text-warm-mist/60">
-              (optional)
-            </span>
-          </span>
+        <FormIconField icon={Smartphone} error={errors.phone?.message}>
           <input
-            {...register("phone")}
-            className={inputBase}
-            placeholder="+44 7700 000 000"
+            {...register("phone", {
+              required: "Phone number is required.",
+              minLength: {
+                value: 10,
+                message: "Enter a valid UK phone number.",
+              },
+            })}
+            className={iconInputClass}
+            placeholder="Phone *"
+            aria-label="Phone"
             type="tel"
             autoComplete="tel"
           />
-        </label>
+        </FormIconField>
 
-        <label className={labelBase}>
-          Project Type
-          <select
-            {...register("projectType", { required: "Select a project type." })}
-            className={inputBase}
-          >
-            <option value="">Select an option</option>
-            <option value="kitchen-fitting">Kitchen fitting</option>
-            <option value="home-renovation">Home renovation</option>
-            <option value="extension">Extension</option>
-            <option value="bathroom-renovation">Bathroom renovation</option>
-            <option value="general-building-works">General building works</option>
-          </select>
-          {errors.projectType ? (
-            <p className="text-xs font-normal normal-case tracking-normal text-rose-600" role="alert">
-              {errors.projectType.message}
-            </p>
-          ) : null}
-        </label>
+        <FormIconField icon={MapPin} error={errors.postcode?.message}>
+          <input
+            {...register("postcode", {
+              required: "Postcode is required.",
+              minLength: {
+                value: 5,
+                message: "Enter a valid UK postcode.",
+              },
+            })}
+            className={iconInputClass}
+            placeholder="Postcode *"
+            aria-label="Postcode"
+            autoComplete="postal-code"
+          />
+        </FormIconField>
 
-        <label className={`${labelBase} sm:col-span-2`}>
-          Message
+        <FormIconField icon={ListChecks} error={errors.projectType?.message}>
+          <Controller
+            name="projectType"
+            control={control}
+            rules={{ required: "Select a project type." }}
+            render={({ field }) => (
+              <BrandedSelect
+                id="lead-project-type"
+                embedded
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                options={leadProjectTypeOptions}
+                placeholder="Project type *"
+                aria-label="Project type"
+                aria-invalid={errors.projectType ? true : undefined}
+              />
+            )}
+          />
+        </FormIconField>
+
+        <FormIconField
+          icon={MessageSquareText}
+          multiline
+          error={errors.message?.message}
+          className="sm:col-span-2"
+        >
           <textarea
             {...register("message", {
               required: "Please share project details.",
@@ -150,15 +182,11 @@ export function LeadCaptureForm() {
                 message: "Please enter at least 10 characters.",
               },
             })}
-            className={`${inputBase} h-32 resize-none`}
-            placeholder="Tell us about the property, the work you need, and when you would like to start."
+            className={`${iconInputClass} kp-lead-icon-field__input--textarea`}
+            placeholder="Briefly describe your project *"
+            aria-label="Briefly describe your project"
           />
-          {errors.message ? (
-            <p className="text-xs font-normal normal-case tracking-normal text-rose-600" role="alert">
-              {errors.message.message}
-            </p>
-          ) : null}
-        </label>
+        </FormIconField>
 
         <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center">
           <button
