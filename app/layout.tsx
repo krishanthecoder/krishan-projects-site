@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { RouteScrollReset } from "@/components/route-scroll-reset";
+import { brandEmblem } from "@/lib/brand-assets";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -66,6 +67,15 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "/",
+  },
+  icons: {
+    icon: [
+      {
+        url: `${brandEmblem.png}?v=1`,
+        type: "image/png",
+        sizes: "512x512",
+      },
+    ],
   },
 };
 

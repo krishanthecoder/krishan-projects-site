@@ -37,7 +37,7 @@ export function SiteFooter({
               className="w-fit transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-graphite"
               aria-label={`${businessName} home`}
             >
-              <BrandLockup compact variant="inverted" />
+              <BrandLockup compact variant="inverted" alt={businessName} />
             </Link>
             <p className="max-w-sm text-sm leading-relaxed text-stone-white/75">
               Serving {serviceAreasLabel}

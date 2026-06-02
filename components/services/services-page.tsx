@@ -75,7 +75,7 @@ function TradeSidebarLink({
         type="button"
         id={`nav-${service.id}`}
         aria-current={isActive ? "true" : undefined}
-        className={`relative z-[1] ${tradeNavRowClass} transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+        className={`relative z-[1] cursor-pointer ${tradeNavRowClass} transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
           isActive
             ? "text-graphite"
             : "text-graphite/75 hover:bg-parchment/50 hover:text-graphite"
@@ -411,7 +411,7 @@ export function ServicesPageContent({
       <p className="mt-10 text-center text-sm text-warm-mist">
         See recent work in our{" "}
         <Link
-          href="/gallery"
+          href="/projects"
           className="font-semibold text-graphite underline decoration-gold/50 underline-offset-2 hover:decoration-gold"
         >
           project gallery

@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { useEffect, useState, type MouseEvent } from "react";
+import { BrandLockup } from "@/components/brand/brand-lockup";
 
 type NavbarProps = {
   businessName: string;
@@ -136,16 +136,7 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
             className="transition duration-200 hover:scale-105 hover:brightness-115 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
             aria-label={`${businessName} home`}
           >
-            <Image
-              src="/brand/navbar-logo-v3-tweaked.png"
-              alt={businessName}
-              width={1161}
-              height={335}
-              sizes="(max-width: 360px) 118px, (max-width: 640px) 140px, 170px"
-              className="h-8 w-auto min-[360px]:h-9 sm:h-[42px]"
-              priority
-              unoptimized
-            />
+            <BrandLockup compact alt={businessName} />
           </Link>
         </motion.div>
 

@@ -1,38 +1,46 @@
-import Image from "next/image";
+import {
+  brandLockupDimensions,
+  getBrandLogoSources,
+  type BrandLogoVariant,
+} from "@/lib/brand-assets";
 
 type BrandLockupProps = {
+  /** `default` = navbar (light bg). `inverted` = footer (dark bg). */
+  variant?: BrandLogoVariant;
   compact?: boolean;
   className?: string;
-  variant?: "default" | "inverted";
+  alt?: string;
 };
 
 export function BrandLockup({
+  variant = "default",
   compact = false,
   className = "",
-  variant = "default",
+  alt = "Krishan Projects",
 }: BrandLockupProps) {
+  const { svg, png } = getBrandLogoSources(variant);
   const sizes = compact
     ? "(max-width: 360px) 118px, (max-width: 640px) 140px, 170px"
     : "(max-width: 640px) 140px, 170px";
   const classNames = compact
     ? "h-8 w-auto min-[360px]:h-9 sm:h-[42px]"
     : "h-10 w-auto sm:h-11";
-  const src =
-    variant === "inverted"
-      ? "/brand/navbar-logo-v3-inverted.png"
-      : "/brand/navbar-logo-v3-tweaked.png";
 
   return (
     <div className={`flex items-center ${className}`.trim()}>
-      <Image
-        src={src}
-        alt="Krishan Projects"
-        width={1161}
-        height={335}
-        sizes={sizes}
-        className={`${classNames} block object-contain`}
-        unoptimized
-      />
+      <picture>
+        <source srcSet={svg} type="image/svg+xml" />
+        <img
+          src={png}
+          alt={alt}
+          width={brandLockupDimensions.width}
+          height={brandLockupDimensions.height}
+          sizes={sizes}
+          className={`${classNames} block object-contain`}
+          loading="eager"
+          decoding="async"
+        />
+      </picture>
     </div>
   );
 }

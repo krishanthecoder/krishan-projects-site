@@ -146,7 +146,7 @@ export default async function Home() {
                   Get a free quote
                 </a>
                 <a
-                  href="/gallery"
+                  href="/projects"
                   className="inline-flex items-center justify-center rounded-xl border border-graphite/15 bg-stone-white px-6 py-3 text-sm font-semibold text-graphite transition hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
                 >
                   See our recent work

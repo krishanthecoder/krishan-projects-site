@@ -13,7 +13,7 @@ export default function ContactPage() {
             description="Ready to discuss your home renovation? Message us today for a free site visit and quote."
           />
         </ScrollReveal>
-        
+
         <div className="mt-16">
           <LeadCaptureForm />
         </div>
