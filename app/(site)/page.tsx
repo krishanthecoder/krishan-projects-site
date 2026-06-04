@@ -4,7 +4,7 @@ import { ProjectHero } from "@/components/project-hero";
 import { LocalBusinessJsonLd } from "@/components/seo/local-business-jsonld";
 import { TestimonialCarousel } from "@/components/testimonial-carousel";
 import { TrustCards } from "@/components/trust-cards";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
 import { SectionTitle } from "@/components/ui/section-title";
 import {
   getAllTestimonials,
@@ -96,108 +96,112 @@ export default async function Home() {
       >
         <div className="hero-fit-grid relative grid gap-8 min-[1300px]:grid-cols-[1fr_300px] min-[1300px]:items-center">
           <div className="hero-fit-copy">
-            <ScrollReveal>
-              <div className="inline-flex items-center gap-2 rounded-full bg-gold/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
-                <span aria-hidden="true" className="relative flex h-2 w-2 shrink-0">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-gold motion-safe:animate-ping motion-safe:[animation-duration:2.4s]" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-gold motion-safe:animate-status-blink" />
-                </span>
-                Currently taking on new work
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.04}>
-              <div className="hero-fit-title-wrap mt-6">
-                <SectionTitle
-                  as="h1"
-                  eyebrow={`Small ${primaryArea} Building Team`}
-                  title={`Builders and kitchen fitters you can actually trust in ${primaryArea}.`}
-                  description={`We're a small team covering ${serviceAreasLabel}. Home renovations, kitchen fitting, extensions and general building works — done properly, kept tidy, and finished when we said we would.`}
-                />
-              </div>
-            </ScrollReveal>
-
-            {/* Personal note from the team */}
-            <ScrollReveal delay={0.08}>
-              <figure className="hero-fit-note mt-6 flex max-w-xl items-start gap-3 rounded-2xl border border-gold/25 bg-gold/8 p-5 text-graphite sm:p-6">
-                <span
-                  aria-hidden="true"
-                  className="font-serif text-3xl leading-none text-gold"
-                >
-                  &ldquo;
-                </span>
-                <div>
-                  <blockquote className="text-sm italic leading-relaxed text-graphite/90 sm:text-base">
-                    We started {businessName} because we wanted to do things properly — give homeowners our full attention, be honest about timings, and take real pride in every job.
-                  </blockquote>
-                  <figcaption className="mt-2 text-xs font-semibold not-italic text-gold">
-                    &mdash; The {businessName} team
-                  </figcaption>
+            <ScrollRevealGroup>
+              <ScrollReveal>
+                <div className="inline-flex items-center gap-2 rounded-full bg-gold/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
+                  <span aria-hidden="true" className="relative flex h-2 w-2 shrink-0">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-gold motion-safe:animate-ping motion-safe:[animation-duration:2.4s]" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-gold motion-safe:animate-status-blink" />
+                  </span>
+                  Currently taking on new work
                 </div>
-              </figure>
-            </ScrollReveal>
+              </ScrollReveal>
 
-            <ScrollReveal delay={0.12}>
-              <div className="hero-fit-cta mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
-                <a
-                  href="/contact"
-                  className="inline-flex items-center justify-center rounded-xl bg-graphite px-6 py-3 text-sm font-semibold text-stone-white shadow-sm transition hover:bg-graphite/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-                >
-                  Get a free quote
-                </a>
-                <a
-                  href="/projects"
-                  className="inline-flex items-center justify-center rounded-xl border border-graphite/15 bg-stone-white px-6 py-3 text-sm font-semibold text-graphite transition hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-                >
-                  See our recent work
-                </a>
-              </div>
-            </ScrollReveal>
+              <ScrollReveal>
+                <div className="hero-fit-title-wrap mt-6">
+                  <SectionTitle
+                    as="h1"
+                    eyebrow={`Small ${primaryArea} Building Team`}
+                    title={`Builders and kitchen fitters you can actually trust in ${primaryArea}.`}
+                    description={`We're a small team covering ${serviceAreasLabel}. Home renovations, kitchen fitting, extensions and general building works — done properly, kept tidy, and finished when we said we would.`}
+                  />
+                </div>
+              </ScrollReveal>
 
-            <ScrollReveal delay={0.16}>
-              <p className="hero-fit-call mt-6 text-sm leading-relaxed text-warm-mist sm:text-[0.95rem]">
-                Or call us on{" "}
-                <a
-                  href={`tel:${phoneNumber.replace(/\s/g, "")}`}
-                  className="font-semibold text-gold hover:text-gold/80"
-                >
-                  {phoneNumber}
-                </a>
-                {" "}— we&apos;ll get back to you the same day.
-              </p>
-            </ScrollReveal>
+              <ScrollReveal>
+                <figure className="hero-fit-note mt-6 flex max-w-xl items-start gap-3 rounded-2xl border border-gold/25 bg-gold/8 p-5 text-graphite sm:p-6">
+                  <span
+                    aria-hidden="true"
+                    className="font-serif text-3xl leading-none text-gold"
+                  >
+                    &ldquo;
+                  </span>
+                  <div>
+                    <blockquote className="text-sm italic leading-relaxed text-graphite/90 sm:text-base">
+                      We started {businessName} because we wanted to do things properly — give homeowners our full attention, be honest about timings, and take real pride in every job.
+                    </blockquote>
+                    <figcaption className="mt-2 text-xs font-semibold not-italic text-gold">
+                      &mdash; The {businessName} team
+                    </figcaption>
+                  </div>
+                </figure>
+              </ScrollReveal>
+
+              <ScrollReveal>
+                <div className="hero-fit-cta mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5">
+                  <a
+                    href="/contact"
+                    className="inline-flex items-center justify-center rounded-xl bg-graphite px-6 py-3 text-sm font-semibold text-stone-white shadow-sm transition hover:bg-graphite/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                  >
+                    Get a free quote
+                  </a>
+                  <a
+                    href="/projects"
+                    className="inline-flex items-center justify-center rounded-xl border border-graphite/15 bg-stone-white px-6 py-3 text-sm font-semibold text-graphite transition hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                  >
+                    See our recent work
+                  </a>
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal>
+                <p className="hero-fit-call mt-6 text-sm leading-relaxed text-warm-mist sm:text-[0.95rem]">
+                  Or call us on{" "}
+                  <a
+                    href={`tel:${phoneNumber.replace(/\s/g, "")}`}
+                    className="font-semibold text-gold hover:text-gold/80"
+                  >
+                    {phoneNumber}
+                  </a>
+                  {" "}— we&apos;ll get back to you the same day.
+                </p>
+              </ScrollReveal>
+            </ScrollRevealGroup>
           </div>
 
           {/* Sticky-note style Trust Card for Desktop */}
           <div className="hero-fit-trust hidden min-[1300px]:block">
             <div className="hero-fit-trust-inner">
-              <TrustCards />
+              <ScrollReveal>
+                <TrustCards />
+              </ScrollReveal>
             </div>
           </div>
         </div>
 
         {/* Reviews card below CTA on sub-1300 layouts */}
-        <div className="mt-10 min-[1300px]:hidden">
+        <ScrollReveal className="mt-10 min-[1300px]:hidden">
           <TrustCards />
-        </div>
+        </ScrollReveal>
 
       </HeroSection>
 
       {/* ── Brand Pillars ── */}
       <section id="brand-pillars" className="border-b border-graphite/8 bg-stone-white py-14 sm:py-16">
         <div className="mx-auto max-w-6xl px-6 sm:px-10">
-          <ScrollReveal delay={0.04}>
-            <div className="mb-8">
-              <SectionTitle
-                eyebrow="Why Homeowners Choose Us"
-                title="Built around quality, cleanliness, and clear timelines"
-                description="Everything we do on site follows these three principles so you always know the standard to expect."
-              />
-            </div>
-          </ScrollReveal>
+          <ScrollRevealGroup>
+            <ScrollReveal>
+              <div className="mb-8">
+                <SectionTitle
+                  eyebrow="Why Homeowners Choose Us"
+                  title="Built around quality, cleanliness, and clear timelines"
+                  description="Everything we do on site follows these three principles so you always know the standard to expect."
+                />
+              </div>
+            </ScrollReveal>
 
-          <ScrollReveal delay={0.1}>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <ScrollReveal>
+              <div className="grid gap-4 sm:grid-cols-3">
               {pillars.map((card) => {
                 const wrapperClass =
                   card.variant === "graphite"
@@ -229,7 +233,8 @@ export default async function Home() {
                 );
               })}
             </div>
-          </ScrollReveal>
+            </ScrollReveal>
+          </ScrollRevealGroup>
         </div>
       </section>
 
@@ -261,7 +266,7 @@ export default async function Home() {
       {/* ── Featured project ── */}
       <section className="bg-parchment">
         <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
-          <ScrollReveal delay={0.04}>
+          <ScrollReveal>
             <ProjectHero project={featuredProject} />
           </ScrollReveal>
         </div>
@@ -272,7 +277,7 @@ export default async function Home() {
         className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20"
         aria-labelledby="about-heading"
       >
-        <ScrollReveal delay={0.04}>
+        <ScrollReveal>
           <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
             {/* About the team */}
             <div className="space-y-5">
@@ -338,23 +343,25 @@ export default async function Home() {
       {testimonials.length > 0 ? (
         <section className="bg-parchment" aria-labelledby="testimonials-heading">
           <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
-            <ScrollReveal delay={0.04}>
-              <SectionTitle
-                id="testimonials-heading"
-                eyebrow="What homeowners say"
-                title={`Homeowners in ${primaryArea} who\u2019ve hired us`}
-                description="Reviews from clients who wanted tidy, reliable builders — not a big-name contractor."
-              />
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.08}>
-              <div className="mt-12">
-                <TestimonialCarousel
-                  ariaLabelledBy="testimonials-heading"
-                  testimonials={testimonials.slice(0, 4)}
+            <ScrollRevealGroup>
+              <ScrollReveal>
+                <SectionTitle
+                  id="testimonials-heading"
+                  eyebrow="What homeowners say"
+                  title={`Homeowners in ${primaryArea} who\u2019ve hired us`}
+                  description="Reviews from clients who wanted tidy, reliable builders — not a big-name contractor."
                 />
-              </div>
-            </ScrollReveal>
+              </ScrollReveal>
+
+              <ScrollReveal>
+                <div className="mt-12">
+                  <TestimonialCarousel
+                    ariaLabelledBy="testimonials-heading"
+                    testimonials={testimonials.slice(0, 4)}
+                  />
+                </div>
+              </ScrollReveal>
+            </ScrollRevealGroup>
           </div>
         </section>
       ) : null}

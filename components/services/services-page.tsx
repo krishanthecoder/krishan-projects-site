@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
 import { serviceOfferings, type ServiceOffering } from "@/lib/services-content";
 import { scrollToSectionAligned, getSiteHeaderScrollOffset } from "@/lib/scroll-to-section";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 import { TradeMobileNav } from "./trade-mobile-nav";
 import type { ServicesPageProps } from "./types";
@@ -294,18 +295,20 @@ export function ServicesPageContent({
   return (
     <>
       <section aria-labelledby="services-trades-heading">
-        <h2
-          id="services-trades-heading"
-          className="text-xl font-bold tracking-tight text-graphite sm:text-2xl"
-        >
-          Our trades
-        </h2>
-        <p className="mt-1 text-sm text-warm-mist lg:max-w-xl">
-          <span className="lg:hidden">Tap a trade to see what we cover on your job.</span>
-          <span className="hidden lg:inline">
-            Jump to a trade in the sidebar, or scroll through each section below.
-          </span>
-        </p>
+        <ScrollReveal>
+          <h2
+            id="services-trades-heading"
+            className="text-xl font-bold tracking-tight text-graphite sm:text-2xl"
+          >
+            Our trades
+          </h2>
+          <p className="mt-1 text-sm text-warm-mist lg:max-w-xl">
+            <span className="lg:hidden">Tap a trade to see what we cover on your job.</span>
+            <span className="hidden lg:inline">
+              Jump to a trade in the sidebar, or scroll through each section below.
+            </span>
+          </p>
+        </ScrollReveal>
 
         <div
           id="services-mobile-trade-picker"

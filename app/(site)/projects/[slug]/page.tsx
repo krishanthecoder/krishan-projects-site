@@ -10,7 +10,7 @@ import { ProjectFeaturedMedia } from "@/components/project-featured-media";
 import { ProjectPhotoGrid } from "@/components/project-photo-grid";
 import { ProjectJsonLd } from "@/components/seo/project-json-ld";
 import { SanityImage } from "@/components/sanity-image";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
 import { sortLabelsAlphabetically } from "@/lib/gallery-category-sort";
 import { buildImageAltText } from "@/lib/project-image-alt";
 import { buildProjectMetaDescription } from "@/lib/seo/build-project-meta-description";
@@ -271,6 +271,7 @@ export default async function ProjectDetailPage({
         heroImageUrl={heroImageUrl}
       />
       <div className="mx-auto max-w-6xl px-6 py-10 sm:px-10 sm:py-14">
+        <ScrollRevealGroup>
         <ScrollReveal>
           <Link
             href="/projects"
@@ -329,7 +330,7 @@ export default async function ProjectDetailPage({
         </ScrollReveal>
 
         {project.featuredImage ? (
-          <ScrollReveal delay={0.04} className="mt-10">
+          <ScrollReveal className="mt-10">
             {project.beforeImage?.asset ? (
               <ProjectFeaturedMedia
                 afterImage={project.featuredImage}
@@ -363,7 +364,6 @@ export default async function ProjectDetailPage({
         ) : null}
 
         <ScrollReveal
-          delay={0.08}
           className="mt-10 max-w-3xl space-y-4 text-sm leading-relaxed text-graphite/90 sm:text-base"
         >
           <PortableText
@@ -374,7 +374,7 @@ export default async function ProjectDetailPage({
 
         {project.images.length > 0 ? (
           <section className="mt-14" aria-labelledby="project-photos-heading">
-            <ScrollReveal delay={0.12}>
+            <ScrollReveal>
               <h2
                 id="project-photos-heading"
                 className="text-lg font-bold tracking-tight text-graphite"
@@ -396,6 +396,7 @@ export default async function ProjectDetailPage({
             </ScrollReveal>
           </section>
         ) : null}
+        </ScrollRevealGroup>
       </div>
     </main>
   );

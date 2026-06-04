@@ -11,7 +11,7 @@ import {
 
 import { buildImageAltText } from "@/lib/project-image-alt";
 import type { SanityImage } from "@/lib/sanity.queries";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
 
 import { SanityImage as SanityImageComponent } from "./sanity-image";
 
@@ -112,11 +112,10 @@ export function ProjectPhotoGrid({
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {thumbnailImages.map((img, index) => (
+      <ScrollRevealGroup stagger={0.05} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {thumbnailImages.map((img) => (
           <ScrollReveal
             key={img.asset._ref}
-            delay={Math.min(index * 0.05, 0.3)}
             className="h-64"
           >
             <button
@@ -138,7 +137,7 @@ export function ProjectPhotoGrid({
             </button>
           </ScrollReveal>
         ))}
-      </div>
+      </ScrollRevealGroup>
 
       {selectedImage ? (
         <div
