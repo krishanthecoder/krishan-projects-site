@@ -14,7 +14,7 @@ export function ContactHeroCopy() {
     <ScrollRevealGroup when="mount" className="relative z-[1] max-w-2xl">
       <ScrollReveal>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold">
+          <p className="contact-hero-eyebrow text-xs font-semibold uppercase tracking-[0.22em] text-gold">
             {CONTACT_HERO_COPY.eyebrow}
           </p>
           <h1

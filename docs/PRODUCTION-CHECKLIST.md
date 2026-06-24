@@ -27,9 +27,9 @@ With `LEAD_FROM_EMAIL=onboarding@resend.dev`, Resend only delivers to your accou
 - `NEXT_PUBLIC_BUSINESS_SERVICE_AREAS`
 - `NEXT_PUBLIC_WEBSITE_URL` (canonical URL for SEO)
 
-### Contact page map image
+### Contact page map
 
-Add a static map screenshot at `public/images/contact-map-hero.jpg` (see `lib/contact-map-hero.ts` for target dimensions).
+The `/contact` hero uses a live OpenStreetMap (Leaflet) map — no Studio upload or static image file required.
 
 ---
 

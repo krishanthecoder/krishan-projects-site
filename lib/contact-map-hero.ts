@@ -1,8 +1,8 @@
-/** Contact page map hero — local image only (place file in `public/`). */
+/** Contact page map hero — live OpenStreetMap via Leaflet. */
 
-/** Path under `public/` — add your file at `public/images/contact-map-hero.jpg`. */
-export const CONTACT_MAP_HERO_IMAGE_SRC = "/images/contact-map-hero.jpg";
+/** Default map view (Greater London east, South Ockendon pin visible). */
+export const CONTACT_MAP_DEFAULT_ZOOM = 10;
+export const CONTACT_MAP_DEFAULT_CENTER: [number, number] = [51.505, -0.18];
 
-/** Target export size (2:1). The hero uses `object-cover`; edges may crop slightly. */
-export const CONTACT_MAP_HERO_IMAGE_WIDTH = 2400;
-export const CONTACT_MAP_HERO_IMAGE_HEIGHT = 1200;
+export const CONTACT_MAP_MIN_ZOOM = 8;
+export const CONTACT_MAP_MAX_ZOOM = 14;
