@@ -111,6 +111,7 @@ export default async function Home() {
                 <div className="hero-fit-title-wrap mt-6">
                   <SectionTitle
                     as="h1"
+                    headingVariant="homeHero"
                     eyebrow={`Small ${primaryArea} Building Team`}
                     title={`Builders and kitchen fitters you can actually trust in ${primaryArea}.`}
                     description={`We're a small team covering ${serviceAreasLabel}. Home renovations, kitchen fitting, extensions and general building works — done properly, kept tidy, and finished when we said we would.`}

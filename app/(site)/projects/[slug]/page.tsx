@@ -12,6 +12,7 @@ import { ProjectJsonLd } from "@/components/seo/project-json-ld";
 import { SanityImage } from "@/components/sanity-image";
 import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
 import { sortLabelsAlphabetically } from "@/lib/gallery-category-sort";
+import { heroHeadingClassGraphite } from "@/lib/page-hero";
 import { buildImageAltText } from "@/lib/project-image-alt";
 import { buildProjectMetaDescription } from "@/lib/seo/build-project-meta-description";
 import {
@@ -270,7 +271,7 @@ export default async function ProjectDetailPage({
         description={metaDescription}
         heroImageUrl={heroImageUrl}
       />
-      <div className="mx-auto max-w-6xl px-6 py-10 sm:px-10 sm:py-14">
+      <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
         <ScrollRevealGroup>
         <ScrollReveal>
           <Link
@@ -284,7 +285,7 @@ export default async function ProjectDetailPage({
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
               Project
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
+            <h1 className={heroHeadingClassGraphite}>
               {project.title}
             </h1>
 

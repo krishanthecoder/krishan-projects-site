@@ -1,6 +1,7 @@
 "use client";
 
 import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
+import { heroHeadingClassOnDark } from "@/lib/page-hero";
 
 import type { ServicesHeroProps } from "./services-hero-types";
 
@@ -17,7 +18,7 @@ export function ServicesHeroCopy({
           </p>
           <h1
             id="services-hero-heading"
-            className="mt-4 text-3xl font-bold leading-tight tracking-tight text-stone-white sm:text-4xl lg:text-5xl"
+            className={`mt-4 ${heroHeadingClassOnDark}`}
           >
             Every trade you need.
             <span className="block text-gold">One team on site.</span>

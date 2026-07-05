@@ -1,3 +1,5 @@
+import { heroHeadingClassGraphite, heroHeadingClassGraphiteHome } from "@/lib/page-hero";
+
 type SectionTitleProps = {
   /** Render as h1 for the primary page title, h2 for section headings (default). */
   as?: "h1" | "h2";
@@ -6,13 +8,20 @@ type SectionTitleProps = {
   eyebrow?: string;
   title: string;
   description?: string;
+  /** Override heading size — use `homeHero` for the homepage hero h1 only. */
+  headingVariant?: "default" | "homeHero";
 };
 
-export function SectionTitle({ as: Tag = "h2", id, eyebrow, title, description }: SectionTitleProps) {
+export function SectionTitle({
+  as: Tag = "h2",
+  id,
+  eyebrow,
+  title,
+  description,
+  headingVariant = "default",
+}: SectionTitleProps) {
   const headingClass =
-    Tag === "h1"
-      ? "text-3xl font-bold leading-tight tracking-tight text-graphite sm:text-5xl lg:text-6xl"
-      : "text-3xl font-bold leading-tight tracking-tight text-graphite sm:text-5xl lg:text-6xl";
+    headingVariant === "homeHero" ? heroHeadingClassGraphiteHome : heroHeadingClassGraphite;
 
   return (
     <div className="space-y-4">

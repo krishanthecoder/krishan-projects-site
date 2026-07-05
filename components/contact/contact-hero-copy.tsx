@@ -1,6 +1,7 @@
 "use client";
 
 import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
+import { heroHeadingClassOnDark } from "@/lib/page-hero";
 
 const CONTACT_HERO_COPY = {
   eyebrow: "Get in Touch",
@@ -19,7 +20,7 @@ export function ContactHeroCopy() {
           </p>
           <h1
             id="contact-map-heading"
-            className="mt-4 text-3xl font-bold leading-tight tracking-tight text-stone-white sm:text-4xl lg:text-5xl"
+            className={`mt-4 ${heroHeadingClassOnDark}`}
           >
             {CONTACT_HERO_COPY.title}
           </h1>
