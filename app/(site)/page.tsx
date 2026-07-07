@@ -12,6 +12,7 @@ import {
   getHomepageHeroBackgrounds,
   getLatestProjectsForGallery,
 } from "@/lib/sanity.queries";
+import { getTestimonialSummary } from "@/lib/testimonial-summary";
 
 const processSteps = [
   {
@@ -67,6 +68,7 @@ export default async function Home() {
     getHomepageHeroBackgrounds(),
   ]);
   const testimonials = await getAllTestimonials();
+  const testimonialSummary = getTestimonialSummary(testimonials);
   const featuredProject = homepageFeaturedOverride ?? latestProjects[0] ?? null;
   const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Krishan Projects";
   const serviceArea = (process.env.NEXT_PUBLIC_BUSINESS_SERVICE_AREAS ?? "London, South Ockendon, Grays")
@@ -174,7 +176,7 @@ export default async function Home() {
           <div className="hero-fit-trust hidden min-[1300px]:block">
             <div className="hero-fit-trust-inner">
               <ScrollReveal>
-                <TrustCards />
+                <TrustCards testimonialSummary={testimonialSummary} />
               </ScrollReveal>
             </div>
           </div>
@@ -182,7 +184,7 @@ export default async function Home() {
 
         {/* Reviews card below CTA on sub-1300 layouts */}
         <ScrollReveal when="mount" className="mt-10 min-[1300px]:hidden">
-          <TrustCards />
+          <TrustCards testimonialSummary={testimonialSummary} />
         </ScrollReveal>
 
       </HeroSection>
@@ -358,7 +360,7 @@ export default async function Home() {
                 <div className="mt-12">
                   <TestimonialCarousel
                     ariaLabelledBy="testimonials-heading"
-                    testimonials={testimonials.slice(0, 4)}
+                    testimonials={testimonials}
                   />
                 </div>
               </ScrollReveal>

@@ -1,0 +1,134 @@
+[
+  {
+    "id": "2025-09-05-bedroom-painting-ct1",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 10,
+    "service": "Refurbishments",
+    "jobTitle": "Bedroom painting",
+    "posted": "05 September 2025",
+    "location": "CT1",
+    "content": "Krishan projects repainted my bedroom in a professional and timely manner and did an excellent job. I would use them again and recommend.",
+    "verified": true
+  },
+  {
+    "id": "2025-04-06-painting-fill-plastering-rm15",
+    "clientName": "Phillip L",
+    "checkatradeScore": 9.33,
+    "service": "Painting / Decorating",
+    "jobTitle": "Painting, fill, plastering of multiple rooms",
+    "posted": "06 April 2025",
+    "location": "RM15",
+    "content": "Krishan provided great service at an excellent price, despite a number of challenges in the job. I highly recommend him for any decorative work.",
+    "verified": true
+  },
+  {
+    "id": "2025-01-07-painting-across-house-rm17",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 10,
+    "service": "Painter / Decorator",
+    "jobTitle": "Painting across house",
+    "posted": "07 January 2025",
+    "location": "RM17",
+    "content": "I am really pleased with the service provided by my painter. Excellent knowledge about job fully prepared. Especially I like time punctuality by him. Also he is electrician too he did my little electric job as well. Very reasonable price and stays long . He is the best of best men we have so far. Really recommend to all my friends and family and all around London people. Special those who lives near Grays.",
+    "verified": true
+  },
+  {
+    "id": "2024-06-01-kitchen-tap-fitting-gu2",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 10,
+    "service": "Bathroom & Kitchen Plumbing",
+    "jobTitle": "Kitchen tap fitting",
+    "posted": "01 June 2024",
+    "location": "GU2",
+    "content": "Krishan completed the job to the expectations. Happy with it.",
+    "verified": false
+  },
+  {
+    "id": "2024-05-23-repair-bath-waste-plug-ig7",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 10,
+    "service": "Bathroom & Kitchen Plumbing",
+    "jobTitle": "Repair bath waste plug",
+    "posted": "23 May 2024",
+    "location": "IG7",
+    "content": "These guys were quick, polite, tidy and reasonable - thank you!",
+    "verified": true
+  },
+  {
+    "id": "2024-05-21-redecoration-of-kitchen-rm16",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 10,
+    "service": "Bathroom & Kitchen Plumbing",
+    "jobTitle": "Redecoration of Kitchen",
+    "posted": "21 May 2024",
+    "location": "RM16",
+    "content": "Really pleased with the finish of the redecoration of my kitchen. Would consider for future jobs and recommend to anyone.",
+    "verified": true
+  },
+  {
+    "id": "2024-03-03-bedroom-painting-ig3",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 10,
+    "service": "Painting / Decorating",
+    "jobTitle": "Bedroom painting",
+    "posted": "03 March 2024",
+    "location": "IG3",
+    "content": "Very happy with works carried out, will be calling back.",
+    "verified": true
+  },
+  {
+    "id": "2024-01-14-painted-whole-flat-e7",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 10,
+    "service": "Painting / Decorating",
+    "jobTitle": "Painted whole flat including woodwork",
+    "posted": "14 January 2024",
+    "location": "E7",
+    "content": "Krishan provided excellent service. I highly recommend him.",
+    "verified": true
+  },
+  {
+    "id": "2023-12-29-hallway-painting-rm13",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 10,
+    "service": "Painting / Decorating",
+    "jobTitle": "Hallway Painting",
+    "posted": "29 December 2023",
+    "location": "RM13",
+    "content": "Was very happy with final result and very good price!",
+    "verified": true
+  },
+  {
+    "id": "2023-10-06-paint-ig11",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 8.25,
+    "service": "Painting / Decorating",
+    "jobTitle": "Paint",
+    "posted": "06 October 2023",
+    "location": "IG11",
+    "content": "Krishan done a good paint inside the property.",
+    "verified": true
+  },
+  {
+    "id": "2023-10-01-painted-front-of-house-da8",
+    "clientName": "Bruce W",
+    "checkatradeScore": 10,
+    "service": "Painting / Decorating",
+    "jobTitle": "Painted front of house",
+    "posted": "01 October 2023",
+    "location": "DA8",
+    "content": "Great work for reasonable price.",
+    "verified": true
+  },
+  {
+    "id": "2023-09-14-painted-multiple-rooms-rm8",
+    "clientName": "Checkatrade customer",
+    "checkatradeScore": 9.5,
+    "service": "Painting / Decorating",
+    "jobTitle": "Painted two beds, living room, hallway, landing deck etc",
+    "posted": "14 September 2023",
+    "location": "RM8",
+    "content": "Excellent paint work carried on by Krishan. Highly recommended.",
+    "verified": true
+  }
+]

@@ -10,6 +10,7 @@
     "sanity": "sanity",
     "studio:dev": "sanity dev",
     "seed:example-project": "node scripts/seed-example-project.mjs",
+    "import:checkatrade-testimonials": "node scripts/import-checkatrade-testimonials.mjs",
     "migrate:gallery-categories-to-inline": "node scripts/migrate-gallery-categories-to-inline.mjs",
     "cleanup:daily": "pkill -f \"next dev\" || true && rm -rf .next && npm cache clean --force",
     "postinstall": "patch-package && node scripts/patch-sanity-plugin-media-dist.mjs"
