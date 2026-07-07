@@ -2,7 +2,7 @@
 export const pageHeroSectionClass =
   "relative w-full overflow-hidden bg-graphite py-16 sm:py-20";
 
-/** Services-style heroes with a side card — keeps height aligned across pages. */
+/** Leave-a-review hero — taller block with side card alignment. */
 export const pageHeroMarketingSectionClass =
   `${pageHeroSectionClass} min-h-[22rem] sm:min-h-[26rem] lg:flex lg:flex-col lg:justify-end`;
 
