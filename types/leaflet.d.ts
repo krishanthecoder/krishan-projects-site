@@ -1,8 +1,12 @@
 declare module "leaflet" {
   export type LatLngExpression = [number, number] | { lat: number; lng: number };
 
+  export interface ZoomPanOptions {
+    animate?: boolean;
+  }
+
   export interface LeafletMap {
-    setView(center: LatLngExpression, zoom: number): this;
+    setView(center: LatLngExpression, zoom?: number, options?: ZoomPanOptions): this;
     invalidateSize(): this;
     remove(): void;
     scrollWheelZoom: {
