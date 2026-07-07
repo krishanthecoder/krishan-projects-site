@@ -7,8 +7,14 @@ declare module "leaflet" {
 
   export interface LeafletMap {
     setView(center: LatLngExpression, zoom?: number, options?: ZoomPanOptions): this;
+    getZoom(): number;
+    getMinZoom(): number;
+    getMaxZoom(): number;
+    zoomIn(): this;
+    zoomOut(): this;
     invalidateSize(): this;
     remove(): void;
+    on(type: "zoomend", handler: () => void): this;
     scrollWheelZoom: {
       enable(): void;
       disable(): void;
@@ -53,12 +59,18 @@ declare module "leaflet" {
     interface Options extends DivIconOptions {}
   }
 
-  export interface ZoomControlOptions {
+  export interface ControlOptions {
     position?: "topleft" | "topright" | "bottomleft" | "bottomright";
   }
 
   export interface Control {
     addTo(map: LeafletMap): this;
+  }
+
+  export interface ControlConstructor {
+    extend<T extends object>(
+      props: T,
+    ): new (options?: ControlOptions) => Control & T;
   }
 
   export interface Marker {
@@ -74,8 +86,23 @@ declare module "leaflet" {
     tileLayer(url: string, options?: TileLayerOptions): TileLayer;
     marker(latlng: LatLngExpression, options?: MarkerOptions): Marker;
     divIcon(options: DivIconOptions): DivIcon;
-    control: {
-      zoom(options?: ZoomControlOptions): Control;
+    Control: ControlConstructor;
+    DomUtil: {
+      create(
+        tagName: string,
+        className?: string,
+        container?: HTMLElement,
+      ): HTMLElement;
+    };
+    DomEvent: {
+      on(
+        el: HTMLElement,
+        type: string,
+        fn: (event: Event) => void,
+      ): void;
+      stopPropagation(event: Event): void;
+      preventDefault(event: Event): void;
+      disableClickPropagation(el: HTMLElement): void;
     };
   };
 

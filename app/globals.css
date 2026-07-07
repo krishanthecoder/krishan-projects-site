@@ -411,37 +411,54 @@ body {
   color: #333333;
 }
 
-.contact-service-map .leaflet-top.leaflet-right {
-  top: 10px;
-  right: 10px;
+.contact-map-zoom-controls__group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid rgb(51 51 51 / 0.12);
+  border-radius: 8px;
+  background: rgb(51 51 51 / 0.1);
+  box-shadow: 0 2px 10px rgb(51 51 51 / 0.16);
 }
 
-.contact-service-map .leaflet-control-zoom {
-  border: none;
-  box-shadow: 0 2px 8px rgb(51 51 51 / 0.2);
-  z-index: 30;
+.contact-map-zoom-controls__button {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
   margin: 0;
-}
-
-.contact-service-map .leaflet-control-zoom a {
-  width: 32px;
-  height: 32px;
-  font-size: 18px;
-  line-height: 30px;
+  padding: 0.5rem;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1;
   color: #333333;
-  background: rgb(249 249 248 / 0.92);
-  border-bottom: 1px solid rgb(51 51 51 / 0.12);
+  background: #ffffff;
+  border: none;
+  border-radius: 0;
   touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
-.contact-service-map .leaflet-control-zoom a:hover {
-  background: #f9f9f8;
+.contact-map-zoom-controls__button:hover:not(:disabled) {
   color: #c4973d;
 }
 
-.contact-service-map .leaflet-control-zoom a.leaflet-disabled {
-  color: rgb(51 51 51 / 0.35);
-  background: rgb(249 249 248 / 0.75);
+.contact-map-zoom-controls__button:active:not(:disabled) {
+  background: #f3f3f2;
+  color: #a67d2f;
+}
+
+.contact-map-zoom-controls__button:disabled {
+  color: rgb(51 51 51 / 0.3);
+  background: #f5f5f4;
   cursor: not-allowed;
 }
 

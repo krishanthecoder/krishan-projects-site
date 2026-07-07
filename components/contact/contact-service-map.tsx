@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
 import {
   CONTACT_MAP_MAX_ZOOM,
@@ -12,6 +12,13 @@ import { SERVICE_AREA_LOCATIONS } from "@/lib/service-area-locations";
 import { contactMapPinLeafletHtml } from "./contact-map-pin-icon";
 
 import "leaflet/dist/leaflet.css";
+
+const LAYOUT_WIDTH_THRESHOLD_PX = 16;
+
+type ContactServiceMapProps = {
+  userAdjustedZoomRef: RefObject<boolean>;
+  onMapReady: (map: import("leaflet").LeafletMap) => void;
+};
 
 function createGoldPinIcon(L: typeof import("leaflet").default) {
   return L.divIcon({
@@ -33,13 +40,17 @@ async function waitForElementSize(element: HTMLElement) {
 }
 
 /** OpenStreetMap with a South Ockendon pin (client-only). */
-export function ContactServiceMap() {
+export function ContactServiceMap({
+  userAdjustedZoomRef,
+  onMapReady,
+}: ContactServiceMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let map: import("leaflet").LeafletMap | null = null;
     let cancelled = false;
     let container: HTMLDivElement | null = null;
+    let lastLayoutWidth = -1;
 
     const onEnter = () => {
       map?.scrollWheelZoom.enable();
@@ -48,9 +59,7 @@ export function ContactServiceMap() {
       map?.scrollWheelZoom.disable();
     };
 
-    let lastLayoutWidth = -1;
-
-    async function applyMapView() {
+    function applyMapView(resetZoom: boolean) {
       if (!map || !container || cancelled) return;
       const [southOckendon] = SERVICE_AREA_LOCATIONS;
       const { center, zoom } = getContactMapView(
@@ -58,7 +67,9 @@ export function ContactServiceMap() {
         container.clientWidth,
         container.clientHeight,
       );
-      map.setView(center, zoom, { animate: false });
+      const userAdjusted = userAdjustedZoomRef.current ?? false;
+      const targetZoom = resetZoom && !userAdjusted ? zoom : map.getZoom();
+      map.setView(center, targetZoom, { animate: false });
     }
 
     async function initMap() {
@@ -91,8 +102,6 @@ export function ContactServiceMap() {
         maxZoom: CONTACT_MAP_MAX_ZOOM,
       });
 
-      L.control.zoom({ position: "topright" }).addTo(map);
-
       container.addEventListener("mouseenter", onEnter);
       container.addEventListener("mouseleave", onLeave);
 
@@ -106,22 +115,29 @@ export function ContactServiceMap() {
       const pinIcon = createGoldPinIcon(L);
       L.marker([southOckendon.lat, southOckendon.lng], { icon: pinIcon }).addTo(map);
 
+      onMapReady(map);
+
+      lastLayoutWidth = container.clientWidth;
+
       const resizeObserver = new ResizeObserver(() => {
         if (!map || !container || cancelled) return;
         const width = container.clientWidth;
         map.invalidateSize();
-        if (width !== lastLayoutWidth) {
+        if (
+          lastLayoutWidth < 0 ||
+          Math.abs(width - lastLayoutWidth) >= LAYOUT_WIDTH_THRESHOLD_PX
+        ) {
           lastLayoutWidth = width;
-          void applyMapView();
+          applyMapView(false);
         }
       });
       resizeObserver.observe(container);
-      lastLayoutWidth = container.clientWidth;
 
       requestAnimationFrame(() => {
         if (!map || cancelled) return;
         map.invalidateSize();
-        void applyMapView();
+        applyMapView(true);
+        lastLayoutWidth = container!.clientWidth;
       });
 
       return () => {
@@ -147,7 +163,7 @@ export function ContactServiceMap() {
       map?.remove();
       map = null;
     };
-  }, []);
+  }, [onMapReady, userAdjustedZoomRef]);
 
   return (
     <div

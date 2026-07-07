@@ -7,7 +7,10 @@ import { ContactHeroMap } from "./contact-hero-map";
 /** Full-width contact hero with live service-area map. */
 export function ContactHero() {
   return (
-    <section className={pageHeroSectionClass} aria-labelledby="contact-map-heading">
+    <section
+      className={`${pageHeroSectionClass} min-h-[22rem]`}
+      aria-labelledby="contact-map-heading"
+    >
       <ContactHeroMap />
 
       <ServicesHeroGridPattern />

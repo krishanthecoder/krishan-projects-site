@@ -15,6 +15,8 @@ const REFERENCE_MAP_WIDTH = 769;
 const TILE_SIZE = 256;
 const PIN_ICON_HALF_WIDTH = 14;
 const MIN_RIGHT_INSET_PX = 12;
+/** Keep pin clear of bottom-right zoom buttons on narrow layouts. */
+const NARROW_ZOOM_CONTROL_RESERVE_PX = 52;
 
 function pixelsPerLongitudeDegree(latitude: number, zoom: number): number {
   const latRad = (latitude * Math.PI) / 180;
@@ -52,8 +54,7 @@ function centerLngForAnchorX(
   return pin.lng - (targetAnchorX - mapWidth / 2) / pxPerDeg;
 }
 
-function zoomForNarrowMap(mapWidth: number): number {
-  if (mapWidth < 640) return 9;
+function zoomForNarrowMap(): number {
   return CONTACT_MAP_DEFAULT_ZOOM;
 }
 
@@ -64,13 +65,14 @@ function getNarrowContactMapView(
   const width = Math.max(mapWidth, 1);
   const zoom = Math.min(
     CONTACT_MAP_MAX_ZOOM,
-    Math.max(CONTACT_MAP_MIN_ZOOM, zoomForNarrowMap(width)),
+    Math.max(CONTACT_MAP_MIN_ZOOM, zoomForNarrowMap()),
   );
 
   const anchorFraction = referencePinAnchorFraction(pin);
+  const rightInset = MIN_RIGHT_INSET_PX + NARROW_ZOOM_CONTROL_RESERVE_PX;
   const targetAnchorX = Math.min(
     width * anchorFraction,
-    width - PIN_ICON_HALF_WIDTH - MIN_RIGHT_INSET_PX,
+    width - PIN_ICON_HALF_WIDTH - rightInset,
   );
 
   const centerLng = centerLngForAnchorX(width, pin, zoom, targetAnchorX);
