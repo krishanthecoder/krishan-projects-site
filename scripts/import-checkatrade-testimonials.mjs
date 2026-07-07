@@ -109,6 +109,8 @@ async function main() {
     const doc = {
       _id: docId,
       _type: "testimonial",
+      status: "published",
+      source: "checkatrade-import",
       clientName: review.clientName,
       rating: toStarRating(review.checkatradeScore),
       jobTitle,

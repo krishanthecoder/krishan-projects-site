@@ -2,6 +2,10 @@
 export const pageHeroSectionClass =
   "relative w-full overflow-hidden bg-graphite py-16 sm:py-20";
 
+/** Services-style heroes with a side card — keeps height aligned across pages. */
+export const pageHeroMarketingSectionClass =
+  `${pageHeroSectionClass} min-h-[22rem] sm:min-h-[26rem] lg:flex lg:flex-col lg:justify-end`;
+
 /** Version 1 — homepage hero: 30px → 48px → 60px */
 const HERO_HEADING_SCALE_V1 = "text-3xl sm:text-5xl lg:text-6xl";
 

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { HeroSection } from "@/components/hero-section";
 import { HowWeWorkSteps } from "@/components/how-we-work-steps";
 import { ProjectHero } from "@/components/project-hero";
@@ -363,6 +364,15 @@ export default async function Home() {
                     testimonials={testimonials}
                   />
                 </div>
+                <p className="mt-10 text-center text-sm text-warm-mist">
+                  Worked with us recently?{" "}
+                  <Link
+                    href="/leave-a-review"
+                    className="font-medium text-graphite/70 underline decoration-graphite/20 underline-offset-[0.2em] transition hover:text-gold hover:decoration-gold/40"
+                  >
+                    Leave a review
+                  </Link>
+                </p>
               </ScrollReveal>
             </ScrollRevealGroup>
           </div>

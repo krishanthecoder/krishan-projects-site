@@ -72,6 +72,54 @@ button.kp-studio-save-btn:disabled {
   cursor: not-allowed !important;
 }
 
+/* Testimonials structure nav — count badges before chevron */
+.kp-testimonials-nav a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Match DocumentListPane sizing (min 320, default 350, max 640) */
+[data-ui="Pane"]:has(.kp-testimonials-nav) {
+  flex: 0 0 350px !important;
+  width: 350px !important;
+  min-width: 320px !important;
+  max-width: 640px !important;
+}
+
+.kp-testimonials-nav__row {
+  border-radius: 6px;
+  transition: background-color 0.12s ease;
+}
+
+.kp-testimonials-nav__row:hover {
+  background: #f3f4f6;
+}
+
+.kp-testimonials-nav__row--active {
+  background: #eff6ff;
+}
+
+.kp-testimonials-nav__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.375rem;
+  height: 1.375rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.kp-testimonials-nav__badge--highlight {
+  background: #991b1b;
+  color: #ffffff;
+}
+
 /* Project — prominent gallery filter tags */
 .kp-gallery-categories-prominent {
   background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%) !important;

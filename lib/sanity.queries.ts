@@ -315,7 +315,9 @@ const projectSitemapEntriesQuery = groq`*[_type == "project" && defined(slug.cur
   _updatedAt
 }`;
 
-const allTestimonialsQuery = groq`*[_type == "testimonial"] | order(_createdAt desc){
+const publishedTestimonialsFilter = `!defined(status) || status == "published"`;
+
+const allTestimonialsQuery = groq`*[_type == "testimonial" && (${publishedTestimonialsFilter})] | order(_createdAt desc){
   _id,
   clientName,
   jobTitle,
