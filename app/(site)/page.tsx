@@ -96,7 +96,7 @@ export default async function Home() {
       >
         <div className="hero-fit-grid relative grid gap-8 min-[1300px]:grid-cols-[1fr_300px] min-[1300px]:items-center">
           <div className="hero-fit-copy">
-            <ScrollRevealGroup>
+            <ScrollRevealGroup when="mount">
               <ScrollReveal>
                 <div className="inline-flex items-center gap-2 rounded-full bg-gold/12 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-gold">
                   <span aria-hidden="true" className="relative flex h-2 w-2 shrink-0">
@@ -181,7 +181,7 @@ export default async function Home() {
         </div>
 
         {/* Reviews card below CTA on sub-1300 layouts */}
-        <ScrollReveal className="mt-10 min-[1300px]:hidden">
+        <ScrollReveal when="mount" className="mt-10 min-[1300px]:hidden">
           <TrustCards />
         </ScrollReveal>
 

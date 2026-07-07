@@ -43,7 +43,7 @@ export function HeroSection({
       />
 
       {showBackgroundImage ? (
-        <picture className="absolute inset-0">
+        <picture className="pointer-events-none absolute inset-0">
           {mobileSrc ? <source media="(max-width: 767px)" srcSet={mobileSrc} /> : null}
           {backgroundSrcDesktop ? (
             <img
@@ -61,12 +61,12 @@ export function HeroSection({
       {/* ── Overlay ────────────────────────────────────────────────────────── */}
       {/* Global dark tint over the hero image */}
       <div
-        className="absolute inset-0 bg-gradient-to-b from-black/22 via-black/28 to-black/36"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/22 via-black/28 to-black/36"
         aria-hidden="true"
       />
-      {/* Left-side readability veil so dark text remains legible */}
+      {/* Readability veil: top-weighted on mobile, left-weighted from sm up */}
       <div
-        className="absolute inset-0 bg-gradient-to-r from-stone-white/96 via-stone-white/78 to-stone-white/24"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-stone-white/95 via-stone-white/72 to-stone-white/28 sm:bg-gradient-to-r sm:from-stone-white/96 sm:via-stone-white/78 sm:to-stone-white/24"
         aria-hidden="true"
       />
 

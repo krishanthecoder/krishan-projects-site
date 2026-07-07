@@ -12,7 +12,7 @@ const CONTACT_HERO_COPY = {
 
 export function ContactHeroCopy() {
   return (
-    <ScrollRevealGroup when="mount" className="relative z-[1] max-w-2xl">
+    <ScrollRevealGroup when="mount" className="pointer-events-auto relative z-[1] max-w-2xl">
       <ScrollReveal>
         <div>
           <p className="contact-hero-eyebrow text-xs font-semibold uppercase tracking-[0.22em] text-gold">

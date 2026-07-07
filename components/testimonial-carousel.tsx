@@ -106,7 +106,8 @@ export function TestimonialCarousel({
   const scrollRef = useRef<HTMLDivElement>(null);
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const reduceMotion = useReducedMotion();
-  const [slidesPerView, setSlidesPerView] = useState(() => getSlidesPerView());
+  // Always start at 1 for SSR — updated in useLayoutEffect after mount (avoids hydration mismatch).
+  const [slidesPerView, setSlidesPerView] = useState(1);
   const [activePage, setActivePage] = useState(0);
   const [arrowMarginTop, setArrowMarginTop] = useState(0);
 

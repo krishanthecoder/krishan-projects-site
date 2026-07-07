@@ -48,6 +48,19 @@ export function ContactServiceMap() {
       map?.scrollWheelZoom.disable();
     };
 
+    let lastLayoutWidth = -1;
+
+    async function applyMapView() {
+      if (!map || !container || cancelled) return;
+      const [southOckendon] = SERVICE_AREA_LOCATIONS;
+      const { center, zoom } = getContactMapView(
+        southOckendon,
+        container.clientWidth,
+        container.clientHeight,
+      );
+      map.setView(center, zoom, { animate: false });
+    }
+
     async function initMap() {
       container = containerRef.current;
       if (!container || cancelled) return;
@@ -93,24 +106,42 @@ export function ContactServiceMap() {
       const pinIcon = createGoldPinIcon(L);
       L.marker([southOckendon.lat, southOckendon.lng], { icon: pinIcon }).addTo(map);
 
+      const resizeObserver = new ResizeObserver(() => {
+        if (!map || !container || cancelled) return;
+        const width = container.clientWidth;
+        map.invalidateSize();
+        if (width !== lastLayoutWidth) {
+          lastLayoutWidth = width;
+          void applyMapView();
+        }
+      });
+      resizeObserver.observe(container);
+      lastLayoutWidth = container.clientWidth;
+
       requestAnimationFrame(() => {
         if (!map || cancelled) return;
         map.invalidateSize();
-        const { center: nextCenter, zoom: nextZoom } = getContactMapView(
-          southOckendon,
-          container!.clientWidth,
-          container!.clientHeight,
-        );
-        map.setView(nextCenter, nextZoom);
+        void applyMapView();
       });
+
+      return () => {
+        resizeObserver.disconnect();
+      };
     }
 
-    void initMap().catch((error: unknown) => {
+    let cleanupResize: (() => void) | undefined;
+
+    async function initMapWrapper() {
+      cleanupResize = await initMap();
+    }
+
+    void initMapWrapper().catch((error: unknown) => {
       console.error("Contact map failed to load", error);
     });
 
     return () => {
       cancelled = true;
+      cleanupResize?.();
       container?.removeEventListener("mouseenter", onEnter);
       container?.removeEventListener("mouseleave", onLeave);
       map?.remove();

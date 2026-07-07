@@ -17,7 +17,7 @@ export function ContactHero() {
         aria-hidden
       />
 
-      <div className="relative z-[2] mx-auto max-w-6xl px-6 sm:px-10">
+      <div className="pointer-events-none relative z-[2] mx-auto max-w-6xl px-6 sm:px-10">
         <ContactHeroCopy />
       </div>
     </section>
