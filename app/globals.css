@@ -411,10 +411,16 @@ body {
   color: #333333;
 }
 
+.contact-service-map .leaflet-top.leaflet-right {
+  top: 10px;
+  right: 10px;
+}
+
 .contact-service-map .leaflet-control-zoom {
   border: none;
   box-shadow: 0 2px 8px rgb(51 51 51 / 0.2);
   z-index: 30;
+  margin: 0;
 }
 
 .contact-service-map .leaflet-control-zoom a {
@@ -426,19 +432,6 @@ body {
   background: rgb(249 249 248 / 0.92);
   border-bottom: 1px solid rgb(51 51 51 / 0.12);
   touch-action: manipulation;
-}
-
-@media (max-width: 768px) {
-  .contact-service-map .leaflet-top.leaflet-right {
-    top: 4.5rem;
-  }
-
-  .contact-service-map .leaflet-control-zoom a {
-    width: 44px;
-    height: 44px;
-    font-size: 22px;
-    line-height: 42px;
-  }
 }
 
 .contact-service-map .leaflet-control-zoom a:hover {
