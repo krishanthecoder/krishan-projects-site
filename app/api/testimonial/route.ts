@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
+import {
+  buildReviewNotificationHtml,
+  buildReviewNotificationText,
+} from "@/lib/emails/review-notification-email";
+import { getEmailBusinessName } from "@/lib/emails/brand";
 import { getSanityWriteClient } from "@/lib/sanity.server";
 
 type TestimonialRequest = {
@@ -14,45 +19,12 @@ type TestimonialRequest = {
 const resendApiKey = process.env.RESEND_API_KEY;
 const notifyToEmail = process.env.LEAD_TO_EMAIL;
 const notifyFromEmail = process.env.LEAD_FROM_EMAIL ?? "onboarding@resend.dev";
-const businessName = process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Krishan Projects";
-const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL ?? "https://krishanprojects.co.uk";
+const businessName = getEmailBusinessName();
 
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 function notifyFromAddress(): string {
   return `${businessName} <${notifyFromEmail}>`;
-}
-
-function buildReviewNotificationText({
-  clientName,
-  jobTitle,
-  rating,
-  content,
-  documentId,
-}: {
-  clientName: string;
-  jobTitle: string;
-  rating: number;
-  content: string;
-  documentId: string;
-}) {
-  const studioUrl = `${websiteUrl.replace(/\/$/, "")}/studio`;
-
-  return [
-    "A new customer review was submitted on your website.",
-    "",
-    `Name: ${clientName}`,
-    `Job: ${jobTitle}`,
-    `Rating: ${rating}/5`,
-    "",
-    "Review:",
-    content,
-    "",
-    `Sanity document: ${documentId}`,
-    `Review in Studio: ${studioUrl}`,
-    "",
-    "Status: pending — publish or discard from Studio → Review submissions.",
-  ].join("\n");
 }
 
 function normalizeRating(value: unknown): number | null {
@@ -125,6 +97,13 @@ export async function POST(request: Request) {
         to: notifyToEmail,
         subject: `New review submission — ${businessName}`,
         text: buildReviewNotificationText({
+          clientName,
+          jobTitle,
+          rating,
+          content,
+          documentId: doc._id,
+        }),
+        html: buildReviewNotificationHtml({
           clientName,
           jobTitle,
           rating,
