@@ -1,5 +1,6 @@
 import { emailBrand, getEmailWebsiteUrl } from "@/lib/emails/brand";
 import {
+  emailCtaButton,
   emailDetailRow,
   emailMessageBlock,
   escapeHtml,
@@ -65,7 +66,7 @@ export function buildReviewNotificationHtml({
   <p style="margin:16px 0 0;font-size:18px;line-height:1;letter-spacing:0.08em;color:${emailBrand.gold};">${stars}</p>
   ${emailMessageBlock("Review", content)}
   <p style="margin:20px 0 0;font-size:16px;line-height:1.65;">
-    <a href="${studioUrl}" style="display:inline-block;padding:12px 20px;border-radius:12px;background-color:${emailBrand.gold};color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;">Open in Studio</a>
+    ${emailCtaButton("Open in Studio", studioUrl)}
   </p>
   <p style="margin:16px 0 0;font-size:14px;line-height:1.55;color:${emailBrand.warmMist};">
     Document ID: ${escapeHtml(documentId)} · Status: pending

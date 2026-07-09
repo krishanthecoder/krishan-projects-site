@@ -1,5 +1,6 @@
 import {
   emailBrand,
+  emailLogoDimensions,
   getEmailBusinessName,
   getEmailLogoUrl,
   getEmailWebsiteUrl,
@@ -22,10 +23,18 @@ type BrandedEmailOptions = {
   /** `dark` = graphite header with inverted logo; `light` = logo on stone-white */
   header?: "dark" | "light";
   footerNote?: string;
+  /** Internal notifications keep the footer site link; customer emails omit it. */
+  showFooterLink?: boolean;
 };
 
 const bodyFont =
   '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+
+const contentPaddingX = "28px";
+
+export function emailCtaButton(label: string, href: string): string {
+  return `<a href="${escapeHtml(href)}" style="display:inline-block;padding:12px 20px;border-radius:12px;background-color:${emailBrand.gold};color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;">${escapeHtml(label)}</a>`;
+}
 
 export function wrapBrandedEmail({
   eyebrow,
@@ -33,6 +42,7 @@ export function wrapBrandedEmail({
   bodyHtml,
   header = "light",
   footerNote,
+  showFooterLink = true,
 }: BrandedEmailOptions): string {
   const businessName = escapeHtml(getEmailBusinessName());
   const websiteUrl = escapeHtml(getEmailWebsiteUrl());
@@ -43,9 +53,18 @@ export function wrapBrandedEmail({
   const footerHtml = footerNote
     ? `<p style="margin:16px 0 0;font-size:14px;line-height:1.55;color:${emailBrand.warmMist};">${escapeHtml(footerNote)}</p>`
     : "";
+  const footerLinkHtml = showFooterLink
+    ? `<tr>
+            <td style="padding:0 ${contentPaddingX} 28px;font-size:14px;line-height:1.5;color:${emailBrand.warmMist};">
+              <p style="margin:0;">
+                <a href="${websiteUrl}" style="color:${emailBrand.gold};text-decoration:none;font-weight:600;">${businessName}</a>
+              </p>
+            </td>
+          </tr>`
+    : "";
 
   const headerBg = header === "dark" ? emailBrand.graphite : emailBrand.stoneWhite;
-  const headerPadding = header === "dark" ? "28px 24px 24px" : "32px 24px 20px";
+  const headerPadding = `24px ${contentPaddingX} 20px`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -61,9 +80,9 @@ export function wrapBrandedEmail({
       <td align="center">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:${emailBrand.stoneWhite};border:1px solid ${emailBrand.parchment};border-radius:16px;overflow:hidden;">
           <tr>
-            <td align="center" style="background-color:${headerBg};padding:${headerPadding};">
+            <td align="left" style="background-color:${headerBg};padding:${headerPadding};">
               <a href="${websiteUrl}" style="text-decoration:none;">
-                <img src="${logoUrl}" alt="${businessName}" width="220" height="64" style="display:block;width:220px;max-width:100%;height:auto;border:0;" />
+                <img src="${logoUrl}" alt="${businessName}" width="${emailLogoDimensions.width}" height="${emailLogoDimensions.height}" style="display:block;width:${emailLogoDimensions.width}px;max-width:100%;height:auto;border:0;" />
               </a>
             </td>
           </tr>
@@ -71,20 +90,14 @@ export function wrapBrandedEmail({
             <td style="height:4px;background-color:${emailBrand.gold};font-size:0;line-height:0;">&nbsp;</td>
           </tr>
           <tr>
-            <td style="padding:28px 28px 24px;font-size:16px;line-height:1.65;color:${emailBrand.graphite};">
+            <td style="padding:28px ${contentPaddingX} 24px;font-size:16px;line-height:1.65;color:${emailBrand.graphite};">
               ${eyebrowHtml}
               <h1 style="margin:0 0 18px;font-size:22px;line-height:1.3;font-weight:700;letter-spacing:-0.02em;color:${emailBrand.graphite};">${escapeHtml(title)}</h1>
               ${bodyHtml}
               ${footerHtml}
             </td>
           </tr>
-          <tr>
-            <td style="padding:0 28px 28px;font-size:14px;line-height:1.5;color:${emailBrand.warmMist};">
-              <p style="margin:0;">
-                <a href="${websiteUrl}" style="color:${emailBrand.gold};text-decoration:none;font-weight:600;">${businessName}</a>
-              </p>
-            </td>
-          </tr>
+          ${footerLinkHtml}
         </table>
       </td>
     </tr>

@@ -1,4 +1,4 @@
-import { brandLogos } from "@/lib/brand-assets";
+import { brandLockupDimensions, brandLogos } from "@/lib/brand-assets";
 
 /** Email-safe brand palette — mirrors `app/globals.css`. */
 export const emailBrand = {
@@ -7,6 +7,12 @@ export const emailBrand = {
   graphite: "#333333",
   warmMist: "#8C8780",
   gold: "#C4973D",
+} as const;
+
+/** Matches navbar lockup (`h-10` / `sm:h-11` in `BrandLockup`). */
+export const emailLogoDimensions = {
+  height: 42,
+  width: Math.round(42 * (brandLockupDimensions.width / brandLockupDimensions.height)),
 } as const;
 
 export function getEmailWebsiteUrl(): string {

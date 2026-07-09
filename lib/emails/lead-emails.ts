@@ -5,6 +5,7 @@ import {
   getEmailWebsiteUrl,
 } from "@/lib/emails/brand";
 import {
+  emailCtaButton,
   emailDetailRow,
   emailMessageBlock,
   escapeHtml,
@@ -116,7 +117,7 @@ export function buildAutoReplyHtml(name: string, projectType: string): string {
     <strong>${escapeHtml(businessName)}</strong>
   </p>
   <p style="margin:20px 0 0;font-size:16px;line-height:1.65;">
-    <a href="${websiteUrl}" style="display:inline-block;padding:12px 20px;border-radius:12px;background-color:${emailBrand.gold};color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;">Visit our website</a>
+    ${emailCtaButton("Visit our website", websiteUrl)}
   </p>`;
 
   return wrapBrandedEmail({
@@ -124,6 +125,7 @@ export function buildAutoReplyHtml(name: string, projectType: string): string {
     title: "We've got your message",
     bodyHtml,
     header: "light",
+    showFooterLink: false,
     footerNote:
       "Please do not reply to this address with sensitive information. Your original message has been passed to our team.",
   });
