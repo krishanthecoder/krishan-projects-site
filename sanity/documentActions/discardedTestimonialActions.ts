@@ -1,5 +1,7 @@
 import type { DocumentActionComponent } from "sanity";
 
+import { DiscardedTestimonialDeleteAction } from "./discardedTestimonialDeleteAction";
+import { isDiscardedTestimonial } from "./discardedTestimonialStatus";
 import {
   mapPublishActionsToPrimaryTone,
   withPrimaryPublishTone,
@@ -8,23 +10,6 @@ import {
 type DocumentActionsContext = {
   schemaType: string;
 };
-
-type TestimonialActionProps = {
-  draft?: { status?: string } | Record<string, unknown> | null;
-  published?: { status?: string } | Record<string, unknown> | null;
-};
-
-function readStatus(props: TestimonialActionProps): string | undefined {
-  const draftStatus = props.draft?.status;
-  if (typeof draftStatus === "string") return draftStatus;
-  const publishedStatus = props.published?.status;
-  if (typeof publishedStatus === "string") return publishedStatus;
-  return undefined;
-}
-
-function isDiscardedTestimonial(props: TestimonialActionProps): boolean {
-  return readStatus(props) === "discarded";
-}
 
 function hideWhenDiscarded(
   original: DocumentActionComponent,
@@ -42,27 +27,8 @@ function hideWhenDiscarded(
   return Wrapped;
 }
 
-/** Primary red Delete when status is discarded. */
-function showDeleteWhenDiscardedOnly(
-  original: DocumentActionComponent,
-): DocumentActionComponent {
-  const Wrapped: DocumentActionComponent = (props) => {
-    if (!isDiscardedTestimonial(props)) return null;
-    const description = original(props);
-    if (!description) return null;
-    return { ...description, tone: "critical" };
-  };
-
-  Wrapped.action = original.action;
-  Wrapped.displayName = original.displayName
-    ? `DiscardedPrimaryDelete(${original.displayName})`
-    : "DiscardedPrimaryDeleteAction";
-
-  return Wrapped;
-}
-
-/** Keep overflow-menu delete for non-discarded reviews only. */
-function hideDeleteWhenDiscarded(
+/** Built-in delete stays in the overflow menu for non-discarded reviews only. */
+function hideBuiltInDeleteWhenDiscarded(
   original: DocumentActionComponent,
 ): DocumentActionComponent {
   const Wrapped: DocumentActionComponent = (props) => {
@@ -72,8 +38,8 @@ function hideDeleteWhenDiscarded(
 
   Wrapped.action = original.action;
   Wrapped.displayName = original.displayName
-    ? `HideDeleteWhenDiscarded(${original.displayName})`
-    : "HideDeleteWhenDiscardedAction";
+    ? `HideBuiltInDeleteWhenDiscarded(${original.displayName})`
+    : "HideBuiltInDeleteWhenDiscardedAction";
 
   return Wrapped;
 }
@@ -100,8 +66,8 @@ export function resolveDocumentActions(
   );
 
   return [
-    ...(deleteAction ? [showDeleteWhenDiscardedOnly(deleteAction)] : []),
+    DiscardedTestimonialDeleteAction,
     ...wrappedOthers,
-    ...(deleteAction ? [hideDeleteWhenDiscarded(deleteAction)] : []),
+    ...(deleteAction ? [hideBuiltInDeleteWhenDiscarded(deleteAction)] : []),
   ];
 }
