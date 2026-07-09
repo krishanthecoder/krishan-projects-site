@@ -1,8 +1,11 @@
-import { SectionTitle } from "@/components/ui/section-title";
-import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
 import { ProjectGallery } from "@/components/project-gallery";
+import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
+import { SectionTitle } from "@/components/ui/section-title";
+import { getGalleryFilterData } from "@/lib/sanity.queries";
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const initialData = await getGalleryFilterData();
+
   return (
     <main id="main-content" className="min-h-screen bg-stone-white">
       <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
@@ -16,7 +19,7 @@ export default function ProjectsPage() {
           </ScrollReveal>
 
           <ScrollReveal className="mt-12">
-            <ProjectGallery showHeadline={false} />
+            <ProjectGallery showHeadline={false} initialData={initialData} />
           </ScrollReveal>
         </ScrollRevealGroup>
       </div>

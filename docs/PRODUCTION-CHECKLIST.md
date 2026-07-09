@@ -22,10 +22,21 @@ With `LEAD_FROM_EMAIL=onboarding@resend.dev`, Resend only delivers to your accou
 
 ### Also set on Vercel (if not already)
 
+- `NEXT_PUBLIC_SANITY_PROJECT_ID`
+- `NEXT_PUBLIC_SANITY_DATASET` (usually `production`)
 - `NEXT_PUBLIC_BUSINESS_NAME`
 - `NEXT_PUBLIC_BUSINESS_PHONE`
 - `NEXT_PUBLIC_BUSINESS_SERVICE_AREAS`
 - `NEXT_PUBLIC_WEBSITE_URL` (canonical URL for SEO)
+- `SANITY_API_WRITE_TOKEN` (review submissions + server writes; mark Sensitive)
+
+### Sanity — production domain
+
+1. [sanity.io/manage](https://sanity.io/manage) → your project → **API** → **CORS origins** — add:
+   - `https://krishanprojects.co.uk`
+   - `https://www.krishanprojects.co.uk`
+   - `http://localhost:3000` (local dev)
+2. Open **https://krishanprojects.co.uk/studio** while logged into Sanity → **Register this studio** (one-time for production CMS).
 
 ### Contact page map
 

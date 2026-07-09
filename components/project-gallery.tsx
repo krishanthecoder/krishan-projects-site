@@ -65,13 +65,25 @@ function formatGbpValue(value?: number) {
 type ProjectGalleryProps = {
   /** When false, omit the built-in headline block (page-level SectionTitle provides the title). */
   showHeadline?: boolean;
+  /** Server-fetched gallery data — avoids browser CORS to Sanity on production. */
+  initialData?: {
+    categories: GalleryCategory[];
+    projects: GalleryProjectCard[];
+  };
 };
 
-export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
-  const [projects, setProjects] = useState<GalleryProjectCard[]>([]);
-  const [categories, setCategories] = useState<GalleryCategory[]>([]);
+export function ProjectGallery({
+  showHeadline = true,
+  initialData,
+}: ProjectGalleryProps) {
+  const [projects, setProjects] = useState<GalleryProjectCard[]>(
+    initialData?.projects ?? [],
+  );
+  const [categories, setCategories] = useState<GalleryCategory[]>(
+    initialData?.categories ?? [],
+  );
   const [selectedSlug, setSelectedSlug] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [hasError, setHasError] = useState(false);
 
   const sortedCategories = useMemo(
@@ -96,6 +108,8 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
   }, []);
 
   useEffect(() => {
+    if (initialData) return;
+
     let active = true;
 
     async function loadGallery() {
@@ -117,7 +131,7 @@ export function ProjectGallery({ showHeadline = true }: ProjectGalleryProps) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [initialData]);
 
   const sectionAriaProps = showHeadline
     ? ({ "aria-labelledby": "project-gallery-heading" } as const)
