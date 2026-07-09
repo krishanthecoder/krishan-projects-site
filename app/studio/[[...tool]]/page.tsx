@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 
+import { BrandLoadingScreen } from "@/components/brand/brand-loading-screen";
 import { createStudioConfig } from "@/sanity/studioConfig";
 
 const studioConfig = createStudioConfig();
@@ -11,9 +12,10 @@ const NextStudio = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full min-h-0 flex-1 items-center justify-center bg-stone-white">
-        <div className="h-9 w-9 animate-spin rounded-full border-2 border-stone-300 border-t-stone-800" />
-      </div>
+      <BrandLoadingScreen
+        ariaLabel="Loading Studio"
+        hint="First load compiles the CMS in the background. Later visits are much faster."
+      />
     ),
   },
 );

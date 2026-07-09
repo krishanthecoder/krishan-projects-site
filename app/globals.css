@@ -146,6 +146,67 @@ body {
   }
 }
 
+@keyframes emblem-quadrant-flicker {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.brand-loading-emblem {
+  --brand-loading-emblem-size: 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+
+.brand-loading-emblem__visual {
+  position: relative;
+  width: var(--brand-loading-emblem-size);
+  height: var(--brand-loading-emblem-size);
+}
+
+.brand-loading-emblem__quad {
+  animation: emblem-quadrant-flicker 1.05s ease-in-out infinite;
+}
+
+.brand-loading-emblem__quad--tl {
+  clip-path: inset(7% 50% 50% 7%);
+}
+
+.brand-loading-emblem__quad--tr {
+  clip-path: inset(7% 7% 50% 50%);
+  animation-delay: 0.15s;
+}
+
+.brand-loading-emblem__quad--bl {
+  clip-path: inset(50% 50% 7% 7%);
+  animation-delay: 0.3s;
+}
+
+.brand-loading-emblem__quad--br {
+  clip-path: inset(50% 7% 7% 50%);
+  animation-delay: 0.45s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-loading-emblem__quad {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+@media (min-width: 640px) {
+  .brand-loading-emblem {
+    --brand-loading-emblem-size: 6rem;
+  }
+}
+
 /* Lead form — icon inside field, before placeholder text. */
 .kp-lead-icon-field {
   display: flex;
