@@ -122,8 +122,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      message:
-        "Thank you — we've received your review. Our team will check it before it appears on the website.",
+      message: "Our team will check it before it appears on the website.",
       id: doc._id,
     });
   } catch (error) {
