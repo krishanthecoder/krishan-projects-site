@@ -1,7 +1,7 @@
 import { defineConfig, type Config } from "sanity";
 
 import { StudioLayoutWithPublishStyles } from "./components/StudioLayoutWithPublishStyles";
-import { mapPublishActionsToPrimaryTone } from "./documentActions/primaryTonePublishAction";
+import { resolveDocumentActions } from "./documentActions/discardedTestimonialActions";
 import { sanityApiVersion, sanityDataset, sanityProjectId } from "./env";
 import { schemas } from "./schemas";
 import { studioPlugins } from "./studioPlugins";
@@ -23,7 +23,7 @@ export function createStudioConfig(): Config | null {
       enabled: false,
     },
     document: {
-      actions: (prev) => mapPublishActionsToPrimaryTone(prev),
+      actions: (prev, context) => resolveDocumentActions(prev, context),
       newDocumentOptions: (prev) =>
         prev.filter((item) => item.templateId !== "siteSettings"),
     },
