@@ -76,7 +76,6 @@ export function buildReviewNotificationHtml({
     eyebrow: "Review submission",
     title: clientName,
     bodyHtml,
-    header: "dark",
     footerNote: "Publish or discard from Studio → Customer Reviews → Review submissions.",
   });
 }

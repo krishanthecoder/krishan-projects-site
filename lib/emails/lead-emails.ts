@@ -5,9 +5,11 @@ import {
   getEmailWebsiteUrl,
 } from "@/lib/emails/brand";
 import {
+  createEmailToken,
   emailCtaButton,
   emailDetailRow,
   emailMessageBlock,
+  emailUniquePreheader,
   escapeHtml,
   wrapBrandedEmail,
 } from "@/lib/emails/layout";
@@ -64,7 +66,6 @@ export function buildLeadNotificationHtml(body: LeadEmailPayload): string {
     eyebrow: "New lead",
     title: formatProjectType(body.projectType),
     bodyHtml,
-    header: "dark",
   });
 }
 
@@ -99,12 +100,14 @@ export function buildAutoReplyHtml(name: string, projectType: string): string {
   const websiteUrl = escapeHtml(getEmailWebsiteUrl());
   const firstName = escapeHtml(name.trim().split(/\s+/)[0] || name);
   const formattedProject = escapeHtml(formatProjectType(projectType));
+  const emailToken = createEmailToken();
 
   const phoneHtml = businessPhone
     ? `If you'd rather talk, call us on <a href="tel:${escapeHtml(businessPhone.replace(/\s/g, ""))}" style="color:${emailBrand.gold};font-weight:600;text-decoration:none;">${escapeHtml(formatUkPhoneDisplay(businessPhone))}</a>.`
     : "If you'd rather talk, reply to this email and we'll call you back.";
 
-  const bodyHtml = `<p style="margin:0 0 16px;font-size:16px;line-height:1.65;">Hi ${firstName},</p>
+  const bodyHtml = `${emailUniquePreheader(emailToken)}
+  <p style="margin:0 0 16px;font-size:16px;line-height:1.65;">Hi ${firstName},</p>
   <p style="margin:0 0 16px;font-size:16px;line-height:1.65;">
     Thank you for contacting <strong>${escapeHtml(businessName)}</strong>. We've received your enquiry about <strong>${formattedProject}</strong>.
   </p>
@@ -112,21 +115,25 @@ export function buildAutoReplyHtml(name: string, projectType: string): string {
     We'll review your message and get back to you as soon as possible — usually within a few hours on weekdays.
   </p>
   <p style="margin:0 0 16px;font-size:16px;line-height:1.65;">${phoneHtml}</p>
-  <p style="margin:0;font-size:16px;line-height:1.65;">
+  <p style="margin:0 0 16px;font-size:16px;line-height:1.65;">
     Best regards,<br />
     <strong>${escapeHtml(businessName)}</strong>
   </p>
-  <p style="margin:20px 0 0;font-size:16px;line-height:1.65;">
+  <p style="margin:0;font-size:16px;line-height:1.65;">
     ${emailCtaButton("Visit our website", websiteUrl)}
   </p>`;
 
   return wrapBrandedEmail({
     eyebrow: "Enquiry received",
-    title: "We've got your message",
+    title: `Your ${formatProjectType(projectType).toLowerCase()} enquiry`,
     bodyHtml,
-    header: "light",
+    showHeaderPhone: true,
     showFooterLink: false,
     footerNote:
       "Please do not reply to this address with sensitive information. Your original message has been passed to our team.",
   });
+}
+
+export function buildAutoReplySubject(projectType: string): string {
+  return `We've received your ${formatProjectType(projectType).toLowerCase()} enquiry — ${getEmailBusinessName()}`;
 }

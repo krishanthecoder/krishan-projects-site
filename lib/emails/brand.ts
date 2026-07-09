@@ -26,8 +26,12 @@ export function getEmailBusinessName(): string {
   return process.env.NEXT_PUBLIC_BUSINESS_NAME ?? "Krishan Projects";
 }
 
-export function getEmailLogoUrl(variant: "default" | "inverted" = "default"): string {
+export function getEmailBusinessPhone(): string {
+  return process.env.NEXT_PUBLIC_BUSINESS_PHONE ?? "";
+}
+
+export function getEmailLogoUrl(): string {
   const base = getEmailWebsiteUrl();
-  const path = variant === "inverted" ? brandLogos.inverted.png : brandLogos.default.png;
+  const path = brandLogos.default.png;
   return `${base}${path}`;
 }

@@ -4,6 +4,7 @@ import { Resend } from "resend";
 import { getEmailBusinessName } from "@/lib/emails/brand";
 import {
   buildAutoReplyHtml,
+  buildAutoReplySubject,
   buildAutoReplyText,
   buildLeadNotificationHtml,
   buildLeadNotificationText,
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
     from: leadFromAddress(),
     to: body.email,
     replyTo: leadToEmail,
-    subject: `We've received your message — ${businessName}`,
+    subject: buildAutoReplySubject(body.projectType),
     text: buildAutoReplyText(body.name, body.projectType),
     html: buildAutoReplyHtml(body.name, body.projectType),
   });

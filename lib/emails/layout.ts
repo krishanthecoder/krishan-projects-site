@@ -2,9 +2,11 @@ import {
   emailBrand,
   emailLogoDimensions,
   getEmailBusinessName,
+  getEmailBusinessPhone,
   getEmailLogoUrl,
   getEmailWebsiteUrl,
 } from "@/lib/emails/brand";
+import { formatUkPhoneDisplay } from "@/lib/format-phone";
 
 export function escapeHtml(value: string): string {
   return value
@@ -20,11 +22,11 @@ type BrandedEmailOptions = {
   eyebrow?: string;
   title: string;
   bodyHtml: string;
-  /** `dark` = graphite header with inverted logo; `light` = logo on stone-white */
-  header?: "dark" | "light";
   footerNote?: string;
   /** Internal notifications keep the footer site link; customer emails omit it. */
   showFooterLink?: boolean;
+  /** Customer auto-reply only — phone on the right of the logo, like the site header. */
+  showHeaderPhone?: boolean;
 };
 
 const bodyFont =
@@ -32,21 +34,59 @@ const bodyFont =
 
 const contentPaddingX = "28px";
 
+/** Stops Gmail collapsing repeated boilerplate when several test emails share a thread. */
+export function emailUniquePreheader(token: string): string {
+  return `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;mso-hide:all;font-size:1px;line-height:1px;">${escapeHtml(token)}</div>`;
+}
+
+export function createEmailToken(): string {
+  return crypto.randomUUID();
+}
+
 export function emailCtaButton(label: string, href: string): string {
   return `<a href="${escapeHtml(href)}" style="display:inline-block;padding:12px 20px;border-radius:12px;background-color:${emailBrand.gold};color:#ffffff;font-size:16px;font-weight:700;text-decoration:none;">${escapeHtml(label)}</a>`;
+}
+
+function buildEmailHeader(showHeaderPhone: boolean): string {
+  const businessName = escapeHtml(getEmailBusinessName());
+  const websiteUrl = escapeHtml(getEmailWebsiteUrl());
+  const logoUrl = escapeHtml(getEmailLogoUrl());
+  const headerPadding = `24px ${contentPaddingX} 20px`;
+
+  const phone = getEmailBusinessPhone();
+  const phoneCell =
+    showHeaderPhone && phone
+      ? `<td align="right" valign="middle" style="width:40%;">
+            <a href="tel:${escapeHtml(phone.replace(/\s/g, ""))}" style="font-size:14px;font-weight:700;color:${emailBrand.gold};text-decoration:none;white-space:nowrap;">${escapeHtml(formatUkPhoneDisplay(phone))}</a>
+          </td>`
+      : "";
+
+  return `<tr>
+            <td align="left" style="background-color:${emailBrand.stoneWhite};padding:${headerPadding};border-bottom:0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="left" valign="middle" style="width:${showHeaderPhone && phone ? "60%" : "100%"};">
+                    <a href="${websiteUrl}" style="text-decoration:none;">
+                      <img src="${logoUrl}" alt="${businessName}" width="${emailLogoDimensions.width}" height="${emailLogoDimensions.height}" style="display:block;width:${emailLogoDimensions.width}px;max-width:100%;height:auto;border:0;" />
+                    </a>
+                  </td>
+                  ${phoneCell}
+                </tr>
+              </table>
+            </td>
+          </tr>`;
 }
 
 export function wrapBrandedEmail({
   eyebrow,
   title,
   bodyHtml,
-  header = "light",
   footerNote,
   showFooterLink = true,
+  showHeaderPhone = false,
 }: BrandedEmailOptions): string {
   const businessName = escapeHtml(getEmailBusinessName());
   const websiteUrl = escapeHtml(getEmailWebsiteUrl());
-  const logoUrl = escapeHtml(getEmailLogoUrl(header === "dark" ? "inverted" : "default"));
   const eyebrowHtml = eyebrow
     ? `<p style="margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:${emailBrand.gold};">${escapeHtml(eyebrow)}</p>`
     : "";
@@ -63,9 +103,6 @@ export function wrapBrandedEmail({
           </tr>`
     : "";
 
-  const headerBg = header === "dark" ? emailBrand.graphite : emailBrand.stoneWhite;
-  const headerPadding = `24px ${contentPaddingX} 20px`;
-
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,14 +115,8 @@ export function wrapBrandedEmail({
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${emailBrand.parchment};padding:24px 12px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:${emailBrand.stoneWhite};border:1px solid ${emailBrand.parchment};border-radius:16px;overflow:hidden;">
-          <tr>
-            <td align="left" style="background-color:${headerBg};padding:${headerPadding};">
-              <a href="${websiteUrl}" style="text-decoration:none;">
-                <img src="${logoUrl}" alt="${businessName}" width="${emailLogoDimensions.width}" height="${emailLogoDimensions.height}" style="display:block;width:${emailLogoDimensions.width}px;max-width:100%;height:auto;border:0;" />
-              </a>
-            </td>
-          </tr>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:${emailBrand.stoneWhite};border:1px solid ${emailBrand.parchment};border-radius:16px;">
+          ${buildEmailHeader(showHeaderPhone)}
           <tr>
             <td style="height:4px;background-color:${emailBrand.gold};font-size:0;line-height:0;">&nbsp;</td>
           </tr>
