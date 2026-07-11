@@ -1,0 +1,31 @@
+---
+description: Never push to GitHub (and trigger Vercel) without explicit user approval
+alwaysApply: true
+---
+
+# No push without approval
+
+**Never run `git push` (to any remote or branch) unless the user explicitly asks you to push in that conversation.**
+
+Pushing to GitHub deploys to Vercel for this project — treat push as a production action.
+
+## Required workflow
+
+1. Make and test changes locally (e.g. `localhost:3000`, Studio) when possible.
+2. **Commit only when the user asks** (existing git safety rules still apply).
+3. **Stop before push** and tell the user what will go live.
+4. Push **only** after clear approval, e.g. “push it”, “deploy to production”, “push to main”.
+
+## Do not push when the user says
+
+- “commit” (without also asking to push)
+- “looks good” / “thanks” / “yes please” to a **feature** request (unless they clearly mean push/deploy)
+- “revert on live site” — confirm, commit if needed, then **ask again** before pushing unless they explicitly included push/deploy in the same message
+
+## When blocked from pushing
+
+Say briefly that changes are committed locally (if applicable) and ready to push when they approve.
+
+## Allowed without push approval
+
+- `git status`, `git diff`, `git log`, local commits (if requested), local dev server, local builds/tests
