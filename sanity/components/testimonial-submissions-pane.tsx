@@ -5,7 +5,18 @@ import { useClient } from "sanity";
 import { usePaneRouter } from "sanity/structure";
 
 import { sanityApiVersion } from "../env";
+import {
+  TESTIMONIAL_PENDING_EDIT_LIST_ITEM_ID,
+} from "../structurePaneIds";
+import { useTestimonialMutationRefresh } from "../hooks/useTestimonialMutationRefresh";
+import {
+  commitTestimonialWorkflow,
+  repairStaleTestimonialDrafts,
+  TESTIMONIAL_WORKFLOW_CHANGED_EVENT,
+  type TestimonialWorkflowChangedDetail,
+} from "../lib/testimonial-workflow";
 import { studioPublishButtonStyle } from "../styles/publish-button";
+import { TestimonialStarRating } from "./testimonial-form-fields";
 
 type PendingTestimonial = {
   _id: string;
@@ -16,7 +27,7 @@ type PendingTestimonial = {
   createdAt?: string;
 };
 
-const pendingQuery = `*[_type == "testimonial" && status == "pending"] | order(_createdAt desc){
+const pendingQuery = `*[_type == "testimonial" && !(_id in path("drafts.**")) && status == "pending"] | order(_createdAt desc){
   _id,
   clientName,
   jobTitle,
@@ -41,34 +52,60 @@ async function setTestimonialStatus(
   id: string,
   status: "published" | "discarded",
 ) {
-  await client.patch(id).set({ status }).commit();
+  await commitTestimonialWorkflow(client, id, { status });
 }
 
 export function TestimonialSubmissionsPane() {
   const client = useClient({ apiVersion: sanityApiVersion });
-  const router = usePaneRouter();
+  const { ChildLink } = usePaneRouter();
   const [rows, setRows] = useState<PendingTestimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const loadPending = useCallback(async () => {
-    setLoading(true);
+  const loadPending = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setLoading(true);
+    }
     setError(null);
     try {
+      await repairStaleTestimonialDrafts(client);
       const next = await client.fetch<PendingTestimonial[]>(pendingQuery);
       setRows(next);
     } catch (err) {
       console.error(err);
       setError("Could not load pending reviews.");
     } finally {
-      setLoading(false);
+      if (!options?.silent) {
+        setLoading(false);
+      }
     }
   }, [client]);
 
   useEffect(() => {
     void loadPending();
   }, [loadPending]);
+
+  useTestimonialMutationRefresh(() => {
+    void loadPending({ silent: true });
+  });
+
+  useEffect(() => {
+    const onWorkflowChanged = (event: Event) => {
+      const detail = (event as CustomEvent<TestimonialWorkflowChangedDetail>).detail;
+      if (
+        detail?.documentId &&
+        (detail.status === "discarded" || detail.status === "published")
+      ) {
+        setRows((current) => current.filter((row) => row._id !== detail.documentId));
+      }
+    };
+
+    window.addEventListener(TESTIMONIAL_WORKFLOW_CHANGED_EVENT, onWorkflowChanged);
+    return () => {
+      window.removeEventListener(TESTIMONIAL_WORKFLOW_CHANGED_EVENT, onWorkflowChanged);
+    };
+  }, []);
 
   const handlePublish = useCallback(
     async (id: string) => {
@@ -102,20 +139,13 @@ export function TestimonialSubmissionsPane() {
     [client, loadPending],
   );
 
-  const handleAmend = useCallback(
-    (id: string) => {
-      router.navigateIntent("edit", { id, type: "testimonial" });
-    },
-    [router],
-  );
-
   return (
     <div style={paneStyle}>
       <header style={headerStyle}>
         <h2 style={titleStyle}>Pending submissions</h2>
         <p style={helpStyle}>
           Reviews from <code>/leave-a-review</code> land here first. Publish to add them to the
-          site, open Amend to edit, or Discard to hide them. Published and imported reviews live
+          site, use Edit to update wording, or Discard to hide them. Published and imported reviews live
           under <strong>Published on site</strong>.
         </p>
       </header>
@@ -142,10 +172,11 @@ export function TestimonialSubmissionsPane() {
                 <div style={cardHeaderStyle}>
                   <div>
                     <p style={nameStyle}>{row.clientName}</p>
-                    <p style={metaStyle}>
-                      {row.jobTitle} · {row.rating}/5
-                      {posted ? ` · ${posted}` : ""}
-                    </p>
+                    <div style={metaRowStyle}>
+                      <span style={metaStyle}>{row.jobTitle}</span>
+                      <TestimonialStarRating value={row.rating} />
+                      {posted ? <span style={metaStyle}>{posted}</span> : null}
+                    </div>
                   </div>
                 </div>
                 <p style={contentStyle}>{row.content}</p>
@@ -158,14 +189,14 @@ export function TestimonialSubmissionsPane() {
                   >
                     Publish
                   </button>
-                  <button
-                    type="button"
-                    style={secondaryButtonStyle}
-                    disabled={isBusy}
-                    onClick={() => handleAmend(row._id)}
+                  <ChildLink
+                    childId={TESTIMONIAL_PENDING_EDIT_LIST_ITEM_ID}
+                    childPayload={{ documentId: row._id }}
                   >
-                    Amend
-                  </button>
+                    <button type="button" style={secondaryButtonStyle} disabled={isBusy}>
+                      Edit
+                    </button>
+                  </ChildLink>
                   <button
                     type="button"
                     style={dangerButtonStyle}
@@ -254,9 +285,16 @@ const nameStyle: CSSProperties = {
 };
 
 const metaStyle: CSSProperties = {
-  margin: "0.25rem 0 0",
   fontSize: "0.8125rem",
   color: "#6b7280",
+};
+
+const metaRowStyle: CSSProperties = {
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "center",
+  gap: "0.5rem",
+  marginTop: "0.25rem",
 };
 
 const contentStyle: CSSProperties = {

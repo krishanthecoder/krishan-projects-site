@@ -17,12 +17,14 @@ export const testimonialSchema = defineType({
       name: "status",
       title: "Status",
       type: "string",
+      description: "Managed by the Customer Reviews lists — not edited here.",
       options: {
         list: [...testimonialStatusOptions],
         layout: "radio",
       },
       initialValue: "published",
       validation: (rule) => rule.required(),
+      hidden: true,
     }),
     defineField({
       name: "source",

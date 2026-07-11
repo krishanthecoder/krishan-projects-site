@@ -1,14 +1,10 @@
 import { ChevronRightIcon, DocumentsIcon } from "@sanity/icons";
 import type { CSSProperties } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useClient } from "sanity";
+import { useMemo } from "react";
 import { usePaneRouter } from "sanity/structure";
 
-import {
-  type TestimonialStructureCounts,
-  testimonialStructureCountsQuery,
-} from "../../lib/testimonial-structure-counts";
-import { sanityApiVersion } from "../env";
+import type { TestimonialStructureCounts } from "../../lib/testimonial-structure-counts";
+import { useTestimonialStructureCounts } from "../hooks/useTestimonialStructureCounts";
 import {
   TESTIMONIAL_SUBMISSIONS_LIST_ITEM_ID,
   TESTIMONIALS_DISCARDED_LIST_ID,
@@ -41,48 +37,13 @@ const rows: NavRow[] = [
   },
 ];
 
-const emptyCounts: TestimonialStructureCounts = {
-  pending: 0,
-  published: 0,
-  discarded: 0,
-};
-
 function formatCount(value: number) {
   return value > 99 ? "99+" : String(value);
 }
 
 export function TestimonialsStructureNavPane() {
-  const client = useClient({ apiVersion: sanityApiVersion });
   const { ChildLink, groupIndex, index, routerPanesState } = usePaneRouter();
-  const [counts, setCounts] = useState<TestimonialStructureCounts>(emptyCounts);
-  const [loading, setLoading] = useState(true);
-
-  const loadCounts = useCallback(async () => {
-    try {
-      const next = await client.fetch<TestimonialStructureCounts>(
-        testimonialStructureCountsQuery,
-      );
-      setCounts(next ?? emptyCounts);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }, [client]);
-
-  useEffect(() => {
-    void loadCounts();
-  }, [loadCounts]);
-
-  useEffect(() => {
-    const subscription = client
-      .listen(`*[_type == "testimonial"]`, {}, { includeResult: false })
-      .subscribe(() => {
-        void loadCounts();
-      });
-
-    return () => subscription.unsubscribe();
-  }, [client, loadCounts]);
+  const { counts, loading } = useTestimonialStructureCounts();
 
   const selectedChildId = useMemo(() => {
     const siblings = routerPanesState[groupIndex];

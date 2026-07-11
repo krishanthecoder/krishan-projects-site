@@ -6,9 +6,15 @@ export const TESTIMONIALS_SUBLIST_ID = "testimonialsSublist";
 
 export const TESTIMONIAL_SUBMISSIONS_LIST_ITEM_ID = "testimonialSubmissionsQueue";
 export const TESTIMONIAL_SUBMISSIONS_MIDDLE_PANE_ID = "testimonialSubmissionsMiddlePane";
+export const TESTIMONIAL_PENDING_EDIT_LIST_ITEM_ID = "testimonialPendingEdit";
 
 export const TESTIMONIALS_PUBLISHED_LIST_ID = "testimonialsPublishedList";
+export const TESTIMONIALS_PUBLISHED_MIDDLE_PANE_ID = "testimonialPublishedMiddlePane";
+export const TESTIMONIAL_PUBLISHED_EDIT_LIST_ITEM_ID = "testimonialPublishedEdit";
+
 export const TESTIMONIALS_DISCARDED_LIST_ID = "testimonialsDiscardedList";
+export const TESTIMONIALS_DISCARDED_MIDDLE_PANE_ID = "testimonialsDiscardedMiddlePane";
+export const TESTIMONIAL_DISCARDED_EDIT_LIST_ITEM_ID = "testimonialDiscardedEdit";
 
 export const DEFAULT_STRUCTURE_PATH = `/studio/structure/${HOMEPAGE_SETTINGS_LIST_ITEM_ID};${HOMEPAGE_SETTINGS_MIDDLE_PANE_ID}`;
 

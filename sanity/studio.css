@@ -21,10 +21,19 @@ button[data-testid="action-publishing"] {
   font-weight: 600 !important;
 }
 
+button[data-testid="action-permanentdelete"] {
+  box-sizing: border-box !important;
+  min-height: var(--kp-publish-btn-min-height) !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
 /* @sanity/ui Button — padding lives on the inner wrapper span */
 button[data-testid^="action-publish"] > span,
 button[data-testid="action-published"] > span,
-button[data-testid="action-publishing"] > span {
+button[data-testid="action-publishing"] > span,
+button[data-testid="action-permanentdelete"] > span {
   box-sizing: border-box !important;
   display: inline-flex !important;
   align-items: center !important;

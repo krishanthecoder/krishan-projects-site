@@ -3,6 +3,7 @@ import type { Tool } from "sanity";
 import { definePlugin } from "sanity";
 
 import { DefaultHomepageStructureNavigation } from "../components/default-homepage-structure-navigation";
+import { DeletedTestimonialPaneRedirect } from "../components/deleted-testimonial-pane-redirect";
 
 const STRUCTURE_TOOL_NAME = "structure";
 
@@ -27,6 +28,7 @@ export const defaultHomepageStructureNavigationPlugin = definePlugin({
           return (
             <Fragment>
               <DefaultHomepageStructureNavigation />
+              <DeletedTestimonialPaneRedirect />
               <OriginalComponent {...props} />
             </Fragment>
           );

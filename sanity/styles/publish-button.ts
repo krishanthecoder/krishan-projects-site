@@ -20,3 +20,15 @@ export const studioPublishButtonStyle: CSSProperties = {
   borderRadius: 6,
   cursor: "pointer",
 };
+
+export const studioDisabledPrimaryButtonStyle: CSSProperties = {
+  ...studioPublishButtonStyle,
+  background: "#9ca3af",
+  cursor: "not-allowed",
+};
+
+export const studioCriticalButtonStyle: CSSProperties = {
+  ...studioPublishButtonStyle,
+  background: "#dc2626",
+  color: "#fff",
+};
