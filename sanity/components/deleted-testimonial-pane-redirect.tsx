@@ -27,7 +27,14 @@ export function DeletedTestimonialPaneRedirect() {
     let cancelled = false;
 
     void client
-      .fetch<boolean>(`!defined(*[_id == $id][0]._id)`, { id: documentPaneId })
+      .fetch<{ _type?: string } | null>(`*[_id == $id][0]{ _type }`, { id: documentPaneId })
+      .then((document) => {
+        if (cancelled || document?._type !== "testimonial") {
+          return;
+        }
+
+        return client.fetch<boolean>(`!defined(*[_id == $id][0]._id)`, { id: documentPaneId });
+      })
       .then((isMissing) => {
         if (cancelled || !isMissing) {
           return;

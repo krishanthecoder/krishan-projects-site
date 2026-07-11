@@ -1,14 +1,15 @@
 import type { RouterPanes } from "sanity/structure";
 
 import { TESTIMONIAL_PENDING_EDIT_LIST_ITEM_ID, TESTIMONIAL_PUBLISHED_EDIT_LIST_ITEM_ID, TESTIMONIAL_DISCARDED_EDIT_LIST_ITEM_ID } from "../structurePaneIds";
-import { isStructurePaneId } from "./structure-pane-ids";
+import { isDocumentTypeListPaneId, isStructurePaneId } from "./structure-pane-ids";
 
 export function paneBaseId(id: string): string {
   return id.split(",")[0] ?? id;
 }
 
 export function isDocumentPaneId(id: string): boolean {
-  return !isStructurePaneId(paneBaseId(id));
+  const baseId = paneBaseId(id);
+  return !isStructurePaneId(baseId) && !isDocumentTypeListPaneId(baseId);
 }
 
 /** Deepest open document pane id in the current Structure router state. */

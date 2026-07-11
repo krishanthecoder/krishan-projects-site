@@ -35,6 +35,14 @@ const STRUCTURE_PANE_IDS = new Set([
   `${TESTIMONIALS_DISCARDED_LIST_ID}Documents`,
 ]);
 
+/** Document-type list panes from `S.documentTypeListItems()` use the schema name as pane id. */
+const DOCUMENT_TYPE_LIST_PANE_IDS = new Set(["project"]);
+
+export function isDocumentTypeListPaneId(id: string): boolean {
+  const baseId = id.split(",")[0] ?? id;
+  return DOCUMENT_TYPE_LIST_PANE_IDS.has(baseId);
+}
+
 export function isStructurePaneId(id: string): boolean {
   return STRUCTURE_PANE_IDS.has(id);
 }
