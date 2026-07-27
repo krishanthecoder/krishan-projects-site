@@ -87,8 +87,18 @@ export type ProjectDetail = {
   beforeImage: SanityImage | null;
   /** When true and both images exist, UI uses a comparison slider; otherwise side-by-side. */
   beforeAfterAligned: boolean;
+  videos: ProjectVideo[];
   images: SanityImage[];
   galleryCategories?: GalleryCategory[];
+};
+
+export type ProjectVideo = {
+  _key: string;
+  title?: string;
+  url: string;
+  mimeType?: string;
+  size?: number;
+  filename?: string;
 };
 
 export type GalleryImageItem = {
@@ -297,6 +307,17 @@ const projectBySlugQuery = groq`*[_type == "project" && slug.current == $slug][0
       }
     }
   },
+  videos[]{
+    _key,
+    title,
+    asset->{
+      _id,
+      url,
+      mimeType,
+      size,
+      originalFilename
+    }
+  },
   "images": images[]{
     ...,
     asset->{
@@ -360,6 +381,34 @@ function normalizeResolvedCategories(
         Boolean(c?._id && typeof c.slug === "string" && c.slug.length > 0 && c.title),
     ) ?? []
   );
+}
+
+type ProjectVideoFromGroq = {
+  _key?: string;
+  title?: string;
+  asset?: {
+    url?: string;
+    mimeType?: string;
+    size?: number;
+    originalFilename?: string;
+  } | null;
+};
+
+function normalizeProjectVideos(
+  rows: ProjectVideoFromGroq[] | null | undefined,
+): ProjectVideo[] {
+  if (!rows?.length) return [];
+
+  return rows
+    .filter((row) => Boolean(row?.asset?.url))
+    .map((row, index) => ({
+      _key: row._key ?? `video-${index}`,
+      title: row.title?.trim() || undefined,
+      url: row.asset!.url!,
+      mimeType: row.asset?.mimeType,
+      size: row.asset?.size,
+      filename: row.asset?.originalFilename,
+    }));
 }
 
 function projectGalleryCategories(project: ProjectRowForGallery): GalleryCategory[] {
@@ -607,6 +656,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectDetail | nu
   return {
     ...doc,
     images,
+    videos: normalizeProjectVideos(doc.videos as ProjectVideoFromGroq[] | undefined),
     featuredImage: featured ?? cardFallback,
     beforeImage: before,
     beforeAfterAligned: Boolean(doc.beforeAfterAligned),

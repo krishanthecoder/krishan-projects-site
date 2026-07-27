@@ -143,7 +143,7 @@ export const projectSchema = defineType({
       name: "projectLocation",
       title: "Project location",
       type: "string",
-      description: "Example: Kitchen renovation — Barking",
+      description: "Example: Barking",
       validation: (rule) => rule.required().min(3),
     }),
     defineField({
@@ -153,6 +153,29 @@ export const projectSchema = defineType({
       of: [{ type: "block" }],
       description: "Full write-up shown on the project page.",
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "videos",
+      title: "Project videos (optional)",
+      type: "array",
+      description:
+        "Optional clips from this job, shown on the project page. Use MP4 when possible and compress large files (under ~100 MB) for faster uploads and playback.",
+      of: [
+        defineArrayMember({
+          type: "file",
+          options: {
+            accept: "video/*",
+          },
+          fields: [
+            defineField({
+              name: "title",
+              title: "Label",
+              type: "string",
+              description: "Optional short label shown above the video.",
+            }),
+          ],
+        }),
+      ],
     }),
     defineField({
       name: "images",

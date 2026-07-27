@@ -8,6 +8,7 @@ import { PortableText, type PortableTextComponents } from "@portabletext/react";
 
 import { ProjectFeaturedMedia } from "@/components/project-featured-media";
 import { ProjectPhotoGrid } from "@/components/project-photo-grid";
+import { ProjectVideos } from "@/components/project-videos";
 import { ProjectJsonLd } from "@/components/seo/project-json-ld";
 import { SanityImage } from "@/components/sanity-image";
 import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
@@ -372,6 +373,25 @@ export default async function ProjectDetailPage({
             components={projectDescriptionComponents}
           />
         </ScrollReveal>
+
+        {project.videos.length > 0 ? (
+          <section className="mt-14" aria-labelledby="project-videos-heading">
+            <ScrollReveal>
+              <h2
+                id="project-videos-heading"
+                className="text-lg font-bold tracking-tight text-graphite"
+              >
+                Videos from this job
+              </h2>
+              <p className="mt-2 text-sm text-graphite/75">
+                Tap a video to play it full size.
+              </p>
+              <div className="mt-6">
+                <ProjectVideos videos={project.videos} />
+              </div>
+            </ScrollReveal>
+          </section>
+        ) : null}
 
         {project.images.length > 0 ? (
           <section className="mt-14" aria-labelledby="project-photos-heading">
