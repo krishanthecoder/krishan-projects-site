@@ -12,10 +12,14 @@ import { urlFor } from "@/src/sanity/lib/imageHelpers";
 
 export type SanityImage = {
   _type: "image";
+  /** Present on images from array fields — unique per gallery slot. */
+  _key?: string;
   alt?: string;
   asset: {
     _ref: string;
     _type: "reference";
+    /** Set when GROQ expands `asset->` (alongside or instead of `_ref` until normalized). */
+    _id?: string;
     metadata?: {
       lqip?: string;
     };
@@ -448,7 +452,27 @@ function deriveGalleryCategoriesFromProjects(
 function stripImageFields(img: GalleryImageFromGroq): SanityImage {
   const { _key, ...rest } = img;
   void _key;
-  return rest as SanityImage;
+  return normalizeSanityImage(rest as SanityImage);
+}
+
+/** Ensure `asset._ref` exists when GROQ returned an expanded `asset->_id`. */
+function normalizeSanityImage(img: SanityImage): SanityImage {
+  const asset = img.asset as SanityImage["asset"] | undefined;
+  if (!asset) return img;
+  const ref = asset._ref ?? asset._id;
+  if (!ref || asset._ref === ref) return img;
+  return {
+    ...img,
+    asset: {
+      ...asset,
+      _ref: ref,
+      _type: "reference",
+    },
+  };
+}
+
+function normalizeSanityImageList(images: SanityImage[]): SanityImage[] {
+  return images.map(normalizeSanityImage);
 }
 
 function pickCardImage(project: ProjectRowForGallery): SanityImage | null {
@@ -660,12 +684,20 @@ export async function getProjectBySlug(slug: string): Promise<ProjectDetail | nu
     sanityFetchOptions(),
   );
   if (!doc?.slug) return null;
-  const images = (doc.images ?? []).filter((img) => Boolean(img?.asset)) as SanityImage[];
-  const featured =
-    doc.featuredImage && doc.featuredImage.asset ? (doc.featuredImage as SanityImage) : null;
+  const images = normalizeSanityImageList(
+    (doc.images ?? []).filter((img) => Boolean(img?.asset)) as SanityImage[],
+  );
+  const featuredRaw =
+    doc.featuredImage && doc.featuredImage.asset
+      ? (doc.featuredImage as SanityImage)
+      : null;
+  const featured = featuredRaw ? normalizeSanityImage(featuredRaw) : null;
   const cardFallback = images[0] ?? null;
-  const before =
-    doc.beforeImage && doc.beforeImage.asset ? (doc.beforeImage as SanityImage) : null;
+  const beforeRaw =
+    doc.beforeImage && doc.beforeImage.asset
+      ? (doc.beforeImage as SanityImage)
+      : null;
+  const before = beforeRaw ? normalizeSanityImage(beforeRaw) : null;
   return {
     ...doc,
     images,

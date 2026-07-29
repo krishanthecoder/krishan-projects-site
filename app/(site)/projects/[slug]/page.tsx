@@ -13,6 +13,7 @@ import { ProjectJsonLd } from "@/components/seo/project-json-ld";
 import { SanityImage } from "@/components/sanity-image";
 import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
 import { sortLabelsAlphabetically } from "@/lib/gallery-category-sort";
+import { imageAssetRef } from "@/lib/image-asset-ref";
 import { heroHeadingClassGraphite } from "@/lib/page-hero";
 import { buildImageAltText } from "@/lib/project-image-alt";
 import { buildProjectMetaDescription } from "@/lib/seo/build-project-meta-description";
@@ -255,11 +256,12 @@ export default async function ProjectDetailPage({
           .url()
       : undefined;
 
-  const heroRef = project.featuredImage?.asset?._ref;
-  const beforeRef = project.beforeImage?.asset?._ref;
-  const dedupedThumbs = project.images.filter(
-    (img) => img.asset?._ref !== heroRef && img.asset?._ref !== beforeRef,
-  );
+  const heroRef = imageAssetRef(project.featuredImage);
+  const beforeRef = imageAssetRef(project.beforeImage);
+  const dedupedThumbs = project.images.filter((img) => {
+    const ref = imageAssetRef(img);
+    return ref !== heroRef && ref !== beforeRef;
+  });
   const thumbnailImages =
     dedupedThumbs.length > 0 ? dedupedThumbs : project.images;
 

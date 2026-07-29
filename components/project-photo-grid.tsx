@@ -12,6 +12,7 @@ import {
 import type { Image as SanityCmsImage } from "sanity";
 
 import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
+import { imageAssetRef } from "@/lib/image-asset-ref";
 import {
   lightboxImageUrl,
   prefetchLightboxImage,
@@ -43,11 +44,17 @@ export function ProjectPhotoGrid({
 }: ProjectPhotoGridProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [lightboxReady, setLightboxReady] = useState(false);
+  /** Keep the previous slide visible until the next one is decoded. */
+  const [heldSrc, setHeldSrc] = useState<string | null>(null);
   const lastFocusedRef = useRef<HTMLElement | null>(null);
   const lengthRef = useRef(0);
+  const readySrcRef = useRef<string | null>(null);
 
   const closeModal = useCallback(() => {
     setSelectedIndex(null);
+    setHeldSrc(null);
+    readySrcRef.current = null;
+    setLightboxReady(false);
     requestAnimationFrame(() => {
       lastFocusedRef.current?.focus();
     });
@@ -91,24 +98,29 @@ export function ProjectPhotoGrid({
     lengthRef.current = lightboxImages.length;
   }, [lightboxImages.length]);
 
-  // Reset reveal state when the slide changes; prefetch neighbours.
+  // Warm lightbox-sized URLs for thumbs while the grid is on screen.
   useEffect(() => {
-    if (selectedIndex === null) return;
-    setLightboxReady(false);
-    prefetchLightboxImage(lightboxImages[selectedIndex] as SanityCmsImage);
-    prefetchLightboxImage(lightboxImages[selectedIndex - 1] as SanityCmsImage);
-    prefetchLightboxImage(lightboxImages[selectedIndex + 1] as SanityCmsImage);
-  }, [selectedIndex, lightboxImages]);
-
-  const openAtLightboxIndex = useCallback(
-    (image: SanityImage) => {
-      const idx = lightboxImages.findIndex(
-        (img) => img.asset?._ref === image.asset?._ref,
-      );
-      setSelectedIndex(idx >= 0 ? idx : 0);
-    },
-    [lightboxImages],
-  );
+    if (thumbnailImages.length === 0) return;
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      for (const img of thumbnailImages) {
+        prefetchLightboxImage(img as SanityCmsImage);
+      }
+    };
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(run, { timeout: 1500 });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback(id);
+      };
+    }
+    const timeout = window.setTimeout(run, 200);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
+  }, [thumbnailImages]);
 
   const selectedImage =
     selectedIndex !== null ? lightboxImages[selectedIndex] : null;
@@ -124,6 +136,64 @@ export function ProjectPhotoGrid({
     ? lightboxImageUrl(selectedImage as SanityCmsImage)
     : null;
 
+  // Reveal only after decode; hold the prior frame to avoid blank flashes.
+  useLayoutEffect(() => {
+    if (selectedIndex === null || !selectedSrc) return;
+
+    if (readySrcRef.current && readySrcRef.current !== selectedSrc) {
+      setHeldSrc(readySrcRef.current);
+    }
+    setLightboxReady(false);
+
+    prefetchLightboxImage(lightboxImages[selectedIndex] as SanityCmsImage);
+    prefetchLightboxImage(lightboxImages[selectedIndex - 1] as SanityCmsImage);
+    prefetchLightboxImage(lightboxImages[selectedIndex + 1] as SanityCmsImage);
+
+    let cancelled = false;
+    const probe = new window.Image();
+    probe.decoding = "async";
+    probe.src = selectedSrc;
+
+    const markReady = () => {
+      if (cancelled) return;
+      readySrcRef.current = selectedSrc;
+      setLightboxReady(true);
+      setHeldSrc(null);
+    };
+
+    if (probe.complete && probe.naturalWidth > 0) {
+      markReady();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void probe
+      .decode()
+      .then(markReady)
+      .catch(() => {
+        // decode() can fail on some cached/aborted loads — onLoad still covers it.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedIndex, selectedSrc, lightboxImages]);
+
+  const openAtLightboxIndex = useCallback(
+    (image: SanityImage) => {
+      const clickedKey = image._key;
+      const clickedRef = imageAssetRef(image);
+      const idx = lightboxImages.findIndex((img) => {
+        if (clickedKey && img._key) return img._key === clickedKey;
+        const ref = imageAssetRef(img);
+        return Boolean(clickedRef && ref && ref === clickedRef);
+      });
+      setSelectedIndex(idx >= 0 ? idx : 0);
+    },
+    [lightboxImages],
+  );
+
   const canPrev = selectedIndex !== null && selectedIndex > 0;
   const canNext =
     selectedIndex !== null && selectedIndex < lightboxImages.length - 1;
@@ -138,12 +208,16 @@ export function ProjectPhotoGrid({
         stagger={0.05}
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
       >
-        {thumbnailImages.map((img) => (
-          <ScrollReveal key={img.asset._ref} className="h-64">
+        {thumbnailImages.map((img, thumbIndex) => (
+          <ScrollReveal
+            key={img._key ?? imageAssetRef(img) ?? `thumb-${thumbIndex}`}
+            className="h-64"
+          >
             <button
               type="button"
               onClick={(event) => {
                 lastFocusedRef.current = event.currentTarget;
+                prefetchLightboxImage(img as SanityCmsImage);
                 openAtLightboxIndex(img);
               }}
               onMouseEnter={() => prefetchLightboxImage(img as SanityCmsImage)}
@@ -216,22 +290,44 @@ export function ProjectPhotoGrid({
           </button>
 
           <div
-            className="relative h-[78vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-graphite/40 shadow-2xl"
+            className="relative flex h-[78vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-graphite/40 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <Image
-              key={selectedSrc}
-              src={selectedSrc}
-              alt={selectedAlt}
-              fill
-              sizes="(max-width: 1024px) 100vw, 1024px"
-              priority
-              unoptimized
-              className={`object-contain transition-opacity duration-200 ease-out ${
-                lightboxReady ? "opacity-100" : "opacity-0"
-              }`}
-              onLoad={() => setLightboxReady(true)}
-            />
+            <div className="relative min-h-0 flex-1">
+              {heldSrc && heldSrc !== selectedSrc && !lightboxReady ? (
+                <Image
+                  src={heldSrc}
+                  alt=""
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                  unoptimized
+                  aria-hidden
+                  className="object-contain"
+                />
+              ) : null}
+              <Image
+                key={selectedSrc}
+                src={selectedSrc}
+                alt={selectedAlt}
+                fill
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                priority
+                unoptimized
+                className={`object-contain transition-opacity duration-150 ease-out ${
+                  lightboxReady ? "opacity-100" : "opacity-0"
+                }`}
+                onLoad={() => {
+                  readySrcRef.current = selectedSrc;
+                  setLightboxReady(true);
+                  setHeldSrc(null);
+                }}
+              />
+            </div>
+            {selectedAlt.trim().length > 0 ? (
+              <p className="shrink-0 border-t border-stone-white/10 bg-graphite/55 px-4 py-3 text-center text-sm leading-snug text-stone-white/80 sm:px-6">
+                {selectedAlt}
+              </p>
+            ) : null}
           </div>
 
           <div className="pointer-events-none absolute left-1/2 top-20 z-[55] -translate-x-1/2 rounded-full bg-graphite/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-white/85 backdrop-blur-sm ring-1 ring-stone-white/15">
