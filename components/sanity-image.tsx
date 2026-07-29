@@ -7,12 +7,12 @@ import type { Image as SanityImageAsset } from "sanity";
 
 import { objectPositionFromHotspot } from "@/lib/image-hotspot";
 import { sanityClient } from "@/lib/sanity.client";
+import type { SanityImage as CmsImage } from "@/lib/sanity.queries";
 import { urlFor } from "@/src/sanity/lib/imageHelpers";
 
 type SanityImageProps = {
-  image: SanityImageAsset & {
-    hotspot?: { x?: number; y?: number; height?: number; width?: number };
-  };
+  /** CMS image from GROQ — crop/hotspot fields may be partial. */
+  image: CmsImage;
   alt: string;
   className?: string;
   sizes?: string;
@@ -36,7 +36,9 @@ export function SanityImage({
   height,
   style,
 }: SanityImageProps) {
-  const imageProps = useNextSanityImage(sanityClient, image, {
+  // next-sanity-image expects Sanity's Image type; our CMS shape is compatible at runtime.
+  const imageSource = image as SanityImageAsset;
+  const imageProps = useNextSanityImage(sanityClient, imageSource, {
     imageBuilder: (builder, options) => {
       const withQuality = builder.quality(quality).auto("format");
       return options.width ? withQuality.width(options.width) : withQuality;
@@ -86,7 +88,11 @@ export function SanityImage({
     <Image
       src={
         imageProps.src ||
-        urlFor(image).width(width ?? 1200).quality(quality).auto("format").url()
+        urlFor(imageSource)
+          .width(width ?? 1200)
+          .quality(quality)
+          .auto("format")
+          .url()
       }
       loader={imageProps.loader}
       alt={alt}
