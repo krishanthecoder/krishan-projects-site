@@ -5,6 +5,21 @@ import { GalleryCategoriesInput } from "../components/gallery-categories-input";
 import { GalleryImagesInput } from "../components/gallery-images-input";
 import { ProjectSlugInput } from "../components/project-slug-input";
 
+/**
+ * Matches the cropped hero / card frames on the site so Studio shows
+ * rectangular previews (Sanity’s drag handle itself stays an oval).
+ */
+const projectImageHotspot = {
+  previews: [
+    // Desktop featured box: ~full content width × sm:h-[28rem]
+    { title: "Project page hero", aspectRatio: 1100 / 448 },
+    // Mobile featured box: ~full width × h-72
+    { title: "Mobile hero", aspectRatio: 390 / 288 },
+    // Gallery / homepage cards: h-64 in a column
+    { title: "Gallery card", aspectRatio: 4 / 3 },
+  ],
+};
+
 /** Alt is only validated once an asset exists, so the upload step is not treated as invalid. */
 function imageAltWhenAsset(minLen: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sanity Rule chain is not typed here
@@ -82,9 +97,9 @@ export const projectSchema = defineType({
       name: "featuredImage",
       title: "Featured image",
       type: "image",
-      options: { hotspot: true },
+      options: { hotspot: projectImageHotspot },
       description:
-        "Shown on the gallery grid, homepage “From a recent job”, and as the project page hero. Falls back to the first gallery image if empty.",
+        "Shown on the gallery grid, homepage “From a recent job”, and as the project page hero. Falls back to the first gallery image if empty. Open Edit hotspot and crop: leave the white crop full, drag the centre of the blue oval onto the subject, check the rectangular previews below, then Publish.",
       fields: [
         defineField({
           name: "alt",
@@ -99,7 +114,7 @@ export const projectSchema = defineType({
       name: "beforeImage",
       title: "Before photo (optional)",
       type: "image",
-      options: { hotspot: true },
+      options: { hotspot: projectImageHotspot },
       description:
         "Optional “before” shot paired with the featured image as the “after” on the project page. Leave empty to show only the featured image.",
       fields: [

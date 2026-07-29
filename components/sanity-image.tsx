@@ -2,13 +2,17 @@
 
 import Image from "next/image";
 import { useNextSanityImage } from "next-sanity-image";
+import type { CSSProperties } from "react";
 import type { Image as SanityImageAsset } from "sanity";
 
+import { objectPositionFromHotspot } from "@/lib/image-hotspot";
 import { sanityClient } from "@/lib/sanity.client";
 import { urlFor } from "@/src/sanity/lib/imageHelpers";
 
 type SanityImageProps = {
-  image: SanityImageAsset;
+  image: SanityImageAsset & {
+    hotspot?: { x?: number; y?: number; height?: number; width?: number };
+  };
   alt: string;
   className?: string;
   sizes?: string;
@@ -17,6 +21,7 @@ type SanityImageProps = {
   fill?: boolean;
   width?: number;
   height?: number;
+  style?: CSSProperties;
 };
 
 export function SanityImage({
@@ -29,6 +34,7 @@ export function SanityImage({
   fill = false,
   width,
   height,
+  style,
 }: SanityImageProps) {
   const imageProps = useNextSanityImage(sanityClient, image, {
     imageBuilder: (builder, options) => {
@@ -53,6 +59,11 @@ export function SanityImage({
   })();
 
   const placeholder = blurDataURL ? "blur" : "empty";
+  const objectPosition = objectPositionFromHotspot(image.hotspot);
+  const mergedStyle: CSSProperties = {
+    ...(objectPosition ? { objectPosition } : {}),
+    ...style,
+  };
 
   if (fill) {
     return (
@@ -66,13 +77,17 @@ export function SanityImage({
         blurDataURL={blurDataURL}
         priority={priority}
         className={className}
+        style={mergedStyle}
       />
     );
   }
 
   return (
     <Image
-      src={imageProps.src || urlFor(image).width(width ?? 1200).quality(quality).auto("format").url()}
+      src={
+        imageProps.src ||
+        urlFor(image).width(width ?? 1200).quality(quality).auto("format").url()
+      }
       loader={imageProps.loader}
       alt={alt}
       width={width ?? imageProps.width}
@@ -82,6 +97,7 @@ export function SanityImage({
       blurDataURL={blurDataURL}
       priority={priority}
       className={className}
+      style={mergedStyle}
     />
   );
 }

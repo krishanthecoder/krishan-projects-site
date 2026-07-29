@@ -20,6 +20,19 @@ export type SanityImage = {
       lqip?: string;
     };
   };
+  /** Focal point from Studio (0–1). Used for object-position when the front end crops. */
+  hotspot?: {
+    x?: number;
+    y?: number;
+    height?: number;
+    width?: number;
+  };
+  crop?: {
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+  };
 };
 
 export type PortableTextBlock = {
