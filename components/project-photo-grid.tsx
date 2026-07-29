@@ -108,11 +108,18 @@ export function ProjectPhotoGrid({
         prefetchLightboxImage(img as SanityCmsImage);
       }
     };
-    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(run, { timeout: 1500 });
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (
+        callback: () => void,
+        options?: { timeout: number },
+      ) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    if (typeof idleWindow.requestIdleCallback === "function") {
+      const id = idleWindow.requestIdleCallback(run, { timeout: 1500 });
       return () => {
         cancelled = true;
-        window.cancelIdleCallback(id);
+        idleWindow.cancelIdleCallback?.(id);
       };
     }
     const timeout = window.setTimeout(run, 200);
