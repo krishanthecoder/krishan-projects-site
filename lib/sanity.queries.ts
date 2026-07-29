@@ -670,6 +670,27 @@ export async function getProjectBySlug(slug: string): Promise<ProjectDetail | nu
   };
 }
 
+const projectSlugByPreviousSlugQuery = groq`*[
+  _type == "project" &&
+  defined(slug.current) &&
+  $slug in previousSlugs
+][0].slug.current`;
+
+/** If `slug` was an older URL for a project, returns the current canonical slug. */
+export async function getCurrentSlugForPreviousSlug(
+  slug: string,
+): Promise<string | null> {
+  if (!sanityConfigured || !slug) {
+    return null;
+  }
+  const current = await sanityClient.fetch<string | null>(
+    projectSlugByPreviousSlugQuery,
+    { slug },
+    sanityFetchOptions(),
+  );
+  return typeof current === "string" && current.length > 0 ? current : null;
+}
+
 export async function getAllProjectSlugs(): Promise<string[]> {
   if (!sanityConfigured) {
     return [];

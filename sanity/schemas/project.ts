@@ -2,6 +2,8 @@ import { defineArrayMember, defineField, defineType } from "sanity";
 
 import { GalleryCategoriesField } from "../components/gallery-categories-field";
 import { GalleryCategoriesInput } from "../components/gallery-categories-input";
+import { GalleryImagesInput } from "../components/gallery-images-input";
+import { ProjectSlugInput } from "../components/project-slug-input";
 
 /** Alt is only validated once an asset exists, so the upload step is not treated as invalid. */
 function imageAltWhenAsset(minLen: number) {
@@ -33,8 +35,12 @@ export const projectSchema = defineType({
       name: "slug",
       title: "Slug",
       type: "slug",
-      description: "URL for the project page (e.g. /projects/kitchen-renovation-barking).",
+      description:
+        "URL for the project page. After you change and publish the slug, the public URL updates; older slugs keep working via redirects.",
       options: { source: "title", maxLength: 96 },
+      components: {
+        input: ProjectSlugInput,
+      },
       validation: (rule) =>
         rule.required().custom((value) => {
           const current =
@@ -46,6 +52,16 @@ export const projectSchema = defineType({
           if (current && current.trim().length > 0) return true;
           return "Generate a slug from the title so this project can have its own page.";
         }),
+    }),
+    defineField({
+      name: "previousSlugs",
+      title: "Previous slugs",
+      type: "array",
+      of: [{ type: "string" }],
+      hidden: true,
+      readOnly: true,
+      description:
+        "Filled automatically when the slug changes — used for permanent redirects from old project URLs.",
     }),
     defineField({
       name: "galleryCategories",
@@ -181,7 +197,8 @@ export const projectSchema = defineType({
       name: "images",
       title: "Gallery images",
       type: "array",
-      description: "All photos for this job. Thumbnails and lightbox on the project page.",
+      description:
+        "All photos for this job. Use “Upload multiple images” (or drop several files) for bulk upload. Thumbnails and lightbox on the project page.",
       of: [
         defineArrayMember({
           type: "image",
@@ -189,7 +206,7 @@ export const projectSchema = defineType({
           fields: [
             defineField({
               name: "alt",
-              title: "Alt Text",
+              title: "Alt text",
               type: "string",
               description:
                 "Describe the image for accessibility and SEO (e.g. 'Kitchen renovation in Surrey with custom cabinets').",
@@ -198,6 +215,9 @@ export const projectSchema = defineType({
           ],
         }),
       ],
+      components: {
+        input: GalleryImagesInput,
+      },
       validation: (rule) => rule.required().min(1),
     }),
     defineField({

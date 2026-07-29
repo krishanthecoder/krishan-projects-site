@@ -3,7 +3,7 @@ import type { PortableTextBlock } from "@portabletext/types";
 import type { ReactNode } from "react";
 import type { Image } from "sanity";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { PortableText, type PortableTextComponents } from "@portabletext/react";
 
 import { ProjectFeaturedMedia } from "@/components/project-featured-media";
@@ -18,6 +18,7 @@ import { buildImageAltText } from "@/lib/project-image-alt";
 import { buildProjectMetaDescription } from "@/lib/seo/build-project-meta-description";
 import {
   getAllProjectSlugs,
+  getCurrentSlugForPreviousSlug,
   getProjectBySlug,
 } from "@/lib/sanity.queries";
 import { urlFor } from "@/src/sanity/lib/imageHelpers";
@@ -134,6 +135,18 @@ function formatUkDate(iso?: string | null) {
   });
 }
 
+async function resolveProjectOrRedirect(slug: string) {
+  const project = await getProjectBySlug(slug);
+  if (project) return project;
+
+  const currentSlug = await getCurrentSlugForPreviousSlug(slug);
+  if (currentSlug && currentSlug !== slug) {
+    permanentRedirect(`/projects/${currentSlug}`);
+  }
+
+  return null;
+}
+
 export async function generateStaticParams() {
   const slugs = await getAllProjectSlugs();
   return slugs.map((slug) => ({ slug }));
@@ -145,7 +158,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
+  const project = await resolveProjectOrRedirect(slug);
   if (!project) {
     return {
       title: "Project",
@@ -225,7 +238,7 @@ export default async function ProjectDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
+  const project = await resolveProjectOrRedirect(slug);
   if (!project) notFound();
 
   const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_URL ?? "https://krishanprojects.co.uk";

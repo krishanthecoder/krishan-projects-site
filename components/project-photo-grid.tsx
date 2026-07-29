@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 import {
   useCallback,
   useEffect,
@@ -8,10 +9,15 @@ import {
   useRef,
   useState,
 } from "react";
+import type { Image as SanityCmsImage } from "sanity";
 
+import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
+import {
+  lightboxImageUrl,
+  prefetchLightboxImage,
+} from "@/lib/lightbox-image";
 import { buildImageAltText } from "@/lib/project-image-alt";
 import type { SanityImage } from "@/lib/sanity.queries";
-import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
 
 import { SanityImage as SanityImageComponent } from "./sanity-image";
 
@@ -36,6 +42,7 @@ export function ProjectPhotoGrid({
   services = [],
 }: ProjectPhotoGridProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [lightboxReady, setLightboxReady] = useState(false);
   const lastFocusedRef = useRef<HTMLElement | null>(null);
   const lengthRef = useRef(0);
 
@@ -84,12 +91,24 @@ export function ProjectPhotoGrid({
     lengthRef.current = lightboxImages.length;
   }, [lightboxImages.length]);
 
-  const openAtLightboxIndex = useCallback((image: SanityImage) => {
-    const idx = lightboxImages.findIndex(
-      (img) => img.asset?._ref === image.asset?._ref,
-    );
-    setSelectedIndex(idx >= 0 ? idx : 0);
-  }, [lightboxImages]);
+  // Reset reveal state when the slide changes; prefetch neighbours.
+  useEffect(() => {
+    if (selectedIndex === null) return;
+    setLightboxReady(false);
+    prefetchLightboxImage(lightboxImages[selectedIndex] as SanityCmsImage);
+    prefetchLightboxImage(lightboxImages[selectedIndex - 1] as SanityCmsImage);
+    prefetchLightboxImage(lightboxImages[selectedIndex + 1] as SanityCmsImage);
+  }, [selectedIndex, lightboxImages]);
+
+  const openAtLightboxIndex = useCallback(
+    (image: SanityImage) => {
+      const idx = lightboxImages.findIndex(
+        (img) => img.asset?._ref === image.asset?._ref,
+      );
+      setSelectedIndex(idx >= 0 ? idx : 0);
+    },
+    [lightboxImages],
+  );
 
   const selectedImage =
     selectedIndex !== null ? lightboxImages[selectedIndex] : null;
@@ -101,6 +120,9 @@ export function ProjectPhotoGrid({
         projectLocation,
       )
     : "";
+  const selectedSrc = selectedImage
+    ? lightboxImageUrl(selectedImage as SanityCmsImage)
+    : null;
 
   const canPrev = selectedIndex !== null && selectedIndex > 0;
   const canNext =
@@ -112,24 +134,32 @@ export function ProjectPhotoGrid({
 
   return (
     <>
-      <ScrollRevealGroup stagger={0.05} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ScrollRevealGroup
+        stagger={0.05}
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {thumbnailImages.map((img) => (
-          <ScrollReveal
-            key={img.asset._ref}
-            className="h-64"
-          >
+          <ScrollReveal key={img.asset._ref} className="h-64">
             <button
               type="button"
               onClick={(event) => {
                 lastFocusedRef.current = event.currentTarget;
                 openAtLightboxIndex(img);
               }}
+              onMouseEnter={() => prefetchLightboxImage(img as SanityCmsImage)}
+              onFocus={() => prefetchLightboxImage(img as SanityCmsImage)}
+              onTouchStart={() => prefetchLightboxImage(img as SanityCmsImage)}
               className="group relative h-full w-full cursor-pointer overflow-hidden rounded-2xl border border-graphite/8 bg-parchment text-left shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
               aria-label={`Open image: ${buildImageAltText(img.alt, projectTitle, services, projectLocation)}`}
             >
               <SanityImageComponent
                 image={img}
-                alt={buildImageAltText(img.alt, projectTitle, services, projectLocation)}
+                alt={buildImageAltText(
+                  img.alt,
+                  projectTitle,
+                  services,
+                  projectLocation,
+                )}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
@@ -139,7 +169,7 @@ export function ProjectPhotoGrid({
         ))}
       </ScrollRevealGroup>
 
-      {selectedImage ? (
+      {selectedImage && selectedSrc ? (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-graphite/92 p-4 backdrop-blur-sm"
           role="dialog"
@@ -186,16 +216,21 @@ export function ProjectPhotoGrid({
           </button>
 
           <div
-            className="relative h-[78vh] w-full max-w-5xl overflow-hidden rounded-2xl shadow-2xl"
+            className="relative h-[78vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-graphite/40 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <SanityImageComponent
-              image={selectedImage}
+            <Image
+              key={selectedSrc}
+              src={selectedSrc}
               alt={selectedAlt}
-              sizes="100vw"
               fill
-              className="object-contain"
+              sizes="(max-width: 1024px) 100vw, 1024px"
               priority
+              unoptimized
+              className={`object-contain transition-opacity duration-200 ease-out ${
+                lightboxReady ? "opacity-100" : "opacity-0"
+              }`}
+              onLoad={() => setLightboxReady(true)}
             />
           </div>
 
