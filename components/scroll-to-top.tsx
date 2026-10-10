@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { siteLayerClass } from "@/lib/site-layers";
+
 export function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);
 
@@ -22,7 +24,8 @@ export function ScrollToTopButton() {
         <motion.button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-[80] inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-gold/55 bg-gold/90 text-stone-white shadow-xl backdrop-blur-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-stone-white sm:bottom-8 sm:right-8"
+          data-scroll-top=""
+          className={`fixed bottom-6 right-6 ${siteLayerClass.scrollTop} inline-flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-gold/55 bg-gold/90 text-stone-white shadow-xl backdrop-blur-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-stone-white sm:bottom-8 sm:right-8`}
           aria-label="Scroll back to the top of the page"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

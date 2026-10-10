@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import {
   useCallback,
   useEffect,
@@ -12,6 +13,7 @@ import {
 import type { Image as SanityCmsImage } from "sanity";
 
 import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
+import { siteLayerClass } from "@/lib/site-layers";
 import { imageAssetRef } from "@/lib/image-asset-ref";
 import {
   lightboxImageUrl,
@@ -250,9 +252,10 @@ export function ProjectPhotoGrid({
         ))}
       </ScrollRevealGroup>
 
-      {selectedImage && selectedSrc ? (
+      {selectedImage && selectedSrc
+        ? createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-graphite/92 p-4 backdrop-blur-sm"
+          className={`fixed inset-0 ${siteLayerClass.viewer} flex items-center justify-center bg-graphite/92 p-4 backdrop-blur-sm`}
           role="dialog"
           aria-modal="true"
           aria-label={`${projectTitle}. ${selectedAlt}`}
@@ -342,8 +345,10 @@ export function ProjectPhotoGrid({
               ? `${selectedIndex + 1} / ${lightboxImages.length}`
               : ""}
           </div>
-        </div>
-      ) : null}
+        </div>,
+        document.body,
+      )
+        : null}
     </>
   );
 }

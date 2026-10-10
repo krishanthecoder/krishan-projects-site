@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { MobileNav } from "@/components/mobile-nav";
 import { Navbar } from "@/components/navbar";
 import { ScrollToTopButton } from "@/components/scroll-to-top";
 import { SiteFooter } from "@/components/site-footer";
@@ -27,6 +28,7 @@ export function SiteChrome({ children }: SiteChromeProps) {
       </a>
 
       <Navbar businessName={businessName} phoneNumber={phoneNumber} />
+      <MobileNav phoneNumber={phoneNumber} />
 
       <div className="flex min-h-0 flex-1 flex-col">{children}</div>
 

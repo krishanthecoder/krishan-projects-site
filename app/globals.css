@@ -523,3 +523,7 @@ body {
   cursor: not-allowed;
 }
 
+body:has([role="dialog"][aria-modal="true"]) [data-scroll-top] {
+  display: none;
+}
+

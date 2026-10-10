@@ -1,0 +1,29 @@
+---
+description: Keep the phone menu isolated from other page changes
+alwaysApply: true
+---
+
+# Mobile navigation
+
+The phone menu is isolated on purpose. Later page work must not fold it back into other components or paint over it.
+
+## Where it lives
+
+- Button, overlay, open animation, and scroll lock: `components/mobile-nav.tsx` only.
+- It mounts on `document.body` (`#mobile-nav-root`), outside the header and outside page sections.
+- Do not edit that file unless the user asked to change the phone menu.
+- New links go in `lib/site-nav.ts`. Do not rebuild the menu to add a link.
+
+## Layers
+
+Use `siteLayerClass` from `lib/site-layers.ts`. Do not invent a new fixed z-index.
+
+- Header `z-40`. Back to top `z-[80]`. Menu panel `z-[90]`. Menu button `z-[100]`. Fullscreen viewers `z-[120]`.
+- Video and photo viewers portal to `document.body`, use the viewer layer, and stay above the menu.
+- While a `role="dialog"` is open, `[data-scroll-top]` stays hidden (`app/globals.css`).
+
+## Do not
+
+- Put the menu button or overlay back inside the header, or inside anything with blur, transform, or animation.
+- Change the fade-open, or add a circle wipe or full-screen blur on the menu.
+- Raise another control above the menu button except a fullscreen viewer.

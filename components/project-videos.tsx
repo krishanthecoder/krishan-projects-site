@@ -3,8 +3,10 @@
 import { Play } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MouseEvent } from "react";
+import { createPortal } from "react-dom";
 
 import { SanityImage } from "@/components/sanity-image";
+import { siteLayerClass } from "@/lib/site-layers";
 import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
 import type { ProjectVideo } from "@/lib/sanity.queries";
 
@@ -88,9 +90,9 @@ function VideoDialog({
     });
   }, [video]);
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-graphite/92 p-4 backdrop-blur-sm"
+      className={`fixed inset-0 ${siteLayerClass.viewer} flex items-center justify-center bg-graphite/92 p-4 backdrop-blur-sm`}
       role="dialog"
       aria-modal="true"
       aria-label={video.title ?? "Project video"}
@@ -128,7 +130,8 @@ function VideoDialog({
           </p>
         ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

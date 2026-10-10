@@ -2,59 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState, type MouseEvent } from "react";
+
 import { BrandLockup } from "@/components/brand/brand-lockup";
+import { CLOSE_MOBILE_NAV_EVENT } from "@/components/mobile-nav";
+import { siteLayerClass } from "@/lib/site-layers";
+import { isNavLinkActive, navLinks } from "@/lib/site-nav";
 
 type NavbarProps = {
   businessName: string;
   phoneNumber: string;
 };
 
-const navLinks = [
-  { name: "Services", href: "/services" },
-  { name: "Projects", href: "/projects" },
-  { name: "Contact", href: "/contact" },
-];
-const mobileNavLinks = [{ name: "Home", href: "/" }, ...navLinks];
-
-/** Home is exact-match only; other items stay active on nested routes (e.g. /projects/[slug]). */
-function isNavLinkActive(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-const menuPanel: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.2, ease: "easeOut" } },
-  exit: { opacity: 0, transition: { duration: 0.15, ease: "easeIn" } },
-};
-
-const linkContainer = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const linkItem = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.22 } },
-};
-
-const mobileNavLinkClass = (isActive: boolean) =>
-  [
-    "block rounded-xl px-4 py-3 text-4xl font-bold tracking-tight transition duration-200",
-    "hover:translate-x-1 hover:scale-[1.06] hover:underline hover:underline-offset-8",
-    isActive ? "text-gold" : "text-stone-white",
-  ].join(" ");
-
 export function Navbar({ businessName, phoneNumber }: NavbarProps) {
   const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -64,19 +26,11 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsMenuOpen(false);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-
   const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    window.dispatchEvent(new Event(CLOSE_MOBILE_NAV_EVENT));
     if (pathname !== "/") return;
 
     event.preventDefault();
-    setIsMenuOpen(false);
 
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -84,162 +38,57 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
     window.scrollTo({ top: 0, left: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
   };
 
-  useEffect(() => {
-    if (!isMenuOpen) return;
-
-    const scrollY = window.scrollY;
-    const htmlElement = document.documentElement;
-    const previousScrollBehavior = htmlElement.style.scrollBehavior;
-    htmlElement.style.scrollBehavior = "auto";
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = "100%";
-    document.body.style.overflow = "hidden";
-    document.body.style.touchAction = "none";
-
-    return () => {
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
-      document.body.style.touchAction = "";
-      window.scrollTo(0, scrollY);
-      htmlElement.style.scrollBehavior = previousScrollBehavior;
-    };
-  }, [isMenuOpen]);
-
   return (
-    <>
-      <header
-        className={`sticky top-0 z-40 border-b border-graphite/8 bg-stone-white/95 backdrop-blur-sm transition-shadow ${
-          isScrolled ? "shadow-[0_8px_24px_-16px_rgba(0,0,0,0.35)]" : ""
-        }`}
-      >
-        <div className="mx-auto flex min-h-20 max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-10">
-          <motion.div
+    <header
+      className={`sticky top-0 ${siteLayerClass.header} border-b border-graphite/8 bg-stone-white/95 backdrop-blur-sm transition-shadow ${
+        isScrolled ? "shadow-[0_8px_24px_-16px_rgba(0,0,0,0.35)]" : ""
+      }`}
+    >
+      <div className="mx-auto flex min-h-20 max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-10">
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.24 }}
+        >
+          <Link
+            href="/"
+            onClick={handleLogoClick}
+            className="transition duration-200 hover:scale-105 hover:brightness-115 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+            aria-label={`${businessName} home`}
+          >
+            <BrandLockup compact alt={businessName} />
+          </Link>
+        </motion.div>
+
+        <div className="hidden items-center gap-8 md:flex">
+          <nav aria-label="Main navigation" className="flex items-center gap-8">
+            {navLinks.map((link) => {
+              const isActive = isNavLinkActive(pathname, link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-bold uppercase tracking-wider transition-colors ${
+                    isActive ? "text-gold" : "text-graphite hover:text-gold"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
+          <motion.a
+            href={`tel:${phoneNumber.replace(/\s/g, "")}`}
+            className="shrink-0 rounded-xl bg-gold px-4 py-2 text-sm font-bold text-stone-white shadow-sm transition-all hover:bg-gold/90 active:scale-95 active:bg-gold/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            aria-label={`Call us at ${phoneNumber}`}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24 }}
+            transition={{ duration: 0.24, delay: 0.08 }}
           >
-            <Link
-              href="/"
-              onClick={handleLogoClick}
-              className="transition duration-200 hover:scale-105 hover:brightness-115 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-              aria-label={`${businessName} home`}
-            >
-              <BrandLockup compact alt={businessName} />
-            </Link>
-          </motion.div>
-
-          <div className="hidden items-center gap-8 md:flex">
-            <nav aria-label="Main navigation" className="flex items-center gap-8">
-              {navLinks.map((link) => {
-                const isActive = isNavLinkActive(pathname, link.href);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`text-sm font-bold uppercase tracking-wider transition-colors ${
-                      isActive ? "text-gold" : "text-graphite hover:text-gold"
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                );
-              })}
-            </nav>
-            <motion.a
-              href={`tel:${phoneNumber.replace(/\s/g, "")}`}
-              className="shrink-0 rounded-xl bg-gold px-4 py-2 text-sm font-bold text-stone-white shadow-sm transition-all hover:bg-gold/90 active:scale-95 active:bg-gold/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-              aria-label={`Call us at ${phoneNumber}`}
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.24, delay: 0.08 }}
-            >
-              {phoneNumber}
-            </motion.a>
-          </div>
+            {phoneNumber}
+          </motion.a>
         </div>
-      </header>
-
-      <button
-        type="button"
-        className={`fixed right-4 top-4 z-[100] inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border transition-colors duration-200 md:hidden ${
-          isMenuOpen
-            ? "border-stone-white/25 bg-slate-900/70"
-            : "border-graphite/15 bg-stone-white/85"
-        }`}
-        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-        aria-expanded={isMenuOpen}
-        onClick={() => setIsMenuOpen((prev) => !prev)}
-      >
-        <div className="relative h-4 w-5">
-          <motion.span
-            className={`absolute left-0 top-0 h-[2px] w-5 rounded transition-colors duration-200 ${
-              isMenuOpen ? "bg-stone-white" : "bg-graphite"
-            }`}
-            animate={isMenuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-            transition={{ duration: 0.22 }}
-          />
-          <motion.span
-            className={`absolute left-0 top-[6px] h-[2px] w-5 rounded transition-colors duration-200 ${
-              isMenuOpen ? "bg-stone-white" : "bg-graphite"
-            }`}
-            animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
-            transition={{ duration: 0.18 }}
-          />
-          <motion.span
-            className={`absolute left-0 top-[12px] h-[2px] w-5 rounded transition-colors duration-200 ${
-              isMenuOpen ? "bg-stone-white" : "bg-graphite"
-            }`}
-            animate={isMenuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-            transition={{ duration: 0.22 }}
-          />
-        </div>
-      </button>
-
-      <AnimatePresence>
-        {isMenuOpen ? (
-          <motion.nav
-            aria-label="Mobile navigation"
-            className="fixed inset-0 z-[90] flex flex-col justify-center bg-slate-900/95 p-6 md:hidden"
-            variants={menuPanel}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <motion.ul
-              className="mx-auto w-full max-w-md space-y-5 text-center"
-              variants={linkContainer}
-              initial="hidden"
-              animate="visible"
-            >
-              {mobileNavLinks.map((link) => {
-                const isActive = isNavLinkActive(pathname, link.href);
-                return (
-                  <motion.li key={link.href} variants={linkItem}>
-                    <Link
-                      href={link.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      className={mobileNavLinkClass(isActive)}
-                    >
-                      {link.name}
-                    </Link>
-                  </motion.li>
-                );
-              })}
-            </motion.ul>
-
-            <a
-              href={`tel:${phoneNumber.replace(/\s/g, "")}`}
-              className="mx-auto mt-10 inline-flex w-full max-w-md items-center justify-center rounded-xl bg-gold px-4 py-3 text-sm font-bold text-stone-white shadow-sm"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {phoneNumber}
-            </a>
-          </motion.nav>
-        ) : null}
-      </AnimatePresence>
-    </>
+      </div>
+    </header>
   );
 }
