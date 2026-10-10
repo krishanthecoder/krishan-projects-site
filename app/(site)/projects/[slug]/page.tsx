@@ -442,7 +442,7 @@ export default async function ProjectDetailPage({
               </p>
               <div className="mt-6">
                 <ProjectPhotoGrid
-                  lightboxImages={project.images}
+                  lightboxImages={thumbnailImages}
                   thumbnailImages={thumbnailImages}
                   projectTitle={project.title}
                   projectLocation={project.projectLocation}
