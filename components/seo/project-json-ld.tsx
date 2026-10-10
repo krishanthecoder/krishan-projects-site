@@ -1,3 +1,11 @@
+export type ProjectVideoJsonLd = {
+  name: string;
+  description: string;
+  contentUrl: string;
+  thumbnailUrl: string;
+  uploadDate: string;
+};
+
 type ProjectJsonLdProps = {
   canonicalUrl: string;
   siteUrl: string;
@@ -5,6 +13,7 @@ type ProjectJsonLdProps = {
   title: string;
   description: string;
   heroImageUrl?: string;
+  videos?: ProjectVideoJsonLd[];
 };
 
 /**
@@ -17,7 +26,17 @@ export function ProjectJsonLd({
   title,
   description,
   heroImageUrl,
+  videos = [],
 }: ProjectJsonLdProps) {
+  const videoObjects = videos.map((video, index) => ({
+    "@type": "VideoObject",
+    "@id": `${canonicalUrl}#video-${index + 1}`,
+    name: video.name,
+    description: video.description,
+    thumbnailUrl: video.thumbnailUrl,
+    uploadDate: video.uploadDate,
+    contentUrl: video.contentUrl,
+  }));
   const graph: Record<string, unknown>[] = [
     {
       "@context": "https://schema.org",
@@ -62,6 +81,11 @@ export function ProjectJsonLd({
               "@type": "ImageObject",
               url: heroImageUrl,
             },
+          }
+        : {}),
+      ...(videoObjects.length > 0
+        ? {
+            video: videoObjects.length === 1 ? videoObjects[0] : videoObjects,
           }
         : {}),
     },

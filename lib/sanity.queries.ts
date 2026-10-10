@@ -116,6 +116,10 @@ export type ProjectVideo = {
   mimeType?: string;
   size?: number;
   filename?: string;
+  /** ISO timestamp from the Sanity file asset. Used as the video upload date. */
+  uploadedAt?: string;
+  /** Still shown before play. Falls back to the video’s first frame when unset. */
+  poster?: SanityImage;
 };
 
 export type GalleryImageItem = {
@@ -327,12 +331,24 @@ const projectBySlugQuery = groq`*[_type == "project" && slug.current == $slug][0
   videos[]{
     _key,
     title,
+    poster{
+      alt,
+      hotspot,
+      crop,
+      asset->{
+        _id,
+        metadata{
+          lqip
+        }
+      }
+    },
     asset->{
       _id,
       url,
       mimeType,
       size,
-      originalFilename
+      originalFilename,
+      _createdAt
     }
   },
   "images": images[]{
@@ -403,11 +419,13 @@ function normalizeResolvedCategories(
 type ProjectVideoFromGroq = {
   _key?: string;
   title?: string;
+  poster?: SanityImage | null;
   asset?: {
     url?: string;
     mimeType?: string;
     size?: number;
     originalFilename?: string;
+    _createdAt?: string;
   } | null;
 };
 
@@ -425,6 +443,14 @@ function normalizeProjectVideos(
       mimeType: row.asset?.mimeType,
       size: row.asset?.size,
       filename: row.asset?.originalFilename,
+      uploadedAt: row.asset?._createdAt,
+      poster:
+        row.poster?.asset != null
+          ? normalizeSanityImage({
+              ...row.poster,
+              _type: "image",
+            })
+          : undefined,
     }));
 }
 

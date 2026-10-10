@@ -1,0 +1,28 @@
+---
+description: How to prepare and show project videos (file size, card size, logo intro)
+alwaysApply: true
+---
+
+# Project videos
+
+When adding or replacing a video on a project, follow this without asking the user to restate it.
+
+## File
+
+- **1920×1080**, 16:9, **MP4**, H.264, AAC stereo **128 kbps**.
+- About **5 Mbps**. For a clip of roughly 1–2 minutes, land around **50–70 MB**. Stay **under 100 MB**.
+- **Fast start** so playback can begin before the file finishes downloading.
+- Strip location and other camera metadata. Leave the original file untouched and write a separate web file.
+
+## Logo intro
+
+- Open with a short logo card (**about 3 seconds**) on graphite `#333333`, using `public/brand/navbar-logo-v3-inverted.png` and a short gold `#C4973D` line under the lockup.
+- Fade the logo in, then dissolve into the footage. The logo is not the thumbnail.
+
+## On the project page
+
+- One video section only, in this order: featured image, description, **Videos from this job**, then photo thumbnails. Do not add a second video block higher on the page.
+- Keep each video card at the existing size: **`h-64`** inside `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`. Do not stretch a single video to full width.
+- Set the Sanity video **Thumbnail** (`poster`) to a still from the footage (after the logo) that shows the work, with alt text. That still is the card image only.
+- Do not set that still as the player `poster`. Playback starts on the logo.
+- Keep the file URL in the page HTML and emit `VideoObject` (name, description, thumbnail, upload date, content URL) so the clip can be indexed.

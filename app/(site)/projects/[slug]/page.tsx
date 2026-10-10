@@ -9,7 +9,7 @@ import { PortableText, type PortableTextComponents } from "@portabletext/react";
 import { ProjectFeaturedMedia } from "@/components/project-featured-media";
 import { ProjectPhotoGrid } from "@/components/project-photo-grid";
 import { ProjectVideos } from "@/components/project-videos";
-import { ProjectJsonLd } from "@/components/seo/project-json-ld";
+import { ProjectJsonLd, type ProjectVideoJsonLd } from "@/components/seo/project-json-ld";
 import { SanityImage } from "@/components/sanity-image";
 import { ScrollReveal, ScrollRevealGroup } from "@/components/ui/scroll-reveal";
 import { sortLabelsAlphabetically } from "@/lib/gallery-category-sort";
@@ -256,6 +256,25 @@ export default async function ProjectDetailPage({
           .url()
       : undefined;
 
+  const videoUploadFallback = project._updatedAt;
+  const videoJsonLd: ProjectVideoJsonLd[] = project.videos.flatMap((video) => {
+    const thumbnailUrl = video.poster?.asset
+      ? urlFor(video.poster as Image).width(1280).auto("format").url()
+      : heroImageUrl;
+    const uploadDate = video.uploadedAt ?? videoUploadFallback;
+    if (!video.url || !thumbnailUrl || !uploadDate) return [];
+    const name = video.title?.trim() || `${project.title} video`;
+    return [
+      {
+        name,
+        description: `Watch ${name} from ${project.title}.`,
+        contentUrl: video.url,
+        thumbnailUrl,
+        uploadDate,
+      },
+    ];
+  });
+
   const heroRef = imageAssetRef(project.featuredImage);
   const beforeRef = imageAssetRef(project.beforeImage);
   const dedupedThumbs = project.images.filter((img) => {
@@ -286,6 +305,7 @@ export default async function ProjectDetailPage({
         title={project.title}
         description={metaDescription}
         heroImageUrl={heroImageUrl}
+        videos={videoJsonLd}
       />
       <div className="mx-auto max-w-6xl px-6 py-16 sm:px-10 sm:py-20">
         <ScrollRevealGroup>

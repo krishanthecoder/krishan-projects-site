@@ -202,7 +202,25 @@ export const projectSchema = defineType({
               name: "title",
               title: "Label",
               type: "string",
-              description: "Optional short label shown above the video.",
+              description: "Optional short label shown with the video.",
+            }),
+            defineField({
+              name: "poster",
+              title: "Thumbnail",
+              type: "image",
+              options: { hotspot: true },
+              description:
+                "Still shown on the project page before the video plays. Use a frame of the work, not a title card.",
+              fields: [
+                defineField({
+                  name: "alt",
+                  title: "Alt text",
+                  type: "string",
+                  description:
+                    "Describe the still for accessibility (e.g. 'Mini-digger excavating for a rear extension in Chigwell').",
+                  validation: imageAltWhenAsset(10),
+                }),
+              ],
             }),
           ],
         }),
