@@ -10,6 +10,7 @@
     "sanity": "sanity",
     "studio:dev": "sanity dev",
     "seed:example-project": "node scripts/seed-example-project.mjs",
+    "seed:project-order": "node scripts/seed-project-order.mjs",
     "import:checkatrade-testimonials": "node scripts/import-checkatrade-testimonials.mjs",
     "migrate:gallery-categories-to-inline": "node scripts/migrate-gallery-categories-to-inline.mjs",
     "cleanup:daily": "pkill -f \"next dev\" || true && rm -rf .next && npm cache clean --force",
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",
+    "@sanity/orderable-document-list": "^2.0.26",
     "@sanity/ui": "^3.1.14",
     "framer-motion": "^12.38.0",
     "groq": "^5.21.0",

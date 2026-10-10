@@ -1,3 +1,4 @@
+import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
 import { GalleryCategoriesField } from "../components/gallery-categories-field";
@@ -39,7 +40,11 @@ export const projectSchema = defineType({
   name: "project",
   title: "Projects",
   type: "document",
+  orderings: [orderRankOrdering],
   fields: [
+    // Hidden rank used by the Projects list drag-and-drop order.
+    // New projects are inserted at the top until you drag them.
+    orderRankField({ type: "project", newItemPosition: "before" }),
     defineField({
       name: "title",
       title: "Title",

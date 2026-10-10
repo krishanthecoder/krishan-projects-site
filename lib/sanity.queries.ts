@@ -142,7 +142,13 @@ export type Testimonial = {
   content: string;
 };
 
-const allProjectsQuery = groq`*[_type == "project"] | order(_createdAt desc){
+/**
+ * Public project lists follow the drag order from Studio (Projects).
+ * Anything not ranked yet stays in newest-first order, after ranked jobs.
+ */
+const projectDisplayOrder = "coalesce(orderRank, \"z\") asc, _createdAt desc";
+
+const allProjectsQuery = groq`*[_type == "project"] | order(${projectDisplayOrder}){
   _id,
   title,
   "slug": slug.current,
@@ -261,7 +267,7 @@ const latestProjectsForGalleryQuery = groq`*[_type == "project"] | order(_create
   )
 }`;
 
-const galleryProjectsRowQuery = groq`*[_type == "project" && defined(slug.current)] | order(_createdAt desc)[0...6]{
+const galleryProjectsRowQuery = groq`*[_type == "project" && defined(slug.current)] | order(${projectDisplayOrder}){
   _id,
   "slug": slug.current,
   title,

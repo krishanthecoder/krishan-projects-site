@@ -1,3 +1,4 @@
+import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import type { StructureResolver } from "sanity/structure";
 
 import { DiscardedTestimonialEditPane } from "./components/discarded-testimonial-edit-pane";
@@ -31,7 +32,7 @@ export {
   TESTIMONIAL_SUBMISSIONS_MIDDLE_PANE_ID,
 } from "./structurePaneIds";
 
-const HIDDEN_DESK_TYPES = new Set(["siteSettings", "media.tag", "testimonial"]);
+const HIDDEN_DESK_TYPES = new Set(["siteSettings", "media.tag", "testimonial", "project"]);
 
 function resolveTestimonialsChild(S: Parameters<StructureResolver>[0], itemId: string) {
   switch (itemId) {
@@ -83,7 +84,7 @@ function resolveTestimonialsChild(S: Parameters<StructureResolver>[0], itemId: s
 }
 
 /** Shared by `sanity.config.ts` (CLI) and `app/studio/[[...tool]]/page.tsx` (embedded Studio). */
-export const deskStructure: StructureResolver = (S) =>
+export const deskStructure: StructureResolver = (S, context) =>
   S.list()
     .title("Content")
     .items([
@@ -106,5 +107,12 @@ export const deskStructure: StructureResolver = (S) =>
             .component(TestimonialsStructureNavPane)
             .child((itemId) => resolveTestimonialsChild(S, itemId)),
         ),
+      orderableDocumentListDeskItem({
+        type: "project",
+        title: "Projects",
+        id: "project",
+        S,
+        context,
+      }),
       ...S.documentTypeListItems().filter((item) => !HIDDEN_DESK_TYPES.has(item.getId() ?? "")),
     ]);
