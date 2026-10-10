@@ -25,17 +25,9 @@ function isNavLinkActive(pathname: string, href: string) {
 }
 
 const menuPanel: Variants = {
-  hidden: { clipPath: "circle(0px at calc(100% - 2rem) 2rem)", opacity: 0.95 },
-  visible: {
-    clipPath: "circle(150vmax at calc(100% - 2rem) 2rem)",
-    opacity: 1,
-    transition: { stiffness: 180, damping: 26, mass: 0.8 },
-  },
-  exit: {
-    clipPath: "circle(0px at calc(100% - 2rem) 2rem)",
-    opacity: 0.95,
-    transition: { duration: 0.28 },
-  },
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.2, ease: "easeOut" } },
+  exit: { opacity: 0, transition: { duration: 0.15, ease: "easeIn" } },
 };
 
 const linkContainer = {
@@ -97,6 +89,8 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
 
     const scrollY = window.scrollY;
     const htmlElement = document.documentElement;
+    const previousScrollBehavior = htmlElement.style.scrollBehavior;
+    htmlElement.style.scrollBehavior = "auto";
     document.body.style.position = "fixed";
     document.body.style.top = `-${scrollY}px`;
     document.body.style.width = "100%";
@@ -109,73 +103,68 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
       document.body.style.width = "";
       document.body.style.overflow = "";
       document.body.style.touchAction = "";
-      const previousScrollBehavior = htmlElement.style.scrollBehavior;
-      htmlElement.style.scrollBehavior = "auto";
       window.scrollTo(0, scrollY);
-      requestAnimationFrame(() => {
-        htmlElement.style.scrollBehavior = previousScrollBehavior;
-      });
+      htmlElement.style.scrollBehavior = previousScrollBehavior;
     };
   }, [isMenuOpen]);
 
   return (
-    <header
-      className={`sticky top-0 z-40 border-b border-graphite/8 bg-stone-white/95 backdrop-blur-sm transition-shadow ${
-        isScrolled ? "shadow-[0_8px_24px_-16px_rgba(0,0,0,0.35)]" : ""
-      }`}
-    >
-      <div className="mx-auto flex min-h-20 max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.24 }}
-        >
-          <Link
-            href="/"
-            onClick={handleLogoClick}
-            className="transition duration-200 hover:scale-105 hover:brightness-115 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-            aria-label={`${businessName} home`}
-          >
-            <BrandLockup compact alt={businessName} />
-          </Link>
-        </motion.div>
-
-        <div className="hidden items-center gap-8 md:flex">
-          <nav aria-label="Main navigation" className="flex items-center gap-8">
-            {navLinks.map((link) => {
-              const isActive = isNavLinkActive(pathname, link.href);
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`text-sm font-bold uppercase tracking-wider transition-colors ${
-                    isActive
-                      ? "text-gold"
-                      : "text-graphite hover:text-gold"
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              );
-            })}
-          </nav>
-          <motion.a
-            href={`tel:${phoneNumber.replace(/\s/g, "")}`}
-            className="shrink-0 rounded-xl bg-gold px-4 py-2 text-sm font-bold text-stone-white shadow-sm transition-all hover:bg-gold/90 active:scale-95 active:bg-gold/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-            aria-label={`Call us at ${phoneNumber}`}
+    <>
+      <header
+        className={`sticky top-0 z-40 border-b border-graphite/8 bg-stone-white/95 backdrop-blur-sm transition-shadow ${
+          isScrolled ? "shadow-[0_8px_24px_-16px_rgba(0,0,0,0.35)]" : ""
+        }`}
+      >
+        <div className="mx-auto flex min-h-20 max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-10">
+          <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24, delay: 0.08 }}
+            transition={{ duration: 0.24 }}
           >
-            {phoneNumber}
-          </motion.a>
-        </div>
+            <Link
+              href="/"
+              onClick={handleLogoClick}
+              className="transition duration-200 hover:scale-105 hover:brightness-115 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+              aria-label={`${businessName} home`}
+            >
+              <BrandLockup compact alt={businessName} />
+            </Link>
+          </motion.div>
 
-      </div>
+          <div className="hidden items-center gap-8 md:flex">
+            <nav aria-label="Main navigation" className="flex items-center gap-8">
+              {navLinks.map((link) => {
+                const isActive = isNavLinkActive(pathname, link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`text-sm font-bold uppercase tracking-wider transition-colors ${
+                      isActive ? "text-gold" : "text-graphite hover:text-gold"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
+            </nav>
+            <motion.a
+              href={`tel:${phoneNumber.replace(/\s/g, "")}`}
+              className="shrink-0 rounded-xl bg-gold px-4 py-2 text-sm font-bold text-stone-white shadow-sm transition-all hover:bg-gold/90 active:scale-95 active:bg-gold/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+              aria-label={`Call us at ${phoneNumber}`}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.24, delay: 0.08 }}
+            >
+              {phoneNumber}
+            </motion.a>
+          </div>
+        </div>
+      </header>
 
       <button
         type="button"
-        className={`fixed right-4 top-4 z-[100] inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border transition-transform duration-200 ease-out hover:scale-110 md:hidden ${
+        className={`fixed right-4 top-4 z-[100] inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border transition-colors duration-200 md:hidden ${
           isMenuOpen
             ? "border-stone-white/25 bg-slate-900/70"
             : "border-graphite/15 bg-stone-white/85"
@@ -186,21 +175,21 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
       >
         <div className="relative h-4 w-5">
           <motion.span
-            className={`absolute left-0 top-0 h-[2px] w-5 rounded ${
+            className={`absolute left-0 top-0 h-[2px] w-5 rounded transition-colors duration-200 ${
               isMenuOpen ? "bg-stone-white" : "bg-graphite"
             }`}
             animate={isMenuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
             transition={{ duration: 0.22 }}
           />
           <motion.span
-            className={`absolute left-0 top-[6px] h-[2px] w-5 rounded ${
+            className={`absolute left-0 top-[6px] h-[2px] w-5 rounded transition-colors duration-200 ${
               isMenuOpen ? "bg-stone-white" : "bg-graphite"
             }`}
             animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
             transition={{ duration: 0.18 }}
           />
           <motion.span
-            className={`absolute left-0 top-[12px] h-[2px] w-5 rounded ${
+            className={`absolute left-0 top-[12px] h-[2px] w-5 rounded transition-colors duration-200 ${
               isMenuOpen ? "bg-stone-white" : "bg-graphite"
             }`}
             animate={isMenuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
@@ -213,7 +202,7 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
         {isMenuOpen ? (
           <motion.nav
             aria-label="Mobile navigation"
-            className="fixed inset-0 z-50 flex h-[100svh] flex-col justify-center bg-slate-900/90 p-6 backdrop-blur-xl md:hidden"
+            className="fixed inset-0 z-[90] flex flex-col justify-center bg-slate-900/95 p-6 md:hidden"
             variants={menuPanel}
             initial="hidden"
             animate="visible"
@@ -251,6 +240,6 @@ export function Navbar({ businessName, phoneNumber }: NavbarProps) {
           </motion.nav>
         ) : null}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
