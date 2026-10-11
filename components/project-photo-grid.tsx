@@ -7,6 +7,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -27,6 +28,18 @@ import { SanityImage as SanityImageComponent } from "./sanity-image";
 const modalNavButtonClass =
   "absolute top-1/2 z-[60] inline-flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-stone-white/20 bg-stone-white/10 text-stone-white shadow-sm backdrop-blur-sm transition hover:bg-stone-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold disabled:pointer-events-none disabled:opacity-30";
 
+/** First screen of the grid, and each step of “see more”. Fills three columns evenly. */
+const PHOTO_PAGE_SIZE = 12;
+
+function seeMoreLabel(remaining: number) {
+  const nextCount = Math.min(PHOTO_PAGE_SIZE, remaining);
+  if (remaining <= PHOTO_PAGE_SIZE) {
+    if (nextCount === 1) return "See the last photo";
+    return `See the last ${nextCount} photos`;
+  }
+  return `See ${nextCount} more photos`;
+}
+
 type ProjectPhotoGridProps = {
   /** Full set for the lightbox carousel (document order). */
   lightboxImages: SanityImage[];
@@ -45,6 +58,7 @@ export function ProjectPhotoGrid({
   services = [],
 }: ProjectPhotoGridProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PHOTO_PAGE_SIZE);
   const [lightboxReady, setLightboxReady] = useState(false);
   /** Keep the previous slide visible until the next one is decoded. */
   const [heldSrc, setHeldSrc] = useState<string | null>(null);
@@ -100,13 +114,19 @@ export function ProjectPhotoGrid({
     lengthRef.current = lightboxImages.length;
   }, [lightboxImages.length]);
 
-  // Warm lightbox-sized URLs for thumbs while the grid is on screen.
+  const visibleImages = useMemo(
+    () => thumbnailImages.slice(0, visibleCount),
+    [thumbnailImages, visibleCount],
+  );
+  const hiddenCount = thumbnailImages.length - visibleImages.length;
+
+  // Warm lightbox-sized URLs only for photos already on the page.
   useEffect(() => {
-    if (thumbnailImages.length === 0) return;
+    if (visibleImages.length === 0) return;
     let cancelled = false;
     const run = () => {
       if (cancelled) return;
-      for (const img of thumbnailImages) {
+      for (const img of visibleImages) {
         prefetchLightboxImage(img as SanityCmsImage);
       }
     };
@@ -129,7 +149,7 @@ export function ProjectPhotoGrid({
       cancelled = true;
       window.clearTimeout(timeout);
     };
-  }, [thumbnailImages]);
+  }, [visibleImages]);
 
   const selectedImage =
     selectedIndex !== null ? lightboxImages[selectedIndex] : null;
@@ -213,14 +233,13 @@ export function ProjectPhotoGrid({
 
   return (
     <>
-      <ScrollRevealGroup
-        stagger={0.05}
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-      >
-        {thumbnailImages.map((img, thumbIndex) => (
+      <ScrollRevealGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {visibleImages.map((img, thumbIndex) => (
           <ScrollReveal
             key={img._key ?? imageAssetRef(img) ?? `thumb-${thumbIndex}`}
             className="h-64"
+            delay={(thumbIndex % PHOTO_PAGE_SIZE) * 0.05}
+            when={thumbIndex < PHOTO_PAGE_SIZE ? "inView" : "mount"}
           >
             <button
               type="button"
@@ -251,6 +270,20 @@ export function ProjectPhotoGrid({
           </ScrollReveal>
         ))}
       </ScrollRevealGroup>
+
+      {hiddenCount > 0 ? (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() =>
+              setVisibleCount((count) => count + PHOTO_PAGE_SIZE)
+            }
+            className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-graphite/15 bg-stone-white px-6 py-3 text-sm font-semibold text-graphite shadow-sm transition hover:border-gold/60 hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+          >
+            {seeMoreLabel(hiddenCount)}
+          </button>
+        </div>
+      ) : null}
 
       {selectedImage && selectedSrc
         ? createPortal(
